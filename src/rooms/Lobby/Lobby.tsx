@@ -1,5 +1,13 @@
 export default function Lobby() {
-    return (
-        <h1>Lobby</h1>
-    );
+  return (
+    <section>
+      <h2>Lobby</h2>
+      <p>
+        Welcome to KAI HQ.
+      </p>
+      <p>
+        This is the starting point of the headquarters.
+      </p>
+    </section>
+  );
 }
