@@ -1,5 +1,10 @@
 export default function DocumentVault() {
-     return (
-           <h1>Document Vault</h1>
-     );
+    return (
+        <section>
+            <h2>Document Vault</h2>
+            <p>
+                Resume and important documents.
+            </p>
+        </section>
+    );
 }

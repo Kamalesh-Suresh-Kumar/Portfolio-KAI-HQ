@@ -1,0 +1,31 @@
+:root {
+  /* ===========================
+     Primary Theme
+  =========================== */
+  --primary: #6C63FF;
+  --primary-light: #8E88FF;
+  --primary-dark: #5147FF;
+  /* ===========================
+     Accent Colors
+  =========================== */
+  --accent-blue: #00C2FF;
+  --accent-green: #00D084;
+  --accent-orange: #FF9F43;
+  --accent-red: #FF4D6D;
+  /* ===========================
+     Backgrounds
+  =========================== */
+  --background: #0B0F19;
+  --surface: #131A2A;
+  --surface-light: #1B2438;
+  /* ===========================
+     Text
+  =========================== */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B9C1D9;
+  --text-muted: #6B7280;
+  /* ===========================
+     Borders
+  =========================== */
+  --border: #2C3553;
+}

@@ -1,5 +1,10 @@
 export default function AchievementHall() {
     return (
-        <h1>Achievement Hall</h1>
+        <section>
+            <h2>Achievement Hall</h2>
+            <p>
+                Awards and recognitions.
+            </p>
+        </section>
     );
 }

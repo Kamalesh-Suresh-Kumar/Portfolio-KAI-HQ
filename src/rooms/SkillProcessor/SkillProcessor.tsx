@@ -1,5 +1,10 @@
 export default function SkillProcessor() {
     return (
-        <h1>Skill Processor</h1>
+        <section>
+            <h2>Skill Processor</h2>
+            <p>
+                Skills and technologies.
+            </p>
+        </section>
     );
 }

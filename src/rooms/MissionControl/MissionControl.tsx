@@ -1,5 +1,10 @@
 export default function MissionControl() {
     return (
-        <h1>Mission Control</h1>
+        <section>
+            <h2>Mission Control</h2>
+            <p>
+                AI assistant and headquarters controls.
+            </p>
+        </section>
     );
 }

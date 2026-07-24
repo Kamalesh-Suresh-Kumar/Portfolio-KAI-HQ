@@ -1,5 +1,10 @@
 export default function MemoryArchive() {
     return (
-        <h1>Memory Archive</h1>
+        <section>
+            <h2>Memory Archive</h2>
+            <p>
+                Certifications, learning history and experience.
+            </p>
+        </section>
     );
 }
