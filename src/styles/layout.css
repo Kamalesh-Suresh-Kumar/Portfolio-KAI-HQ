@@ -1,0 +1,108 @@
+* {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+}
+
+body {
+     background: #050b16;
+     color: white;
+     font-family: Segoe UI, sans-serif;
+}
+
+.layout {
+     height: 100vh;
+     display: flex;
+     flex-direction: column;
+}
+
+.header {
+     height: 80px;
+     background: #0d1628;
+     border-bottom: 1px solid #1b3358;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 0 30px;
+}
+
+.header h1 {
+     font-size: 32px;
+}
+
+.header p {
+     color: #8aa4d6;
+}
+
+.room-label {
+     color: #58c4ff;
+     font-size: 12px;
+     letter-spacing: 2px;
+}
+
+.header-right {
+     text-align: right;
+}
+
+.layout-body {
+     flex: 1;
+     display: flex;
+}
+
+.sidebar {
+     width: 280px;
+     background: #09101d;
+     border-right: 1px solid #1b3358;
+
+     display: flex;
+     flex-direction: column;
+}
+
+.sidebar-logo {
+     padding: 25px;
+     border-bottom: 1px solid #1b3358;
+}
+
+.sidebar nav {
+     display: flex;
+     flex-direction: column;
+     padding: 15px;
+     gap: 10px;
+}
+
+.nav-item {
+     height: 48px;
+     background:transparent;
+     color: white;
+     border: none;
+     border-radius: 10px;
+     display: flex;
+     align-items: center;
+     gap: 15px;
+     padding: 0 15px;
+     cursor: pointer;
+     transition: .25s;
+}
+
+.nav-item:hover {
+     background: #12213b;
+}
+
+.nav-icon {
+     font-size: 20px;
+}
+
+.main-content {
+     flex: 1;
+     background: #0f1729;
+     padding: 35px;
+     overflow: auto;
+}
+.nav-item.active{
+    background:#1a3d6d;
+    color:#58c4ff;
+    border-left:4px solid #58c4ff;
+}
+.nav-item.active .nav-icon{
+    color:#58c4ff;
+}

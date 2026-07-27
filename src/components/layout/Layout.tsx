@@ -1,13 +1,13 @@
 import Header from "../navigation/Header";
 import Sidebar from "../navigation/Sidebar";
-import RoomContainer from "./RoomContainer";
+import MainContent from "./MainContent";
 export default function Layout() {
     return (
-        <div>
+        <div className="layout">
             <Header />
-            <div>
+            <div className="layout-body">
                 <Sidebar />
-                <RoomContainer />
+                <MainContent />
             </div>
         </div>
     );
