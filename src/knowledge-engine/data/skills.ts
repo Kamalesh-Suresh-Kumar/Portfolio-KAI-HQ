@@ -1,0 +1,173 @@
+import type { Skill } from '../types';
+
+export const skillsData: Skill[] = [
+  // Languages
+  {
+    id: 'typescript',
+    name: 'TypeScript',
+    category: 'languages',
+    proficiencyLevel: 'expert',
+    linkedProjectIds: ['kai-headquarters-os', 'conversational-intent-engine'],
+    description: 'Strict static typing, generic design, type inference, and interface-first architecture.',
+  },
+  {
+    id: 'javascript',
+    name: 'JavaScript (ESNext)',
+    category: 'languages',
+    proficiencyLevel: 'expert',
+    linkedProjectIds: ['kai-headquarters-os', 'ci-cd-knowledge-automation'],
+    description: 'Asynchronous programming, event loops, DOM performance, and modern ECMAScript standards.',
+  },
+  {
+    id: 'python',
+    name: 'Python',
+    category: 'languages',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['lifi-security-protocols'],
+    description: 'Scripting, network packet analysis, test harnesses, data structures, and automation.',
+  },
+  {
+    id: 'c-cpp',
+    name: 'C / C++',
+    category: 'languages',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['lifi-security-protocols'],
+    description: 'Systems programming, memory management, hardware-level communication, and embedded logic.',
+  },
+  {
+    id: 'sql',
+    name: 'SQL',
+    category: 'languages',
+    proficiencyLevel: 'intermediate',
+    linkedProjectIds: [],
+    description: 'Relational data modeling, schema design, indexing, and query optimization.',
+  },
+  {
+    id: 'html-css',
+    name: 'HTML5 & Modern CSS',
+    category: 'languages',
+    proficiencyLevel: 'expert',
+    linkedProjectIds: ['kai-headquarters-os'],
+    description: 'Semantic HTML, CSS custom properties, responsive layout design, and accessibility standards.',
+  },
+
+  // Frameworks & Libraries
+  {
+    id: 'react',
+    name: 'React 19',
+    category: 'frameworks',
+    proficiencyLevel: 'expert',
+    linkedProjectIds: ['kai-headquarters-os'],
+    description: 'Component architecture, custom hooks, context providers, state lifecycle, and rendering optimization.',
+  },
+  {
+    id: 'node-js',
+    name: 'Node.js & Express',
+    category: 'frameworks',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['ci-cd-knowledge-automation'],
+    description: 'Server runtime environments, RESTful API architecture, build automation scripts, and file I/O.',
+  },
+  {
+    id: 'tailwind-css',
+    name: 'Tailwind CSS',
+    category: 'frameworks',
+    proficiencyLevel: 'expert',
+    linkedProjectIds: ['kai-headquarters-os'],
+    description: 'Utility-first styling, responsive breakpoint systems, dark mode token design, and layout optimization.',
+  },
+  {
+    id: 'vite',
+    name: 'Vite',
+    category: 'frameworks',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['kai-headquarters-os', 'ci-cd-knowledge-automation'],
+    description: 'Modern build pipelines, fast HMR architectures, asset bundling, and production optimization.',
+  },
+
+  // Cybersecurity & Systems
+  {
+    id: 'network-security',
+    name: 'Network Security',
+    category: 'cybersecurity_systems',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['lifi-security-protocols'],
+    description: 'Packet capture analysis, communication protocols, firewalls, and attack vector mitigation.',
+  },
+  {
+    id: 'penetration-testing',
+    name: 'Penetration Testing',
+    category: 'cybersecurity_systems',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['lifi-security-protocols'],
+    description: 'Vulnerability assessment, physical/optical exploit vectors, and security audit reporting.',
+  },
+  {
+    id: 'linux',
+    name: 'Linux & Unix Shell',
+    category: 'cybersecurity_systems',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['lifi-security-protocols', 'ci-cd-knowledge-automation'],
+    description: 'Shell scripting, process management, file permissions, and environment configuration.',
+  },
+  {
+    id: 'cryptography',
+    name: 'Applied Cryptography',
+    category: 'cybersecurity_systems',
+    proficiencyLevel: 'intermediate',
+    linkedProjectIds: ['lifi-security-protocols'],
+    description: 'Encryption algorithms, key exchange fundamentals, hash functions, and secure transmission protocols.',
+  },
+
+  // Tools & Infrastructure
+  {
+    id: 'git-github',
+    name: 'Git & GitHub',
+    category: 'tools_infrastructure',
+    proficiencyLevel: 'expert',
+    linkedProjectIds: ['kai-headquarters-os', 'ci-cd-knowledge-automation'],
+    description: 'Branching workflows, version control, PR reviews, release management, and issue tracking.',
+  },
+  {
+    id: 'github-actions',
+    name: 'GitHub Actions (CI/CD)',
+    category: 'tools_infrastructure',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['ci-cd-knowledge-automation'],
+    description: 'Continuous integration workflows, automated deployment runners, artifact generation, and verification gates.',
+  },
+  {
+    id: 'devops-ci-cd',
+    name: 'DevOps & Build Pipelines',
+    category: 'tools_infrastructure',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['ci-cd-knowledge-automation'],
+    description: 'Build automation, linting automation, code quality enforcement, and static site hosting.',
+  },
+
+  // Domains & Architecture
+  {
+    id: 'web-architecture',
+    name: 'Full-Stack Architecture',
+    category: 'domains',
+    proficiencyLevel: 'expert',
+    linkedProjectIds: ['kai-headquarters-os'],
+    description: 'Separation of concerns, decoupled state engines, modular component design, and API design.',
+  },
+  {
+    id: 'algorithms',
+    name: 'Data Structures & Algorithms',
+    category: 'domains',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['conversational-intent-engine'],
+    description: 'Algorithmic complexity optimization, search trees, graphs, sorting, and dynamic programming.',
+  },
+  {
+    id: 'ui-ux-engineering',
+    name: 'UI/UX Engineering & A11y',
+    category: 'domains',
+    proficiencyLevel: 'advanced',
+    linkedProjectIds: ['kai-headquarters-os'],
+    description: 'WCAG AA accessibility guidelines, keyboard navigation, responsive layouts, and ergonomic interfaces.',
+  },
+];

@@ -1,0 +1,6 @@
+{
+  "name": "KAI HQ",
+  "description": "Kamalesh Artificial Intelligence Headquarters - An interactive AI-powered portfolio experience.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

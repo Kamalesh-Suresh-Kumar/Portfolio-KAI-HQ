@@ -1,6 +1,8 @@
 import Header from "../navigation/Header";
 import Sidebar from "../navigation/Sidebar";
 import MainContent from "./MainContent";
+import Assistant from "../assistant/Assistant";
+
 export default function Layout() {
     return (
         <div className="layout">
@@ -9,6 +11,7 @@ export default function Layout() {
                 <Sidebar />
                 <MainContent />
             </div>
+            <Assistant />
         </div>
     );
 }

@@ -1,0 +1,68 @@
+import type { RoomMetadata } from '../types';
+
+export const roomsMetadata: RoomMetadata[] = [
+  {
+    id: 'Lobby',
+    name: 'Lobby',
+    subtitle: 'System Hub & Orientation Point',
+    code: 'ROOM-01',
+    domain: 'Orientation & Core Systems',
+    description: 'Welcome hub, identity summary, AI core visualization, and primary entry point to KAI HQ.',
+  },
+  {
+    id: 'EngineeringLaboratory',
+    name: 'Engineering Laboratory',
+    subtitle: 'Project Specimen & Engineering Research',
+    code: 'ROOM-02',
+    domain: 'Software Projects & Architectures',
+    description: 'Filterable collection of engineering specimens, deep-dive architectural notes, and project repositories.',
+  },
+  {
+    id: 'MemoryArchive',
+    name: 'Memory Archive',
+    subtitle: 'Timeline & Career Chronology',
+    code: 'ROOM-03',
+    domain: 'Career & Academic History',
+    description: 'Chronological timeline of education, software engineering internships, naval cadetship, and technical society roles.',
+  },
+  {
+    id: 'AchievementHall',
+    name: 'Achievement Hall',
+    subtitle: 'Honors, Certifications & Credentials',
+    code: 'ROOM-04',
+    domain: 'Credentials & Verifications',
+    description: 'Evidentiary gallery showcasing law enforcement demonstrations, verified enterprise certifications, and leadership honors.',
+  },
+  {
+    id: 'DocumentVault',
+    name: 'Document Vault',
+    subtitle: 'Role-Tailored Resumes & Technical Papers',
+    code: 'ROOM-05',
+    domain: 'Deliverable Documents',
+    description: 'Role-tailored resume variants (Full-Stack, Backend, Cybersecurity, AI/Systems) with direct download capabilities.',
+  },
+  {
+    id: 'CommunicationCenter',
+    name: 'Communication Center',
+    subtitle: 'Direct Frequency & Contact Coordinates',
+    code: 'ROOM-06',
+    domain: 'Communication & Outlets',
+    description: 'Direct communication channels, GitHub repository coordinates, email links, and network presence.',
+  },
+  {
+    id: 'SkillProcessor',
+    name: 'Skill Processor',
+    subtitle: 'Categorized Technical Matrix & Toolchains',
+    code: 'ROOM-07',
+    domain: 'Skills & Proficiencies',
+    description: 'Structured matrix of programming languages, frameworks, security toolchains, and architectural domains with project linkages.',
+  },
+  {
+    id: 'MissionControl',
+    name: 'Mission Control',
+    subtitle: 'Global Telemetry, Search & Mode Controller',
+    code: 'ROOM-08',
+    domain: 'Command & Search Operations',
+    description: 'Central command surface offering full-text knowledge search, system telemetry, and visitor mode configuration.',
+  },
+];

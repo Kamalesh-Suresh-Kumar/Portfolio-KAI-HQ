@@ -1,0 +1,725 @@
+/* Document Vault Facility Styles */
+
+.document-vault {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.vault-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vault-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 4px 10px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.vault-headline-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vault-title {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.vault-subtitle {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  max-width: 750px;
+  margin: 0;
+}
+
+/* Stats Telemetry */
+.vault-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.vault-stat-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(30, 41, 59, 0.8);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vault-stat-value {
+  font-family: monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.vault-stat-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Controls */
+.vault-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .vault-controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.vault-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vault-filter-btn {
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vault-filter-btn:hover {
+  background: #334155;
+  color: #f1f5f9;
+  border-color: #475569;
+}
+
+.vault-filter-btn.active {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: #38bdf8;
+  font-weight: 600;
+}
+
+.vault-filter-count {
+  font-family: monospace;
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.vault-search-wrapper {
+  position: relative;
+  min-width: 220px;
+}
+
+.vault-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+}
+
+.vault-search-input {
+  width: 100%;
+  background: #090e1a;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 8px 12px 8px 32px;
+  font-size: 0.85rem;
+  color: #f1f5f9;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.vault-search-input:focus {
+  border-color: #38bdf8;
+}
+
+.vault-search-input::placeholder {
+  color: #475569;
+}
+
+/* Sections */
+.vault-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vault-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vault-section-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Resumes Grid */
+.vault-resumes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+/* Resume Card */
+.resume-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  transition: all 0.2s ease;
+}
+
+.resume-card:hover {
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 6px 20px -6px rgba(56, 189, 248, 0.12);
+  transform: translateY(-2px);
+}
+
+.resume-card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resume-meta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.resume-target-badge {
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.resume-updated-pill {
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.resume-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resume-card-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.resume-role-sub {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.resume-best-for {
+  font-size: 0.86rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(30, 41, 59, 0.6);
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.resume-highlights-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resume-highlights-title {
+  font-family: monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.resume-highlights-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resume-highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+.resume-skills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.resume-skill-tag {
+  font-family: monospace;
+  font-size: 0.72rem;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  color: #cbd5e1;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.resume-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid rgba(30, 41, 59, 0.8);
+}
+
+.resume-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.resume-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resume-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.btn-primary:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+}
+
+.btn-disabled {
+  background: rgba(30, 41, 59, 0.4);
+  color: #64748b;
+  border: 1px dashed rgba(51, 65, 85, 0.6);
+  cursor: not-allowed;
+  font-size: 0.76rem;
+}
+
+/* Credentials Registry */
+.credentials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.credential-item-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.credential-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.credential-item-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.credential-item-issuer {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.credential-item-date {
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+/* Modal / Preview Dialog */
+.vault-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.vault-modal-dialog {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+}
+
+.vault-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #1e293b;
+  position: sticky;
+  top: 0;
+  background: #0f172a;
+  z-index: 2;
+}
+
+.vault-modal-close-btn {
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.vault-modal-close-btn:hover {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: #64748b;
+}
+
+.vault-modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vault-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid #1e293b;
+  background: #090e1a;
+}
+
+/* Empty State */
+.vault-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: #0f172a;
+  border: 1px dashed #334155;
+  border-radius: 12px;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Print Stylesheet — Document Vault Resume Specification Printing
+   ========================================================================== */
+@media print {
+  /* Reset general page styles for clean paper printout */
+  @page {
+    margin: 15mm 15mm 15mm 15mm;
+    size: A4 portrait;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Hide application shell, sidebars, headers, backdrops, and interactive controls */
+  .app-sidebar,
+  .app-header,
+  .header-container,
+  .sidebar-container,
+  .vault-header,
+  .vault-controls,
+  .vault-stats-grid,
+  .vault-resumes-grid,
+  .credentials-grid,
+  .vault-section-header,
+  .vault-empty-state,
+  .kai-floating-trigger,
+  .kai-assistant-overlay,
+  .kai-modal-backdrop,
+  .vault-modal-close-btn,
+  .vault-modal-footer,
+  .no-print,
+  button,
+  nav,
+  aside,
+  header {
+    display: none !important;
+  }
+
+  /* Reset modal overlay to act as a standard flat print document */
+  .vault-modal-backdrop {
+    position: static !important;
+    inset: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .vault-modal-dialog {
+    position: static !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .vault-modal-header {
+    position: static !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-bottom: 2pt solid #0f172a !important;
+    padding: 0 0 12pt 0 !important;
+    margin-bottom: 16pt !important;
+  }
+
+  .vault-modal-header .resume-card-title {
+    color: #0f172a !important;
+    font-size: 18pt !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    margin: 4pt 0 0 0 !important;
+  }
+
+  .resume-target-badge {
+    background: #f1f5f9 !important;
+    color: #0369a1 !important;
+    border: 1px solid #bae6fd !important;
+    font-size: 9pt !important;
+    padding: 2pt 6pt !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .resume-updated-pill {
+    color: #64748b !important;
+    font-size: 9pt !important;
+  }
+
+  .vault-modal-body {
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14pt !important;
+    background: #ffffff !important;
+  }
+
+  .vault-section {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6pt !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .resume-best-for {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #1e293b !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
+    padding: 8pt 10pt !important;
+    border-radius: 4pt !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .resume-highlights-title {
+    color: #0369a1 !important;
+    font-size: 10pt !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin: 0 0 4pt 0 !important;
+  }
+
+  .resume-highlights-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6pt !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .resume-highlight-item {
+    color: #1e293b !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 6pt !important;
+  }
+
+  .resume-highlight-item svg {
+    stroke: #0284c7 !important;
+  }
+
+  .resume-skills-wrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4pt !important;
+  }
+
+  .resume-skill-tag {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    font-size: 9pt !important;
+    padding: 2pt 6pt !important;
+    border-radius: 3pt !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+

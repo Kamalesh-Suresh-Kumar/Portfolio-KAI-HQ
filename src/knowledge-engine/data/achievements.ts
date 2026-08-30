@@ -1,0 +1,50 @@
+import type { Achievement } from '../types';
+
+export const achievementsData: Achievement[] = [
+  {
+    id: 'ach-lifi-cybercrime-demo',
+    title: 'Li-Fi Penetration Testing Demonstration & Law Enforcement Briefing',
+    issuer: 'Cybercrime Police Department',
+    date: '2024',
+    category: 'demonstration',
+    description: 'Demonstrated live optical wireless penetration testing protocols (Li-Fi RX 2.0 / 3.0) and vulnerability assessments to cybercrime police specialists, highlighting physical-layer security vulnerabilities in optical communications.',
+    relatedProjectIds: ['lifi-security-protocols'],
+    highlight: true,
+  },
+  {
+    id: 'ach-infosys-springboard-cert',
+    title: 'Enterprise Software & Cloud Computing Certification',
+    issuer: 'Infosys SpringBoard',
+    date: '2023 — 2024',
+    category: 'certification',
+    description: 'Awarded formal technical certification upon successful completion of intensive coursework and assessments in modern programming, cloud fundamentals, and software engineering principles.',
+    highlight: true,
+  },
+  {
+    id: 'ach-ncc-navy-recognition',
+    title: 'NCC Naval Wing Cadet Leadership & Service',
+    issuer: 'National Cadet Corps (NCC - Navy Wing)',
+    date: '2022 — Present',
+    category: 'leadership',
+    description: 'Recognized for exemplary discipline, drill execution, leadership capabilities, and participation in naval wing training programs and national integration events.',
+    highlight: true,
+  },
+  {
+    id: 'ach-ieee-cs-contribution',
+    title: 'IEEE Computer Society Event Team Contribution Award',
+    issuer: 'IEEE Computer Society Chapter',
+    date: '2023 — 2024',
+    category: 'leadership',
+    description: 'Honored for active contribution to technical event design, student mentorship, workshop execution, and department hackathon coordination.',
+    highlight: false,
+  },
+  {
+    id: 'ach-academic-excellence',
+    title: 'Computer Science & Engineering Academic & Technical Milestones',
+    issuer: 'Department of Computer Science and Engineering',
+    date: '2022 — Present',
+    category: 'academic',
+    description: 'Demonstrated continuous technical depth across software architectures, distributed networking projects, algorithms, and applied security labs.',
+    highlight: false,
+  },
+];
