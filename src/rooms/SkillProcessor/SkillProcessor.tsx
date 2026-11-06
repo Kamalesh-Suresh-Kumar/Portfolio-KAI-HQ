@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { knowledgeEngine } from "../../knowledge-engine";
 import type { Skill, SkillCategory } from "../../knowledge-engine/types";
-import { useExperienceEngine, parseHash, buildHash } from "../../experience-engine";
+import { useExperienceEngine } from "../../experience-engine";
 import SkillCard from "./SkillCard";
 import SkillDetailModal from "./SkillDetailModal";
 import {
@@ -33,49 +33,25 @@ const CATEGORY_COLORS: Record<SkillCategory, string> = {
 };
 
 export default function SkillProcessor() {
-  const { reducedMotion } = useExperienceEngine();
+  const { reducedMotion, routeParams, changeRoom } = useExperienceEngine();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
 
-  // Synchronize modal state with URL hash (e.g. #/skill-processor?skill=react)
-  useEffect(() => {
-    const syncFromHash = () => {
-      const { room, params } = parseHash(window.location.hash);
-      if (room === "SkillProcessor" && params.skill) {
-        const found = knowledgeEngine.getSkillById(params.skill);
-        if (found) {
-          setSelectedSkill(found);
-          return;
-        }
-      }
-      if (room === "SkillProcessor" && !params.skill) {
-        setSelectedSkill(null);
-      }
-    };
-
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => {
-      window.removeEventListener("hashchange", syncFromHash);
-    };
-  }, []);
+  // Derive selected skill directly from routeParams without cascading effect renders
+  const selectedSkill = useMemo<Skill | null>(() => {
+    if (routeParams.skill) {
+      return knowledgeEngine.getSkillById(routeParams.skill) || null;
+    }
+    return null;
+  }, [routeParams.skill]);
 
   const handleSelectSkill = useCallback((skill: Skill) => {
-    setSelectedSkill(skill);
-    if (typeof window !== "undefined") {
-      window.location.hash = buildHash("SkillProcessor", {
-        skill: skill.id,
-      });
-    }
-  }, []);
+    changeRoom("SkillProcessor", { skill: skill.id });
+  }, [changeRoom]);
 
   const handleCloseSkill = useCallback(() => {
-    setSelectedSkill(null);
-    if (typeof window !== "undefined") {
-      window.location.hash = buildHash("SkillProcessor");
-    }
-  }, []);
+    changeRoom("SkillProcessor");
+  }, [changeRoom]);
 
   // Retrieve all skills from Knowledge Engine (Single source of truth)
   const allSkills = useMemo(() => knowledgeEngine.getSkills(), []);

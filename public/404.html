@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>KAI HQ - Routing Gateway</title>
+  <script>
+    // GitHub Pages Single Page Application Path Redirect
+    // Captures the full requested 404 path and redirects to base with encoded route
+    (function () {
+      var repoName = "Portfolio-KAI-HQ";
+      var l = window.location;
+      var path = l.pathname;
+      var base = "";
+      var route = path;
+
+      if (path.indexOf("/" + repoName) === 0) {
+        base = "/" + repoName;
+        route = path.slice(base.length);
+      }
+
+      // Ensure route begins with a slash
+      if (!route || route.charAt(0) !== "/") {
+        route = "/" + (route || "");
+      }
+
+      var redirectUrl =
+        l.protocol +
+        "//" +
+        l.hostname +
+        (l.port ? ":" + l.port : "") +
+        base +
+        "/?p=" +
+        encodeURIComponent(route) +
+        (l.search ? "&q=" + encodeURIComponent(l.search.slice(1)) : "") +
+        l.hash;
+
+      l.replace(redirectUrl);
+    })();
+  </script>
+</head>
+<body style="background:#050b16; color:#94a3b8; font-family:sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; margin:0;">
+  <div style="text-align:center;">
+    <h1 style="color:#38bdf8; font-size:1.5rem; margin-bottom:8px;">KAI HQ</h1>
+    <p style="font-size:0.9rem;">Routing to requested facility coordinate...</p>
+  </div>
+</body>
+</html>

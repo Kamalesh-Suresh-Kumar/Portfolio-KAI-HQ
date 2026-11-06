@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { knowledgeEngine } from "../../knowledge-engine";
 import type { Project, ProjectDomain } from "../../knowledge-engine/types";
-import { parseHash, buildHash } from "../../experience-engine";
+import { useExperienceEngine } from "../../experience-engine";
 import ProjectCard from "./ProjectCard";
 import ProjectDetailModal from "./ProjectDetailModal";
 import { Search, Filter, Terminal } from "lucide-react";
@@ -10,49 +10,25 @@ import "./engineering-lab.css";
 type FilterTab = "all" | ProjectDomain;
 
 export default function EngineeringLaboratory() {
+  const { routeParams, changeRoom } = useExperienceEngine();
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  // Synchronize modal state with URL hash (e.g. #/engineering-laboratory?project=lifi-security-protocols)
-  useEffect(() => {
-    const syncFromHash = () => {
-      const { room, params } = parseHash(window.location.hash);
-      if (room === "EngineeringLaboratory" && params.project) {
-        const found = knowledgeEngine.getProjectById(params.project);
-        if (found) {
-          setSelectedProject(found);
-          return;
-        }
-      }
-      // If no valid project param or closed, ensure modal is closed
-      if (room === "EngineeringLaboratory" && !params.project) {
-        setSelectedProject(null);
-      }
-    };
-
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => {
-      window.removeEventListener("hashchange", syncFromHash);
-    };
-  }, []);
+  // Derive selected project directly from routeParams without cascading effect renders
+  const selectedProject = useMemo<Project | null>(() => {
+    if (routeParams.project) {
+      return knowledgeEngine.getProjectById(routeParams.project) || null;
+    }
+    return null;
+  }, [routeParams.project]);
 
   const handleInspectProject = useCallback((project: Project) => {
-    setSelectedProject(project);
-    if (typeof window !== "undefined") {
-      window.location.hash = buildHash("EngineeringLaboratory", {
-        project: project.id,
-      });
-    }
-  }, []);
+    changeRoom("EngineeringLaboratory", { project: project.id });
+  }, [changeRoom]);
 
   const handleCloseProject = useCallback(() => {
-    setSelectedProject(null);
-    if (typeof window !== "undefined") {
-      window.location.hash = buildHash("EngineeringLaboratory");
-    }
-  }, []);
+    changeRoom("EngineeringLaboratory");
+  }, [changeRoom]);
 
   // Retrieve projects from Knowledge Engine (single source of truth)
   const allProjects = useMemo(() => knowledgeEngine.getProjects(), []);

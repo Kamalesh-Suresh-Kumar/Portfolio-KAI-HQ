@@ -12,6 +12,24 @@
   <meta name="author" content="Kamalesh Suresh Kumar" />
   <!-- <meta name="theme-color" content="#0B0F19" /> -->
   <title>KAI HQ</title>
+  <script>
+    // GitHub Pages SPA route restoration: restores clean path if redirected from 404.html
+    (function () {
+      var search = window.location.search;
+      if (search) {
+        var match = search.match(/[?&]p=([^&]+)/);
+        if (match) {
+          var route = decodeURIComponent(match[1]);
+          var queryMatch = search.match(/[?&]q=([^&]+)/);
+          var query = queryMatch ? "?" + decodeURIComponent(queryMatch[1]) : "";
+          var base = window.location.pathname.replace(/\/+$/, "");
+          var cleanPath = (base + route).replace(/\/+/g, "/");
+          var cleanUrl = cleanPath + query + window.location.hash;
+          window.history.replaceState(null, null, cleanUrl);
+        }
+      }
+    })();
+  </script>
 </head>
 <body>
   <div id="root"></div>

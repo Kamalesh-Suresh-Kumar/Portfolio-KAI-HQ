@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { knowledgeEngine } from "../../knowledge-engine";
 import type { ResumeVariant } from "../../knowledge-engine/types";
-import { parseHash, buildHash } from "../../experience-engine";
+import { useExperienceEngine } from "../../experience-engine";
 import ResumeCard from "./ResumeCard";
 import ResumeDetailModal from "./ResumeDetailModal";
 import {
@@ -18,49 +18,24 @@ import {
 import "./document-vault.css";
 
 export default function DocumentVault() {
+  const { routeParams, changeRoom } = useExperienceEngine();
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedResume, setSelectedResume] = useState<ResumeVariant | null>(
-    null
-  );
 
-  // Synchronize modal state with URL hash (e.g. #/document-vault?resume=full-stack)
-  useEffect(() => {
-    const syncFromHash = () => {
-      const { room, params } = parseHash(window.location.hash);
-      if (room === "DocumentVault" && params.resume) {
-        const found = knowledgeEngine.getResumeVariantById(params.resume);
-        if (found) {
-          setSelectedResume(found);
-          return;
-        }
-      }
-      if (room === "DocumentVault" && !params.resume) {
-        setSelectedResume(null);
-      }
-    };
-
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => {
-      window.removeEventListener("hashchange", syncFromHash);
-    };
-  }, []);
+  // Derive selected resume directly from routeParams without cascading effect renders
+  const selectedResume = useMemo<ResumeVariant | null>(() => {
+    if (routeParams.resume) {
+      return knowledgeEngine.getResumeVariantById(routeParams.resume) || null;
+    }
+    return null;
+  }, [routeParams.resume]);
 
   const handlePreviewResume = useCallback((resume: ResumeVariant) => {
-    setSelectedResume(resume);
-    if (typeof window !== "undefined") {
-      window.location.hash = buildHash("DocumentVault", {
-        resume: resume.id,
-      });
-    }
-  }, []);
+    changeRoom("DocumentVault", { resume: resume.id });
+  }, [changeRoom]);
 
   const handleCloseResume = useCallback(() => {
-    setSelectedResume(null);
-    if (typeof window !== "undefined") {
-      window.location.hash = buildHash("DocumentVault");
-    }
-  }, []);
+    changeRoom("DocumentVault");
+  }, [changeRoom]);
 
   // Retrieve resume variants and credentials from Knowledge Engine as the single source of truth
   const allResumes = useMemo(() => knowledgeEngine.getResumeVariants(), []);

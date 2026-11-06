@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { knowledgeEngine } from "../../knowledge-engine";
 import type { ExperienceTimeline, TimelineCategory } from "../../knowledge-engine/types";
-import { parseHash } from "../../experience-engine";
+import { useExperienceEngine } from "../../experience-engine";
 import TimelineCard from "./TimelineCard";
 import { Search, Filter, Terminal } from "lucide-react";
 import "./memory-archive.css";
@@ -9,33 +9,23 @@ import "./memory-archive.css";
 type FilterTab = "all" | TimelineCategory;
 
 export default function MemoryArchive() {
+  const { routeParams } = useExperienceEngine();
   const [activeCategory, setActiveCategory] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [highlightedTimelineId, setHighlightedTimelineId] = useState<string | null>(null);
+  const highlightedTimelineId = routeParams.timeline || null;
 
-  // Synchronize deep-link highlight from URL hash (e.g. #/memory-archive?timeline=veltech-btech-cse)
+  // Synchronize deep-link highlight scroll from URL route params (e.g. /memory-archive/timeline/timeline-cse-undergrad)
   useEffect(() => {
-    const syncFromHash = () => {
-      const { room, params } = parseHash(window.location.hash);
-      if (room === "MemoryArchive" && params.timeline) {
-        setHighlightedTimelineId(params.timeline);
-        setTimeout(() => {
-          const el = document.getElementById(`timeline-${params.timeline}`);
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        }, 100);
-      } else {
-        setHighlightedTimelineId(null);
-      }
-    };
-
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => {
-      window.removeEventListener("hashchange", syncFromHash);
-    };
-  }, []);
+    if (routeParams.timeline) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`timeline-${routeParams.timeline}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [routeParams.timeline]);
 
   // Retrieve timeline from Knowledge Engine as the single source of truth
   const allTimeline = useMemo(() => knowledgeEngine.getTimeline(), []);

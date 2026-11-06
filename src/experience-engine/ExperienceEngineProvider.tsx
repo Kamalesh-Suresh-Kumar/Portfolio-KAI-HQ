@@ -7,19 +7,43 @@ import {
   type KAIStatus,
   type AssistantFocusPayload,
 } from "./ExperienceEngineContext";
-import { parseHash, buildHash } from "./urlHelper";
+import { parsePath, buildPath } from "./routeHelper";
 
 export function ExperienceEngineProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  // Initialize room from window hash if present, or default to "Lobby"
+  // Initialize room and route params from window path
   const [currentRoom, setCurrentRoom] = useState<Room>(() => {
-    if (typeof window !== "undefined" && window.location.hash) {
-      return parseHash(window.location.hash).room;
+    if (typeof window !== "undefined") {
+      // Legacy hash migration check (e.g., #/engineering-laboratory)
+      if (window.location.hash && window.location.hash.startsWith("#/")) {
+        const legacySlug = window.location.hash.replace(/^#\/?/, "");
+        const parsed = parsePath(legacySlug);
+        return parsed.room;
+      }
+      return parsePath(window.location.pathname, window.location.search).room;
     }
     return "Lobby";
+  });
+
+  const [routeParams, setRouteParams] = useState<Record<string, string>>(() => {
+    if (typeof window !== "undefined") {
+      if (window.location.hash && window.location.hash.startsWith("#/")) {
+        const legacySlug = window.location.hash.replace(/^#\/?/, "");
+        return parsePath(legacySlug).params;
+      }
+      return parsePath(window.location.pathname, window.location.search).params;
+    }
+    return {};
+  });
+
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return window.location.pathname + window.location.search;
+    }
+    return "/";
   });
 
   // Visitor Mode state
@@ -39,34 +63,45 @@ export function ExperienceEngineProvider({
   });
   const [voiceEnabled, setVoiceEnabled] = useState<boolean>(false);
 
-  // Change room and synchronize with URL hash
+  // Change room and push clean path state to browser History API
   const changeRoom = useCallback((room: Room, params?: Record<string, string>) => {
-    setCurrentRoom(room);
+    const targetPath = buildPath(room, params);
     if (typeof window !== "undefined") {
-      const targetHash = buildHash(room, params);
-      if (window.location.hash !== targetHash) {
-        window.location.hash = targetHash;
+      const currentFull = window.location.pathname + window.location.search;
+      if (currentFull !== targetPath) {
+        window.history.pushState(null, "", targetPath);
       }
     }
+    setCurrentRoom(room);
+    setRouteParams(params || {});
+    setCurrentPath(targetPath);
   }, []);
 
-  // Listen for browser back/forward and hash changes
+  // Listen for browser Back/Forward (popstate) and handle initial legacy hash clean-up
   useEffect(() => {
-    function handleHashChange() {
-      const { room } = parseHash(window.location.hash);
+    function handlePopState() {
+      const { room, params } = parsePath(
+        window.location.pathname,
+        window.location.search
+      );
       setCurrentRoom(room);
+      setRouteParams(params);
+      setCurrentPath(window.location.pathname + window.location.search);
     }
 
-    // Set initial hash if not set
-    if (!window.location.hash) {
-      window.location.hash = buildHash(currentRoom);
+    // Clean up any residual legacy hash on first load by replacing URL with clean path
+    if (typeof window !== "undefined" && window.location.hash && window.location.hash.startsWith("#/")) {
+      const legacyRoute = window.location.hash.replace(/^#\/?/, "");
+      const { room, params } = parsePath(legacyRoute);
+      const cleanPath = buildPath(room, params);
+      window.history.replaceState(null, "", cleanPath);
     }
 
-    window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("popstate", handlePopState);
     return () => {
-      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("popstate", handlePopState);
     };
-  }, [currentRoom]);
+  }, []);
 
   // KAI helper actions
   const openKAI = useCallback(() => setIsKAIOpen(true), []);
@@ -79,6 +114,8 @@ export function ExperienceEngineProvider({
     <ExperienceEngineContext.Provider
       value={{
         currentRoom,
+        currentPath,
+        routeParams,
         changeRoom,
         mode,
         setMode,

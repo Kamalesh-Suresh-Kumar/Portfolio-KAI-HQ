@@ -1,7 +1,7 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { knowledgeEngine } from "../../knowledge-engine";
 import type { Achievement, AchievementCategory } from "../../knowledge-engine/types";
-import { parseHash, buildHash } from "../../experience-engine";
+import { useExperienceEngine } from "../../experience-engine";
 import AchievementCard from "./AchievementCard";
 import AchievementDetailModal from "./AchievementDetailModal";
 import { Search, Filter, Terminal, Star } from "lucide-react";
@@ -10,49 +10,25 @@ import "./achievement-hall.css";
 type FilterTab = "all" | AchievementCategory;
 
 export default function AchievementHall() {
+  const { routeParams, changeRoom } = useExperienceEngine();
   const [activeCategory, setActiveCategory] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedAchievement, setSelectedAchievement] =
-    useState<Achievement | null>(null);
 
-  // Synchronize modal state with URL hash (e.g. #/achievement-hall?achievement=lifi-police-demo)
-  useEffect(() => {
-    const syncFromHash = () => {
-      const { room, params } = parseHash(window.location.hash);
-      if (room === "AchievementHall" && params.achievement) {
-        const found = knowledgeEngine.getAchievementById(params.achievement);
-        if (found) {
-          setSelectedAchievement(found);
-          return;
-        }
-      }
-      if (room === "AchievementHall" && !params.achievement) {
-        setSelectedAchievement(null);
-      }
-    };
-
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => {
-      window.removeEventListener("hashchange", syncFromHash);
-    };
-  }, []);
+  // Derive selected achievement directly from routeParams without cascading effect renders
+  const selectedAchievement = useMemo<Achievement | null>(() => {
+    if (routeParams.achievement) {
+      return knowledgeEngine.getAchievementById(routeParams.achievement) || null;
+    }
+    return null;
+  }, [routeParams.achievement]);
 
   const handleInspectAchievement = useCallback((achievement: Achievement) => {
-    setSelectedAchievement(achievement);
-    if (typeof window !== "undefined") {
-      window.location.hash = buildHash("AchievementHall", {
-        achievement: achievement.id,
-      });
-    }
-  }, []);
+    changeRoom("AchievementHall", { achievement: achievement.id });
+  }, [changeRoom]);
 
   const handleCloseAchievement = useCallback(() => {
-    setSelectedAchievement(null);
-    if (typeof window !== "undefined") {
-      window.location.hash = buildHash("AchievementHall");
-    }
-  }, []);
+    changeRoom("AchievementHall");
+  }, [changeRoom]);
 
   // Retrieve achievements from Knowledge Engine as the single source of truth
   const allAchievements = useMemo(() => knowledgeEngine.getAchievements(), []);
@@ -183,7 +159,7 @@ export default function AchievementHall() {
               <AchievementCard
                 key={item.id}
                 achievement={item}
-                onInspect={(a) => setSelectedAchievement(a)}
+                onInspect={handleInspectAchievement}
               />
             ))}
           </div>
