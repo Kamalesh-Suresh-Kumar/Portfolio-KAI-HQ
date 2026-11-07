@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { knowledgeEngine } from "../../knowledge-engine";
 import ChannelCard, { type ChannelItem } from "./ChannelCard";
 import TransmissionForm from "./TransmissionForm";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import {
   Terminal,
   Copy,
@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Activity,
   Radio,
+  Network,
 } from "lucide-react";
 import "./communication-center.css";
 
@@ -47,13 +48,13 @@ export default function CommunicationCenter() {
       });
     }
 
-    if (contact.linkedin) {
+    if (contact.kaiNexus) {
       list.push({
-        id: "linkedin",
-        name: "LinkedIn Network",
-        sub: "in/kamalesh-suresh-kumar",
-        url: contact.linkedin,
-        icon: <FaLinkedin size={18} />,
+        id: "kai-nexus",
+        name: contact.kaiNexus.name,
+        sub: contact.kaiNexus.description,
+        url: contact.kaiNexus.url,
+        icon: <Network size={18} />,
         isExternal: true,
       });
     }

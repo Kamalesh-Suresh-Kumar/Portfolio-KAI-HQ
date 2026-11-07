@@ -7,6 +7,11 @@ export const contactData: ContactPayload = {
   email: 'kamalsuresh2005@gmail.com',
   github: 'https://github.com/Kamalesh-Suresh-Kumar',
   portfolioRepo: 'https://github.com/Kamalesh-Suresh-Kumar/Portfolio-KAI-HQ',
+  kaiNexus: {
+    name: 'KAI Nexus',
+    description: 'Central hub for all my communication platforms and social profiles.',
+    url: 'https://kamalesh-suresh-kumar.github.io/KAI-Nexus/',
+  },
   linkedin: 'https://linkedin.com/in/kamalesh-suresh-kumar',
   location: 'India',
   availability: 'Available for full-time software engineering roles & research projects',

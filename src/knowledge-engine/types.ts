@@ -117,6 +117,11 @@ export interface ContactPayload {
   github: string;
   portfolioRepo: string;
   linkedin?: string;
+  kaiNexus?: {
+    name: string;
+    description: string;
+    url: string;
+  };
   location: string;
   availability: string;
   bio: string;

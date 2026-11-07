@@ -98,12 +98,11 @@
 /* Assistant Drawer / Panel */
 .kai-panel {
   position: fixed;
-  bottom: 82px;
+  bottom: 80px;
   right: 24px;
-  width: 420px;
-  max-width: calc(100vw - 32px);
-  height: 580px;
-  max-height: calc(100vh - 110px);
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  height: min(520px, calc(100vh - 110px));
   background: #0b1120;
   border: 1px solid rgba(56, 189, 248, 0.3);
   border-radius: 16px;
@@ -113,6 +112,13 @@
   z-index: 455;
   overflow: hidden;
   animation: kaiPanelSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 1600px) {
+  .kai-panel {
+    width: 400px;
+    height: min(550px, calc(100vh - 120px));
+  }
 }
 
 @keyframes kaiPanelSlideUp {
@@ -209,8 +215,11 @@
 
 /* Conversation Body */
 .kai-panel-body {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -482,20 +491,154 @@
   transition: none !important;
 }
 
-/* Responsive Mobile Layout */
-@media (max-width: 640px) {
+/* Tablet Responsive Layout (769px to 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
   .kai-trigger-wrapper {
-    bottom: 16px;
-    right: 16px;
+    bottom: 20px;
+    right: 20px;
+    z-index: 450;
   }
 
   .kai-panel {
-    bottom: 16px;
-    right: 16px;
-    left: 16px;
+    bottom: 76px;
+    right: 20px;
+    width: 360px;
+    max-width: calc(100vw - 40px);
+    height: min(490px, calc(100vh - 110px));
+    z-index: 455;
+  }
+}
+
+/* Responsive Mobile Layout (<= 768px, down to 375px) */
+@media (max-width: 768px) {
+  .kai-trigger-wrapper {
+    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    right: max(16px, env(safe-area-inset-right, 16px));
+    z-index: 450;
+  }
+
+  .kai-trigger-btn {
+    padding: 8px 14px 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .kai-trigger-icon-wrap {
+    width: 24px;
+    height: 24px;
+  }
+
+  .kai-panel {
+    position: fixed;
+    bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    right: max(12px, env(safe-area-inset-right, 12px));
+    left: max(12px, env(safe-area-inset-left, 12px));
     width: auto;
-    max-width: none;
-    height: 75vh;
-    max-height: 560px;
+    max-width: calc(100vw - 24px);
+    height: 70vh;
+    height: 70dvh;
+    max-height: 520px;
+    border-radius: 14px;
+    z-index: 455;
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.85), 0 0 24px rgba(56, 189, 248, 0.2);
+  }
+
+  .kai-panel-header {
+    padding: 10px 14px;
+  }
+
+  .kai-header-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .kai-header-name {
+    font-size: 0.84rem;
+  }
+
+  .kai-header-sub {
+    font-size: 0.65rem;
+  }
+
+  .kai-panel-body {
+    padding: 12px 14px;
+    gap: 12px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .kai-message {
+    max-width: 95%;
+  }
+
+  .kai-msg-bubble {
+    padding: 9px 12px;
+    font-size: 0.82rem;
+  }
+
+  .kai-quick-actions-bar {
+    padding: 6px 10px;
+    gap: 5px;
+    flex-shrink: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .kai-quick-chip {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+  }
+
+  .kai-panel-footer {
+    padding: 10px 12px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+    flex-shrink: 0;
+  }
+
+  .kai-text-input {
+    font-size: 16px; /* Prevents auto zoom on iOS Safari */
+    padding: 9px 12px;
+  }
+
+  .kai-send-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+/* Extra Compact Mobile (<= 380px, e.g. iPhone SE 375px) */
+@media (max-width: 380px) {
+  .kai-trigger-wrapper {
+    bottom: max(10px, env(safe-area-inset-bottom, 10px));
+    right: max(10px, env(safe-area-inset-right, 10px));
+  }
+
+  .kai-panel {
+    bottom: max(8px, env(safe-area-inset-bottom, 8px));
+    right: max(8px, env(safe-area-inset-right, 8px));
+    left: max(8px, env(safe-area-inset-left, 8px));
+    max-width: calc(100vw - 16px);
+    height: 68vh;
+    height: 68dvh;
+    max-height: 480px;
+  }
+
+  .kai-panel-header {
+    padding: 8px 10px;
+  }
+
+  .kai-panel-body {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .kai-panel-footer {
+    padding: 8px 10px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
   }
 }
