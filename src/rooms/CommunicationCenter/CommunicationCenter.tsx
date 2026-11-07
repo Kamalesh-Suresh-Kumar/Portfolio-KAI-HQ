@@ -277,7 +277,7 @@ export default function CommunicationCenter() {
         </div>
 
         {/* Right Column: Direct Message Transmission Console */}
-        <TransmissionForm recipientEmail={contact.email || "kamalsuresh2005@gmail.com"} />
+        <TransmissionForm recipientEmail={contact.email || "kamalesh.sde@gmail.com"} />
       </div>
     </section>
   );

@@ -168,6 +168,7 @@ export function routeIntent(rawQuery: string): IntentRouteResult {
     query.includes("message") ||
     query.includes("connect") ||
     query.includes("linkedin") ||
+    query.includes("nexus") ||
     query.includes("social") ||
     query.includes("call") ||
     query.includes("touch")

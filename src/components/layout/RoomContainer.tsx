@@ -31,5 +31,14 @@ export default function RoomContainer() {
                 return <Lobby />;
         }
     }
-    return renderRoom();
+    return (
+        <div
+            key={currentRoom}
+            className="room-transition-container"
+            role="region"
+            aria-label={`Facility Room: ${currentRoom}`}
+        >
+            {renderRoom()}
+        </div>
+    );
 }

@@ -1,10 +1,12 @@
 import { memo } from "react";
 import type { AssistantMessage as IAssistantMessage } from "../../assistant/types";
 import { useExperienceEngine } from "../../experience-engine";
-import { ArrowRight, Bot, User, Terminal } from "lucide-react";
+import { ArrowRight, Bot, User, Terminal, Volume2, VolumeX } from "lucide-react";
 
 interface AssistantMessageProps {
   message: IAssistantMessage;
+  onSpeak?: (text: string, id: string) => void;
+  isSpeakingThis?: boolean;
 }
 
 function formatTime(timestamp: number): string {
@@ -12,7 +14,11 @@ function formatTime(timestamp: number): string {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-function AssistantMessage({ message }: AssistantMessageProps) {
+function AssistantMessage({
+  message,
+  onSpeak,
+  isSpeakingThis = false,
+}: AssistantMessageProps) {
   const { changeRoom } = useExperienceEngine();
 
   const isUser = message.role === "user";
@@ -47,10 +53,26 @@ function AssistantMessage({ message }: AssistantMessageProps) {
       </div>
 
       <div className="kai-msg-meta">
-        {isUser && <User size={11} />}
-        {isKAI && <Bot size={11} color="#38bdf8" />}
-        {message.role === "system" && <Terminal size={11} />}
-        <span>{formatTime(message.timestamp)}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {isUser && <User size={11} />}
+          {isKAI && <Bot size={11} color="#38bdf8" />}
+          {message.role === "system" && <Terminal size={11} />}
+          <span>{formatTime(message.timestamp)}</span>
+        </div>
+
+        {/* Read aloud toggle for KAI messages */}
+        {isKAI && onSpeak && (
+          <button
+            type="button"
+            className={`kai-msg-speak-btn ${isSpeakingThis ? "speaking" : ""}`}
+            onClick={() => onSpeak(message.content, message.id)}
+            title={isSpeakingThis ? "Stop reading this message" : "Read this message aloud"}
+            aria-label={isSpeakingThis ? "Stop reading this message" : "Read this message aloud"}
+          >
+            {isSpeakingThis ? <VolumeX size={11} color="#f87171" /> : <Volume2 size={11} />}
+            <span>{isSpeakingThis ? "Stop" : "Speak"}</span>
+          </button>
+        )}
       </div>
     </div>
   );

@@ -208,9 +208,48 @@
   border-color: #334155;
 }
 
+.kai-header-btn.voice-active {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
 .kai-header-btn:focus-visible {
   outline: 2px solid #38bdf8;
   outline-offset: 1px;
+}
+
+/* Voice Speaking Status Indicator in Header */
+.kai-speaking-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 9999px;
+  padding: 2px 5px 2px 7px;
+  margin-right: 2px;
+}
+
+.kai-stop-speech-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #ef4444;
+  border: none;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.kai-stop-speech-btn:hover {
+  background: #dc2626;
+  transform: scale(1.05);
 }
 
 /* Conversation Body */
@@ -298,6 +337,7 @@
 .kai-msg-meta {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   font-size: 0.68rem;
   color: #94a3b8;
@@ -306,6 +346,33 @@
 
 .kai-message.user .kai-msg-meta {
   justify-content: flex-end;
+}
+
+.kai-msg-speak-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.kai-msg-speak-btn:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.kai-msg-speak-btn.speaking {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
 }
 
 /* Action Buttons inside message */
@@ -451,6 +518,70 @@
 .kai-send-btn:focus-visible {
   outline: 2px solid #38bdf8;
   outline-offset: 2px;
+}
+
+/* Voice Input Microphone Button */
+.kai-mic-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.kai-mic-btn:hover:not(:disabled) {
+  color: #38bdf8;
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.kai-mic-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.kai-mic-btn:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+/* Voice Input Notice / Alert */
+.kai-voice-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  color: #fca5a5;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.kai-voice-notice-close {
+  background: transparent;
+  border: none;
+  color: #fca5a5;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.kai-voice-notice-close:hover {
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.25);
 }
 
 /* Reduced Motion Override */
@@ -603,6 +734,13 @@
     padding: 9px 12px;
   }
 
+  .kai-mic-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
   .kai-send-btn {
     width: 36px;
     height: 36px;
@@ -613,6 +751,13 @@
 
 /* Extra Compact Mobile (<= 380px, e.g. iPhone SE 375px) */
 @media (max-width: 380px) {
+  .kai-mic-btn,
+  .kai-send-btn {
+    width: 33px;
+    height: 33px;
+    min-width: 33px;
+    min-height: 33px;
+  }
   .kai-trigger-wrapper {
     bottom: max(10px, env(safe-area-inset-bottom, 10px));
     right: max(10px, env(safe-area-inset-right, 10px));

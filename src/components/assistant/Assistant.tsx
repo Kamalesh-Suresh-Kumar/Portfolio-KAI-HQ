@@ -6,6 +6,7 @@ import {
   getGreetingMessage,
   generateAssistantResponse,
 } from "../../assistant/responseTemplates";
+import { speechAdapter } from "../../assistant/speechAdapter";
 import AssistantMessage from "./AssistantMessage";
 import AssistantInput from "./AssistantInput";
 import QuickActions from "./QuickActions";
@@ -14,6 +15,9 @@ import {
   X,
   RotateCcw,
   Bot,
+  Volume2,
+  VolumeX,
+  Square,
 } from "lucide-react";
 import "./assistant.css";
 
@@ -27,11 +31,16 @@ export default function Assistant() {
     setAssistantFocus,
     reducedMotion,
     mode,
+    voiceEnabled,
+    setVoiceEnabled,
   } = useExperienceEngine();
 
   const [messages, setMessages] = useState<IAssistantMessage[]>(() => [
     getGreetingMessage(mode),
   ]);
+
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+  const [activeSpeakingId, setActiveSpeakingId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -46,6 +55,48 @@ export default function Assistant() {
       scrollToBottom();
     }
   }, [messages, isKAIOpen, scrollToBottom]);
+
+  // Stop active speech output
+  const handleStopSpeech = useCallback(() => {
+    speechAdapter.stopSpeaking();
+    setIsSpeaking(false);
+    setActiveSpeakingId(null);
+  }, []);
+
+  // Speak a specific message content
+  const handleSpeakMessage = useCallback(
+    (text: string, id: string) => {
+      if (activeSpeakingId === id && isSpeaking) {
+        handleStopSpeech();
+        return;
+      }
+
+      handleStopSpeech();
+      speechAdapter.speak(
+        text,
+        () => {
+          setIsSpeaking(true);
+          setActiveSpeakingId(id);
+        },
+        () => {
+          setIsSpeaking(false);
+          setActiveSpeakingId(null);
+        },
+        () => {
+          setIsSpeaking(false);
+          setActiveSpeakingId(null);
+        }
+      );
+    },
+    [activeSpeakingId, isSpeaking, handleStopSpeech]
+  );
+
+  // Clean up active speech synthesis when component unmounts
+  useEffect(() => {
+    return () => {
+      speechAdapter.stopSpeaking();
+    };
+  }, []);
 
   // Handle external Assistant Focus from Experience Engine
   useEffect(() => {
@@ -65,6 +116,10 @@ export default function Assistant() {
             },
             res,
           ]);
+
+          if (voiceEnabled && speechAdapter.isSynthesisSupported()) {
+            handleSpeakMessage(res.content, res.id);
+          }
         } else if (focus.message) {
           setMessages((prev) => [
             ...prev,
@@ -81,37 +136,63 @@ export default function Assistant() {
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [assistantFocus, openKAI, setAssistantFocus, mode]);
+  }, [assistantFocus, openKAI, setAssistantFocus, mode, voiceEnabled, handleSpeakMessage]);
 
   // Escape key listener to close drawer
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isKAIOpen) {
+        handleStopSpeech();
         closeKAI();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isKAIOpen, closeKAI]);
+  }, [isKAIOpen, closeKAI, handleStopSpeech]);
 
   // Message Handler
-  const handleSendMessage = useCallback((text: string) => {
-    const userMsg: IAssistantMessage = {
-      id: `msg-${Date.now()}-user`,
-      role: "user",
-      content: text,
-      timestamp: Date.now(),
-    };
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      handleStopSpeech();
 
-    const route = routeIntent(text);
-    const kaiMsg = generateAssistantResponse(route, mode);
+      const userMsg: IAssistantMessage = {
+        id: `msg-${Date.now()}-user`,
+        role: "user",
+        content: text,
+        timestamp: Date.now(),
+      };
 
-    setMessages((prev) => [...prev, userMsg, kaiMsg]);
-  }, [mode]);
+      const route = routeIntent(text);
+      const kaiMsg = generateAssistantResponse(route, mode);
+
+      setMessages((prev) => [...prev, userMsg, kaiMsg]);
+
+      // If voice narration is enabled, speak KAI's response
+      if (voiceEnabled && speechAdapter.isSynthesisSupported()) {
+        handleSpeakMessage(kaiMsg.content, kaiMsg.id);
+      }
+    },
+    [mode, voiceEnabled, handleSpeakMessage, handleStopSpeech]
+  );
 
   const handleResetConversation = useCallback(() => {
+    handleStopSpeech();
     setMessages([getGreetingMessage(mode)]);
-  }, [mode]);
+  }, [mode, handleStopSpeech]);
+
+  const handleToggleKAI = useCallback(() => {
+    if (isKAIOpen) {
+      handleStopSpeech();
+    }
+    toggleKAI();
+  }, [isKAIOpen, handleStopSpeech, toggleKAI]);
+
+  const handleToggleVoice = useCallback(() => {
+    if (voiceEnabled) {
+      handleStopSpeech();
+    }
+    setVoiceEnabled(!voiceEnabled);
+  }, [voiceEnabled, handleStopSpeech, setVoiceEnabled]);
 
   // Compute active quick replies from the latest KAI message if available
   const latestKAIMessage = [...messages].reverse().find((m) => m.role === "kai");
@@ -127,7 +208,7 @@ export default function Assistant() {
         <button
           type="button"
           className={`kai-trigger-btn ${isKAIOpen ? "active" : ""}`}
-          onClick={toggleKAI}
+          onClick={handleToggleKAI}
           aria-expanded={isKAIOpen}
           aria-controls="kai-dialog-panel"
           aria-label={isKAIOpen ? "Close KAI Assistant" : "Open KAI Assistant guide"}
@@ -167,6 +248,52 @@ export default function Assistant() {
             </div>
 
             <div className="kai-header-actions">
+              {/* Speaking indicator and instant stop button */}
+              {isSpeaking && (
+                <div className="kai-speaking-pill" role="status" aria-label="KAI is speaking">
+                  <div className="kai-waveform" aria-hidden="true">
+                    <span className="kai-waveform-bar" />
+                    <span className="kai-waveform-bar" />
+                    <span className="kai-waveform-bar" />
+                    <span className="kai-waveform-bar" />
+                  </div>
+                  <button
+                    type="button"
+                    className="kai-stop-speech-btn"
+                    onClick={handleStopSpeech}
+                    title="Stop speaking"
+                    aria-label="Stop audio narration"
+                  >
+                    <Square size={9} fill="currentColor" />
+                    <span>STOP</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Voice Output Narration Toggle */}
+              <button
+                type="button"
+                className={`kai-header-btn ${voiceEnabled ? "voice-active" : ""}`}
+                onClick={handleToggleVoice}
+                title={
+                  voiceEnabled
+                    ? "Mute voice narration (audio guide active)"
+                    : "Enable voice narration (audio guide muted)"
+                }
+                aria-label={
+                  voiceEnabled
+                    ? "Mute voice narration"
+                    : "Enable voice narration"
+                }
+                aria-pressed={voiceEnabled}
+              >
+                {voiceEnabled ? (
+                  <Volume2 size={15} color="#38bdf8" />
+                ) : (
+                  <VolumeX size={15} />
+                )}
+              </button>
+
               <button
                 type="button"
                 className="kai-header-btn"
@@ -179,7 +306,10 @@ export default function Assistant() {
               <button
                 type="button"
                 className="kai-header-btn"
-                onClick={closeKAI}
+                onClick={() => {
+                  handleStopSpeech();
+                  closeKAI();
+                }}
                 title="Close assistant (Esc)"
                 aria-label="Close assistant"
               >
@@ -199,6 +329,8 @@ export default function Assistant() {
               <AssistantMessage
                 key={msg.id}
                 message={msg}
+                onSpeak={handleSpeakMessage}
+                isSpeakingThis={activeSpeakingId === msg.id}
               />
             ))}
             <div ref={messagesEndRef} />
@@ -210,7 +342,7 @@ export default function Assistant() {
             customReplies={currentQuickReplies}
           />
 
-          {/* Message Input Footer */}
+          {/* Message Input Footer with Speech Recognition */}
           <AssistantInput
             onSend={handleSendMessage}
             isOpen={isKAIOpen}

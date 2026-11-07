@@ -235,7 +235,7 @@ export function generateAssistantResponse(
       return {
         id,
         role: "kai",
-        content: `Direct communication outlets for ${contact.name}:\n\n• Email: ${contact.email}\n• Location: ${contact.location}\n• GitHub: github.com/${contact.github}\n• LinkedIn: linkedin.com/in/${contact.linkedin || "profile"}\n\nYou can dispatch direct messages or copy communication handles in the Communication Center.`,
+        content: `Direct communication outlets for ${contact.name}:\n\n• Email: ${contact.email}\n• Location: ${contact.location}\n• GitHub: github.com/${contact.github}\n• KAI Nexus: ${contact.kaiNexus?.url || "https://kamalesh-suresh-kumar.github.io/KAI-Nexus/"}\n\nYou can dispatch direct messages or copy communication handles in the Communication Center.`,
         timestamp,
         intent: "contact",
         actions: [
