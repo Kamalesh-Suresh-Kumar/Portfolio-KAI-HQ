@@ -1,5 +1,5 @@
 import { knowledgeEngine } from "../../knowledge-engine";
-import { useExperienceEngine } from "../../experience-engine";
+import { useExperienceEngine, resolveAssetUrl } from "../../experience-engine";
 import {
   FolderGit2,
   Cpu,
@@ -50,12 +50,21 @@ export default function HeroSection() {
             </span>
           </div>
 
-          <h1 className="hero-title">
-            KAI HQ
-            <span className="hero-subtitle-block">
-              Kamalesh Artificial Intelligence Headquarters
-            </span>
-          </h1>
+          <div className="hero-title-lockup">
+            <img
+              src={resolveAssetUrl("/assets/kai-hq-logo.svg")}
+              alt="KAI HQ Primary Logo"
+              className="hero-logo-img"
+            />
+            <div className="hero-title-text-wrap">
+              <h1 className="hero-title">
+                KAI HQ
+                <span className="hero-subtitle-block">
+                  Kamalesh Artificial Intelligence Headquarters
+                </span>
+              </h1>
+            </div>
+          </div>
 
           <div className="hero-profile-meta">
             <span className="profile-name">{contact.name}</span>
@@ -226,13 +235,17 @@ export default function HeroSection() {
             <div className="core-ring ring-mid"></div>
             <div className="core-ring ring-inner"></div>
             <div className="core-center">
-              <span className="core-brand-text">KAI</span>
-              <span className="core-status-text">CORE ONLINE</span>
+              <img
+                src={resolveAssetUrl("/assets/kamalesh-portrait.png")}
+                alt="Kamalesh S P"
+                className="core-portrait-img"
+              />
+              <div className="core-portrait-glow" aria-hidden="true" />
             </div>
           </button>
           <div className="core-caption">
-            <span>CENTRAL COGNITIVE CORE</span>
-            <small>Click core to interact</small>
+            <span>KAMALESH S P</span>
+            <small>Click core to interact with KAI</small>
           </div>
         </div>
       </div>

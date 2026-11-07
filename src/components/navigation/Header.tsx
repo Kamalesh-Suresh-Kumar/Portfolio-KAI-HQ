@@ -1,6 +1,6 @@
 import type { RefObject } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { useExperienceEngine } from "../../experience-engine/useExperienceEngine";
+import { useExperienceEngine, resolveAssetUrl } from "../../experience-engine";
 import type { Room, VisitorMode } from "../../experience-engine/ExperienceEngineContext";
 import { Layers, UserCheck, Code2 } from "lucide-react";
 
@@ -67,8 +67,15 @@ export default function Header({
           </button>
         )}
         <div className="header-branding">
-          <h1>KAI HQ</h1>
-          <p>Kamalesh Artificial Intelligence Headquarters</p>
+          <img
+            src={resolveAssetUrl("/assets/kai-hq-symbol.svg")}
+            alt="KAI HQ Symbol"
+            className="header-logo-symbol"
+          />
+          <div className="header-branding-text">
+            <h1>KAI HQ</h1>
+            <p>Kamalesh Artificial Intelligence Headquarters</p>
+          </div>
         </div>
       </div>
 

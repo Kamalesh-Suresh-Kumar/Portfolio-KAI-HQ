@@ -13,7 +13,22 @@ export default function Lobby() {
       {/* 1. Hero / Identity & AI Core Section */}
       <HeroSection />
 
-      {/* 2. Portfolio Dynamic Telemetry */}
+      {/* 2. Active Development Notice */}
+      <section
+        className="lobby-dev-notice"
+        role="status"
+        aria-label="Headquarters Active Development Status"
+      >
+        <div className="dev-notice-header">
+          <span className="dev-notice-pulse" aria-hidden="true" />
+          <h2 className="dev-notice-title">KAI HQ — UNDER ACTIVE DEVELOPMENT</h2>
+        </div>
+        <p className="dev-notice-body">
+          This headquarters is an evolving portfolio project currently under active development. Some features, project descriptions, achievements and other information are still being refined and may be incomplete, provisional or subject to change. Additional improvements and verified content will be introduced progressively.
+        </p>
+      </section>
+
+      {/* 3. Portfolio Dynamic Telemetry */}
       <PortfolioTelemetry />
 
       {/* 3. Visitor Perspective / Mode Selector */}
