@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { ResumeVariant } from "../../knowledge-engine/types";
 import {
   X,
@@ -48,7 +49,7 @@ export default function ResumeDetailModal({
       resume.fileUrl.startsWith("http://") ||
       resume.fileUrl.startsWith("https://"));
 
-  return (
+  const modalContent = (
     <div className="vault-modal-backdrop" onClick={onClose} role="presentation">
       <div
         className="vault-modal-dialog"
@@ -213,4 +214,8 @@ export default function ResumeDetailModal({
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 }

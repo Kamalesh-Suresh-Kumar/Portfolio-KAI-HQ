@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { Project } from "../../knowledge-engine/types";
 import { knowledgeEngine } from "../../knowledge-engine";
 import {
@@ -56,7 +57,7 @@ export default function ProjectDetailModal({
     .map((skillId) => knowledgeEngine.getSkillById(skillId))
     .filter(Boolean);
 
-  return (
+  const modalContent = (
     <div
       className="specimen-modal-backdrop"
       onClick={onClose}
@@ -219,4 +220,8 @@ export default function ProjectDetailModal({
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 }

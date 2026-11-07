@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { Achievement } from "../../knowledge-engine/types";
 import { knowledgeEngine } from "../../knowledge-engine";
 import {
@@ -71,7 +72,7 @@ export default function AchievementDetailModal({
     .map((projectId) => knowledgeEngine.getProjectById(projectId))
     .filter(Boolean);
 
-  return (
+  const modalContent = (
     <div
       className="achievement-modal-backdrop"
       onClick={onClose}
@@ -238,4 +239,8 @@ export default function AchievementDetailModal({
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 }

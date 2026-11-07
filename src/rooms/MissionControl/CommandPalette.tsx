@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { knowledgeEngine } from "../../knowledge-engine";
 import { useExperienceEngine, getSearchResultParams } from "../../experience-engine";
 import {
@@ -214,7 +215,7 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div
       className="cmd-palette-backdrop"
       onClick={onClose}
@@ -300,4 +301,8 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : modalContent;
 }
