@@ -200,7 +200,7 @@ export default function GlobalSearch({ onOpenCommandPalette }: GlobalSearchProps
             </>
           ) : (
             <div className="search-empty-prompt">
-              <Sparkles size={24} color="#64748b" />
+              <Sparkles size={24} color="#94a3b8" />
               <p style={{ margin: 0, color: "#f1f5f9", fontWeight: 600 }}>
                 No indexed entries match "{query}"
               </p>
@@ -211,7 +211,7 @@ export default function GlobalSearch({ onOpenCommandPalette }: GlobalSearchProps
           )
         ) : (
           <div className="search-empty-prompt">
-            <Search size={22} color="#64748b" />
+            <Search size={22} color="#94a3b8" />
             <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.88rem" }}>
               Begin typing in the search console above or press <kbd className="mission-kbd">⌘K / Ctrl+K</kbd> to launch the command palette.
             </p>

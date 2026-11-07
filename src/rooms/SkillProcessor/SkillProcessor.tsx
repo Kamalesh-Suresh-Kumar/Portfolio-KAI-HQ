@@ -172,7 +172,7 @@ export default function SkillProcessor() {
             style={{
               fontFamily: "monospace",
               fontSize: "0.72rem",
-              color: "#64748b",
+              color: "#94a3b8",
             }}
           >
             {allSkills.length} Total Verified Nodes
@@ -274,7 +274,7 @@ export default function SkillProcessor() {
           </div>
         ) : (
           <div className="skill-empty-state">
-            <Filter size={32} color="#64748b" />
+            <Filter size={32} color="#94a3b8" />
             <h3 style={{ color: "#f1f5f9", margin: 0 }}>
               No matching competencies found
             </h3>

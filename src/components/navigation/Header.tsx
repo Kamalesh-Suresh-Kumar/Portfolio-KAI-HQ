@@ -88,6 +88,7 @@ export default function Header({
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
+                aria-label={`Switch perspective to ${opt.label} mode (${opt.tooltip})`}
                 className={`header-mode-chip ${isSelected ? "active" : ""}`}
                 onClick={() => setMode(opt.id)}
                 title={opt.tooltip}

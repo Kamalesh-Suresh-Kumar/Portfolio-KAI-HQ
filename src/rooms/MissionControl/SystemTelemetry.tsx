@@ -40,7 +40,7 @@ export default function SystemTelemetry() {
     },
     {
       name: "Navigation Subsystem",
-      desc: "URL hash synchronizer & 8 facility routes",
+      desc: "History API router & 8 facility routes",
       badge: "ONLINE",
       badgeClass: "online",
     },

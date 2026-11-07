@@ -63,7 +63,7 @@ export default function SkillCard({ skill, onSelect }: SkillCardProps) {
         {/* Discrete Capability Meter */}
         <div className="capability-meter-wrap" aria-label={`Proficiency: ${skill.proficiencyLevel}`}>
           <div className="capability-meter-header">
-            <span style={{ color: "#64748b" }}>Proficiency Tier</span>
+            <span style={{ color: "#94a3b8" }}>Proficiency Tier</span>
             <span className={`capability-level-label level-${skill.proficiencyLevel}`}>
               {skill.proficiencyLevel}
             </span>

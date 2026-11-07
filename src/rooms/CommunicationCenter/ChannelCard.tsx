@@ -31,7 +31,7 @@ export default function ChannelCard({ channel }: ChannelCardProps) {
         </div>
       </div>
 
-      <ExternalLink size={14} color="#64748b" />
+      <ExternalLink size={14} color="#94a3b8" />
     </a>
   );
 }

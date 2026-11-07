@@ -123,7 +123,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .telemetry-stat-value {
@@ -173,7 +173,7 @@
 
 .facility-disclaimer {
   font-size: 0.74rem;
-  color: #64748b;
+  color: #94a3b8;
   font-family: monospace;
 }
 
@@ -208,7 +208,7 @@
 
 .status-node-desc {
   font-size: 0.72rem;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .status-node-badge {
@@ -375,7 +375,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: 0.78rem;
-  color: #64748b;
+  color: #94a3b8;
   font-family: monospace;
   padding-bottom: 4px;
   border-bottom: 1px solid #1e293b;
@@ -496,7 +496,7 @@
   background: #090e1a;
   border: 1px dashed #1e293b;
   border-radius: 8px;
-  color: #64748b;
+  color: #94a3b8;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -594,7 +594,7 @@
   padding-top: 8px;
   border-top: 1px solid rgba(30, 41, 59, 0.8);
   font-size: 0.74rem;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 /* System Activity / Integrity Panel */
@@ -626,7 +626,7 @@
 
 .activity-spec-label {
   font-size: 0.72rem;
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -697,7 +697,7 @@
 .cmd-palette-group-label {
   font-family: monospace;
   font-size: 0.7rem;
-  color: #64748b;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 8px 12px 4px;
@@ -737,7 +737,7 @@
 
 .cmd-item-sub {
   font-size: 0.75rem;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .cmd-palette-footer {
@@ -748,7 +748,7 @@
   border-top: 1px solid #1e293b;
   background: #090e1a;
   font-size: 0.72rem;
-  color: #64748b;
+  color: #94a3b8;
   font-family: monospace;
 }
 
@@ -759,7 +759,15 @@
 }
 
 /* Reduced Motion */
-.reduced-motion * {
+@media (prefers-reduced-motion: reduce) {
+  .mission-control * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.mission-control.reduced-motion *,
+.reduced-motion .mission-control * {
   animation: none !important;
   transition: none !important;
 }

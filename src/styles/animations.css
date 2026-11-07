@@ -3,3 +3,18 @@
   --transition-normal: 0.35s ease;
   --transition-slow: 0.6s ease;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0s !important;
+    --transition-normal: 0s !important;
+    --transition-slow: 0s !important;
+  }
+}
+
+:root.reduced-motion,
+.reduced-motion {
+  --transition-fast: 0s !important;
+  --transition-normal: 0s !important;
+  --transition-slow: 0s !important;
+}

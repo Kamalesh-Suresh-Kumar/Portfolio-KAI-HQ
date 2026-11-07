@@ -78,6 +78,7 @@ export default function Sidebar({
 
   const activeBtnRef = useRef<HTMLButtonElement>(null);
   const firstBtnRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
   // Monitor viewport width for accessible tab navigation
   useEffect(() => {
@@ -103,12 +104,32 @@ export default function Sidebar({
     }
   }, [isMobile, isMobileNavOpen]);
 
-  // Close drawer on Escape key when open
+  // Trap focus within drawer when open on mobile, and close on Escape key
   useEffect(() => {
     if (!isMobileNavOpen) return;
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
         onCloseMobileNav?.();
+        return;
+      }
+
+      if (e.key === "Tab" && navRef.current) {
+        const focusableElements = navRef.current.querySelectorAll<HTMLButtonElement>("button");
+        if (focusableElements.length === 0) return;
+        const firstEl = focusableElements[0];
+        const lastEl = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl) {
+            e.preventDefault();
+            lastEl.focus();
+          }
+        } else {
+          if (document.activeElement === lastEl) {
+            e.preventDefault();
+            firstEl.focus();
+          }
+        }
       }
     }
     window.addEventListener("keydown", handleKeyDown);
@@ -133,7 +154,7 @@ export default function Sidebar({
       <div className="sidebar-logo">
         <h2>KAI HQ</h2>
       </div>
-      <nav aria-label="Facility Rooms">
+      <nav ref={navRef} aria-label="Facility Rooms">
         {rooms.map((room, index) => {
           const isActive = currentRoom === room.value;
           return (

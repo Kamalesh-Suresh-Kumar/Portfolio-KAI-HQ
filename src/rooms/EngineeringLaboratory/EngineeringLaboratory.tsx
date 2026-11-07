@@ -222,7 +222,7 @@ export default function EngineeringLaboratory() {
         </div>
       ) : (
         <div className="lab-empty-state">
-          <Filter size={32} color="#64748b" />
+          <Filter size={32} color="#94a3b8" />
           <h3 style={{ color: "#f1f5f9", margin: 0 }}>No matching specimens found</h3>
           <p style={{ margin: 0, fontSize: "0.9rem" }}>
             No engineering specimens match the criteria "{searchQuery}". Try resetting filters or searching for another keyword.

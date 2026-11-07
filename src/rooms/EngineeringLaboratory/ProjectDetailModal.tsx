@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import type { Project } from "../../knowledge-engine/types";
 import { knowledgeEngine } from "../../knowledge-engine";
@@ -22,12 +22,51 @@ export default function ProjectDetailModal({
   project,
   onClose,
 }: ProjectDetailModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (!project) return;
+
+    // Remember the element that had focus prior to modal opening
+    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+
+    // Focus the first interactive element inside the modal
+    const focusTimer = setTimeout(() => {
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable && focusable.length > 0) {
+        focusable[0].focus();
+      }
+    }, 30);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const firstElement = focusable[0];
+        const lastElement = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
@@ -36,8 +75,10 @@ export default function ProjectDetailModal({
     document.body.style.overflow = "hidden";
 
     return () => {
+      clearTimeout(focusTimer);
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      previouslyFocusedElementRef.current?.focus?.();
     };
   }, [project, onClose]);
 
@@ -64,6 +105,7 @@ export default function ProjectDetailModal({
       role="presentation"
     >
       <div
+        ref={dialogRef}
         className="specimen-modal-dialog"
         onClick={(e) => e.stopPropagation()}
         role="dialog"

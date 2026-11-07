@@ -44,7 +44,7 @@
 .lobby-meta-tag {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #64748b;
+  color: #94a3b8;
   letter-spacing: 0.08em;
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid #1e293b;
@@ -404,10 +404,21 @@
   to { transform: rotate(0deg); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .ring-outer,
+  .ring-mid,
+  .ring-inner {
+    animation: none !important;
+  }
+}
+
 .ai-core-interactive.reduced-motion .ring-outer,
 .ai-core-interactive.reduced-motion .ring-mid,
-.ai-core-interactive.reduced-motion .ring-inner {
-  animation: none;
+.ai-core-interactive.reduced-motion .ring-inner,
+.reduced-motion .ring-outer,
+.reduced-motion .ring-mid,
+.reduced-motion .ring-inner {
+  animation: none !important;
 }
 
 /* ==========================================================================
@@ -475,7 +486,7 @@
 
 .telemetry-card-desc {
   font-size: 0.75rem;
-  color: #64748b;
+  color: #94a3b8;
   margin: 0;
   line-height: 1.35;
 }
@@ -611,7 +622,7 @@
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #64748b;
+  color: #94a3b8;
   border-top: 1px solid #1e293b;
   padding-top: 10px;
 }
@@ -741,7 +752,7 @@
 
 .tech-badge-more {
   font-size: 0.72rem;
-  color: #64748b;
+  color: #94a3b8;
   padding: 3px 6px;
 }
 
@@ -1181,7 +1192,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 /* ==========================================================================

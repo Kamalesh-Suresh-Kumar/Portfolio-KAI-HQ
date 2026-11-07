@@ -40,7 +40,7 @@ export default function RoomDirectory() {
           </p>
         </div>
 
-        <span style={{ fontFamily: "monospace", fontSize: "0.72rem", color: "#64748b" }}>
+        <span style={{ fontFamily: "monospace", fontSize: "0.72rem", color: "#94a3b8" }}>
           {rooms.length} TOTAL FACILITIES
         </span>
       </div>
@@ -74,7 +74,7 @@ export default function RoomDirectory() {
               </div>
 
               <div className="room-card-footer">
-                <span style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#64748b" }}>
+                <span style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#94a3b8" }}>
                   // {room.domain}
                 </span>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#38bdf8", fontWeight: 600 }}>

@@ -63,6 +63,19 @@ export function ExperienceEngineProvider({
   });
   const [voiceEnabled, setVoiceEnabled] = useState<boolean>(false);
 
+  // Sync dynamically with OS prefers-reduced-motion changes
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handler = (e: MediaQueryListEvent) => {
+      setReducedMotion(e.matches);
+    };
+    mediaQuery.addEventListener("change", handler);
+    return () => {
+      mediaQuery.removeEventListener("change", handler);
+    };
+  }, []);
+
   // Change room and push clean path state to browser History API
   const changeRoom = useCallback((room: Room, params?: Record<string, string>) => {
     const targetPath = buildPath(room, params);

@@ -260,7 +260,7 @@ export default function AchievementHall() {
         </div>
       ) : (
         <div className="hall-empty-state">
-          <Filter size={32} color="#64748b" />
+          <Filter size={32} color="#94a3b8" />
           <h3 style={{ color: "#f1f5f9", margin: 0 }}>No verified records found</h3>
           <p style={{ margin: 0, fontSize: "0.9rem" }}>
             No achievement record matches "{searchQuery}". Try resetting your search or filters.

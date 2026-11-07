@@ -1,7 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import type { Skill, Project } from "../../knowledge-engine/types";
 import { knowledgeEngine } from "../../knowledge-engine";
+import { useExperienceEngine, buildPath } from "../../experience-engine";
 import {
   X,
   Layers,
@@ -21,12 +22,50 @@ export default function SkillDetailModal({
   skill,
   onClose,
 }: SkillDetailModalProps) {
+  const { changeRoom } = useExperienceEngine();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (!skill) return;
+
+    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+
+    const focusTimer = setTimeout(() => {
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable && focusable.length > 0) {
+        focusable[0].focus();
+      }
+    }, 30);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const firstElement = focusable[0];
+        const lastElement = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
@@ -34,8 +73,10 @@ export default function SkillDetailModal({
     document.body.style.overflow = "hidden";
 
     return () => {
+      clearTimeout(focusTimer);
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      previouslyFocusedElementRef.current?.focus?.();
     };
   }, [skill, onClose]);
 
@@ -56,6 +97,7 @@ export default function SkillDetailModal({
       role="presentation"
     >
       <div
+        ref={dialogRef}
         className="skill-modal-dialog"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -137,7 +179,7 @@ export default function SkillDetailModal({
                   <span style={{ fontSize: "0.88rem", fontWeight: 600, color: "#f8fafc" }}>
                     {skill.proficiencyLevel.charAt(0).toUpperCase() + skill.proficiencyLevel.slice(1)} Competency
                   </span>
-                  <p style={{ fontSize: "0.76rem", color: "#64748b", margin: 0 }}>
+                  <p style={{ fontSize: "0.76rem", color: "#94a3b8", margin: 0 }}>
                     Integrated in core engineering pipelines & project architectures
                   </p>
                 </div>
@@ -195,8 +237,12 @@ export default function SkillDetailModal({
                       }}
                     >
                       <a
-                        href="#/engineering-laboratory"
-                        onClick={onClose}
+                        href={buildPath("EngineeringLaboratory")}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          changeRoom("EngineeringLaboratory");
+                          onClose();
+                        }}
                         style={{
                           display: "inline-flex",
                           alignItems: "center",
@@ -218,7 +264,7 @@ export default function SkillDetailModal({
               <p
                 style={{
                   fontSize: "0.84rem",
-                  color: "#64748b",
+                  color: "#94a3b8",
                   fontStyle: "italic",
                   margin: 0,
                   padding: "12px",

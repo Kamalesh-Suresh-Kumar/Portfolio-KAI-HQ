@@ -7,7 +7,7 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 990;
+  z-index: 450;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -110,7 +110,7 @@
   box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.15);
   display: flex;
   flex-direction: column;
-  z-index: 995;
+  z-index: 455;
   overflow: hidden;
   animation: kaiPanelSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -291,7 +291,7 @@
   align-items: center;
   gap: 8px;
   font-size: 0.68rem;
-  color: #64748b;
+  color: #94a3b8;
   padding: 0 4px;
 }
 
@@ -412,7 +412,7 @@
 }
 
 .kai-text-input::placeholder {
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .kai-send-btn {
@@ -445,23 +445,41 @@
 }
 
 /* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  .kai-pulse-ring {
+    animation: none !important;
+    display: none !important;
+  }
+  .kai-panel {
+    animation: none !important;
+  }
+  .kai-message {
+    animation: none !important;
+  }
+  .kai-trigger-btn,
+  .kai-action-btn,
+  .kai-send-btn {
+    transition: none !important;
+  }
+}
+
 .reduced-motion .kai-pulse-ring {
-  animation: none;
-  display: none;
+  animation: none !important;
+  display: none !important;
 }
 
 .reduced-motion .kai-panel {
-  animation: none;
+  animation: none !important;
 }
 
 .reduced-motion .kai-message {
-  animation: none;
+  animation: none !important;
 }
 
 .reduced-motion .kai-trigger-btn,
 .reduced-motion .kai-action-btn,
 .reduced-motion .kai-send-btn {
-  transition: none;
+  transition: none !important;
 }
 
 /* Responsive Mobile Layout */

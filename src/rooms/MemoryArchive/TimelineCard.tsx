@@ -80,7 +80,7 @@ export default function TimelineCard({ item, isHighlighted }: TimelineCardProps)
           <div className="milestone-title-group">
             <h3 className="milestone-title">{item.title}</h3>
             <div className="milestone-org">
-              <Building size={14} color="#64748b" />
+              <Building size={14} color="#94a3b8" />
               <span>
                 {item.role} • {item.organization}
               </span>

@@ -259,7 +259,7 @@ export default function CommunicationCenter() {
                 alignItems: "center",
                 justifyContent: "space-between",
                 fontSize: "0.78rem",
-                color: "#64748b",
+                color: "#94a3b8",
                 fontFamily: "monospace",
               }}
             >

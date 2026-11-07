@@ -201,7 +201,7 @@ export default function DocumentVault() {
           </div>
         ) : (
           <div className="vault-empty-state">
-            <Filter size={32} color="#64748b" />
+            <Filter size={32} color="#94a3b8" />
             <h3 style={{ color: "#f1f5f9", margin: 0 }}>
               No matching resume variants
             </h3>
@@ -249,7 +249,7 @@ export default function DocumentVault() {
                 </div>
 
                 <div className="credential-item-issuer">
-                  <Building size={13} color="#64748b" />
+                  <Building size={13} color="#94a3b8" />
                   <span>{cred.issuer}</span>
                 </div>
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import type { ResumeVariant } from "../../knowledge-engine/types";
 import { resolveAssetUrl } from "../../experience-engine";
@@ -24,12 +24,49 @@ export default function ResumeDetailModal({
   resume,
   onClose,
 }: ResumeDetailModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (!resume) return;
+
+    previouslyFocusedElementRef.current = document.activeElement as HTMLElement | null;
+
+    const focusTimer = setTimeout(() => {
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable && focusable.length > 0) {
+        focusable[0].focus();
+      }
+    }, 30);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const firstElement = focusable[0];
+        const lastElement = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
@@ -37,8 +74,10 @@ export default function ResumeDetailModal({
     document.body.style.overflow = "hidden";
 
     return () => {
+      clearTimeout(focusTimer);
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      previouslyFocusedElementRef.current?.focus?.();
     };
   }, [resume, onClose]);
 
@@ -51,6 +90,7 @@ export default function ResumeDetailModal({
   const modalContent = (
     <div className="vault-modal-backdrop" onClick={onClose} role="presentation">
       <div
+        ref={dialogRef}
         className="vault-modal-dialog"
         onClick={(e) => e.stopPropagation()}
         role="dialog"

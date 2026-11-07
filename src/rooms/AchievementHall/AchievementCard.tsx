@@ -78,7 +78,7 @@ export default function AchievementCard({
         <div className="achievement-title-group">
           <h3 className="achievement-card-title">{achievement.title}</h3>
           <div className="achievement-issuer-row">
-            <Building size={14} color="#64748b" />
+            <Building size={14} color="#94a3b8" />
             <span>{achievement.issuer}</span>
           </div>
         </div>
