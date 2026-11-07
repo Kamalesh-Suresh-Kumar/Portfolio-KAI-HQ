@@ -1,12 +1,13 @@
 import type { ResumeVariant } from "../../knowledge-engine/types";
+import { resolveAssetUrl } from "../../experience-engine";
 import {
   FileText,
   Calendar,
   Layers,
   CheckCircle2,
-  AlertCircle,
   ExternalLink,
   ShieldCheck,
+  Download,
 } from "lucide-react";
 
 interface ResumeCardProps {
@@ -15,14 +16,10 @@ interface ResumeCardProps {
 }
 
 export default function ResumeCard({ resume, onPreview }: ResumeCardProps) {
-  // Check if fileUrl is a placeholder or actual linked file
-  // In the dataset: '#/documents/resume-*.pdf' represents unlinked pending production PDFs
-  const isDocumentLinked =
-    resume.fileUrl &&
-    !resume.fileUrl.startsWith("#") &&
-    (resume.fileUrl.startsWith("/") ||
-      resume.fileUrl.startsWith("http://") ||
-      resume.fileUrl.startsWith("https://"));
+  const resolvedUrl = resolveAssetUrl(resume.fileUrl);
+  const isDocumentLinked = Boolean(resolvedUrl && !resume.fileUrl.startsWith("#"));
+
+  const downloadFilename = `Kamalesh-Suresh-Kumar-${resume.id.replace(/^resume-/, "")}-resume.pdf`;
 
   return (
     <article
@@ -88,7 +85,7 @@ export default function ResumeCard({ resume, onPreview }: ResumeCardProps) {
       <div className="resume-card-bottom">
         <div className="resume-status-badge">
           <FileText size={13} />
-          <span>PDF Variant</span>
+          <span>Verified PDF Artifact</span>
         </div>
 
         <div className="resume-action-group">
@@ -99,28 +96,42 @@ export default function ResumeCard({ resume, onPreview }: ResumeCardProps) {
             aria-label={`Inspect ${resume.label} summary specifications`}
           >
             <Layers size={13} />
-            <span>Inspect Variant</span>
+            <span>Inspect</span>
           </button>
 
-          {isDocumentLinked ? (
-            <a
-              href={resume.fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="resume-action-btn btn-primary"
-              aria-label={`Download ${resume.label} PDF`}
-            >
-              <ExternalLink size={13} />
-              <span>Download</span>
-            </a>
-          ) : (
-            <span
-              className="resume-action-btn btn-disabled"
-              title="Physical PDF binary artifact not yet linked into production build"
-            >
-              <AlertCircle size={12} />
-              <span>PDF Unlinked</span>
-            </span>
+          {isDocumentLinked && (
+            <>
+              <a
+                href={resolvedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="resume-action-btn btn-primary"
+                aria-label={`View ${resume.label} PDF in new tab`}
+                style={{
+                  background: "rgba(56, 189, 248, 0.15)",
+                  color: "#38bdf8",
+                  borderColor: "rgba(56, 189, 248, 0.4)",
+                }}
+              >
+                <ExternalLink size={13} />
+                <span>View PDF</span>
+              </a>
+
+              <a
+                href={resolvedUrl}
+                download={downloadFilename}
+                className="resume-action-btn btn-primary"
+                aria-label={`Download ${resume.label} PDF`}
+                style={{
+                  background: "#166534",
+                  color: "#4ade80",
+                  borderColor: "rgba(74, 222, 128, 0.4)",
+                }}
+              >
+                <Download size={13} />
+                <span>Download</span>
+              </a>
+            </>
           )}
         </div>
       </div>

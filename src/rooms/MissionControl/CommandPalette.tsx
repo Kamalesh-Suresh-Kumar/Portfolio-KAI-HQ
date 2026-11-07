@@ -33,7 +33,7 @@ interface CommandItem {
 }
 
 export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
-  const { changeRoom, openKAI } = useExperienceEngine();
+  const { changeRoom, openKAI, mode, setMode } = useExperienceEngine();
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -149,7 +149,40 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
         onClose();
       },
     },
-  ], [changeRoom, openKAI, onClose]);
+    {
+      id: "cmd-mode-recruiter",
+      title: "Switch to Recruiter Mode",
+      category: "KAI HQ Actions",
+      icon: <Sparkles size={15} color="#34d399" />,
+      subtext: "Prioritize resume variants, credentials & screening",
+      action: () => {
+        setMode("recruiter");
+        onClose();
+      },
+    },
+    {
+      id: "cmd-mode-developer",
+      title: "Switch to Developer Mode",
+      category: "KAI HQ Actions",
+      icon: <Sparkles size={15} color="#38bdf8" />,
+      subtext: "Prioritize architecture notes, code links & telemetry",
+      action: () => {
+        setMode("developer");
+        onClose();
+      },
+    },
+    {
+      id: "cmd-mode-neutral",
+      title: "Switch to Neutral Tour",
+      category: "KAI HQ Actions",
+      icon: <Sparkles size={15} color="#94a3b8" />,
+      subtext: "Balanced perspective across all facilities",
+      action: () => {
+        setMode("neutral");
+        onClose();
+      },
+    },
+  ], [changeRoom, openKAI, setMode, onClose]);
 
   // If query is present, search knowledge engine as well as filtering commands
   const displayedItems: CommandItem[] = useMemo(() => {
@@ -165,8 +198,8 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
         (c.subtext && c.subtext.toLowerCase().includes(q))
     );
 
-    // Get search results from Knowledge Engine
-    const searchResults = knowledgeEngine.search(q);
+    // Get search results from Knowledge Engine with mode-aware scoring
+    const searchResults = knowledgeEngine.search(q, { mode });
     const searchItems: CommandItem[] = searchResults.slice(0, 6).map((res) => {
       const { targetRoom, params } = getSearchResultParams(res);
       return {
@@ -183,7 +216,7 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
     });
 
     return [...matchingStandard, ...searchItems];
-  }, [query, standardCommands, changeRoom, onClose]);
+  }, [query, standardCommands, changeRoom, mode, onClose]);
 
   // Keyboard navigation inside list
   const handleKeyDown = (e: React.KeyboardEvent) => {

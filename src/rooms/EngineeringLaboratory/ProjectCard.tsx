@@ -1,6 +1,7 @@
 import type { Project } from "../../knowledge-engine/types";
-import { ExternalLink, ArrowUpRight, Cpu } from "lucide-react";
+import { ExternalLink, ArrowUpRight, Cpu, Terminal, CheckCircle2 } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
+import { useExperienceEngine } from "../../experience-engine";
 
 interface ProjectCardProps {
   project: Project;
@@ -8,6 +9,7 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, onInspect }: ProjectCardProps) {
+  const { mode } = useExperienceEngine();
   const domainLabels: Record<string, string> = {
     cybersecurity: "Cybersecurity",
     fullstack: "Full-Stack",
@@ -33,7 +35,7 @@ export default function ProjectCard({ project, onInspect }: ProjectCardProps) {
 
   return (
     <article
-      className="specimen-card"
+      className={`specimen-card ${mode === "developer" ? "developer-mode-card" : ""}`}
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -52,6 +54,48 @@ export default function ProjectCard({ project, onInspect }: ProjectCardProps) {
 
         <h3 className="specimen-title">{project.title}</h3>
         <p className="specimen-summary">{project.summary}</p>
+
+        {/* Developer mode: Full technical architecture detail displayed */}
+        {mode === "developer" && project.engineeringDecision && (
+          <div
+            style={{
+              margin: "8px 0",
+              padding: "6px 10px",
+              background: "rgba(15, 23, 42, 0.7)",
+              borderLeft: "2px solid #38bdf8",
+              borderRadius: "0 4px 4px 0",
+              fontSize: "0.78rem",
+              color: "#94a3b8",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#38bdf8", marginBottom: 2, fontWeight: 600 }}>
+              <Terminal size={11} />
+              <span>Engineering Architecture Decision:</span>
+            </div>
+            <p style={{ margin: 0, lineHeight: 1.4 }}>{project.engineeringDecision}</p>
+          </div>
+        )}
+
+        {/* Recruiter mode: Key impact / operational metric displayed */}
+        {mode === "recruiter" && project.metrics && project.metrics.length > 0 && (
+          <div
+            style={{
+              margin: "8px 0",
+              padding: "6px 10px",
+              background: "rgba(16, 37, 26, 0.5)",
+              borderLeft: "2px solid #34d399",
+              borderRadius: "0 4px 4px 0",
+              fontSize: "0.78rem",
+              color: "#a7f3d0",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 5, color: "#34d399", marginBottom: 2, fontWeight: 600 }}>
+              <CheckCircle2 size={11} />
+              <span>Demonstrated Impact:</span>
+            </div>
+            <p style={{ margin: 0, lineHeight: 1.4 }}>{project.metrics[0]}</p>
+          </div>
+        )}
 
         <div className="specimen-stack-list" aria-label="Technologies used">
           {project.stack.map((tech) => (

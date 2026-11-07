@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import type { ResumeVariant } from "../../knowledge-engine/types";
+import { resolveAssetUrl } from "../../experience-engine";
 import {
   X,
   FileText,
@@ -11,6 +12,7 @@ import {
   ShieldCheck,
   Award,
   Printer,
+  Download,
 } from "lucide-react";
 
 interface ResumeDetailModalProps {
@@ -42,12 +44,9 @@ export default function ResumeDetailModal({
 
   if (!resume) return null;
 
-  const isDocumentLinked =
-    resume.fileUrl &&
-    !resume.fileUrl.startsWith("#") &&
-    (resume.fileUrl.startsWith("/") ||
-      resume.fileUrl.startsWith("http://") ||
-      resume.fileUrl.startsWith("https://"));
+  const resolvedUrl = resolveAssetUrl(resume.fileUrl);
+  const isDocumentLinked = Boolean(resolvedUrl && !resume.fileUrl.startsWith("#"));
+  const downloadFilename = `Kamalesh-Suresh-Kumar-${resume.id.replace(/^resume-/, "")}-resume.pdf`;
 
   const modalContent = (
     <div className="vault-modal-backdrop" onClick={onClose} role="presentation">
@@ -193,15 +192,36 @@ export default function ResumeDetailModal({
             <span>Print Specification</span>
           </button>
           {isDocumentLinked && (
-            <a
-              href={resume.fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="resume-action-btn btn-primary"
-            >
-              <ExternalLink size={14} />
-              <span>Download PDF</span>
-            </a>
+            <>
+              <a
+                href={resolvedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="resume-action-btn btn-primary"
+                style={{
+                  background: "rgba(56, 189, 248, 0.15)",
+                  color: "#38bdf8",
+                  borderColor: "rgba(56, 189, 248, 0.4)",
+                }}
+              >
+                <ExternalLink size={14} />
+                <span>View PDF</span>
+              </a>
+
+              <a
+                href={resolvedUrl}
+                download={downloadFilename}
+                className="resume-action-btn btn-primary"
+                style={{
+                  background: "#166534",
+                  color: "#4ade80",
+                  borderColor: "rgba(74, 222, 128, 0.4)",
+                }}
+              >
+                <Download size={14} />
+                <span>Download PDF</span>
+              </a>
+            </>
           )}
           <button
             type="button"

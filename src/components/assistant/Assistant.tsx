@@ -26,10 +26,11 @@ export default function Assistant() {
     assistantFocus,
     setAssistantFocus,
     reducedMotion,
+    mode,
   } = useExperienceEngine();
 
   const [messages, setMessages] = useState<IAssistantMessage[]>(() => [
-    getGreetingMessage(),
+    getGreetingMessage(mode),
   ]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -53,7 +54,7 @@ export default function Assistant() {
       const timer = setTimeout(() => {
         if (focus.contextPrompt) {
           const route = routeIntent(focus.contextPrompt);
-          const res = generateAssistantResponse(route);
+          const res = generateAssistantResponse(route, mode);
           setMessages((prev) => [
             ...prev,
             {
@@ -80,7 +81,7 @@ export default function Assistant() {
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [assistantFocus, openKAI, setAssistantFocus]);
+  }, [assistantFocus, openKAI, setAssistantFocus, mode]);
 
   // Escape key listener to close drawer
   useEffect(() => {
@@ -103,14 +104,14 @@ export default function Assistant() {
     };
 
     const route = routeIntent(text);
-    const kaiMsg = generateAssistantResponse(route);
+    const kaiMsg = generateAssistantResponse(route, mode);
 
     setMessages((prev) => [...prev, userMsg, kaiMsg]);
-  }, []);
+  }, [mode]);
 
   const handleResetConversation = useCallback(() => {
-    setMessages([getGreetingMessage()]);
-  }, []);
+    setMessages([getGreetingMessage(mode)]);
+  }, [mode]);
 
   // Compute active quick replies from the latest KAI message if available
   const latestKAIMessage = [...messages].reverse().find((m) => m.role === "kai");

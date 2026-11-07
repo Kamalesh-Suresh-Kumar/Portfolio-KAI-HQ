@@ -4,7 +4,7 @@ import { useExperienceEngine } from "../../experience-engine";
 import { FolderGit2, ArrowRight, CheckCircle2, Terminal } from "lucide-react";
 
 export default function FeaturedProjectsSection() {
-  const { changeRoom, setAssistantFocus } = useExperienceEngine();
+  const { changeRoom, setAssistantFocus, mode } = useExperienceEngine();
 
   const projects = useMemo(() => {
     return knowledgeEngine.getProjects().filter((p) => p.featured || p.id === "lifi-security-protocols");
@@ -22,7 +22,13 @@ export default function FeaturedProjectsSection() {
     <section className="lobby-featured-projects-section" aria-label="Featured Engineering Architectures">
       <div className="lobby-section-header">
         <div>
-          <span className="lobby-sub-badge">// ENGINEERING LAB</span>
+          <span className="lobby-sub-badge">
+            {mode === "developer"
+              ? "// SYSTEM ARCHITECTURES & SOURCE"
+              : mode === "recruiter"
+              ? "// VERIFIED DELIVERABLES & IMPACT"
+              : "// ENGINEERING LAB"}
+          </span>
           <h2 className="lobby-section-title">Featured Systems & Architectures</h2>
         </div>
         <button
@@ -51,7 +57,17 @@ export default function FeaturedProjectsSection() {
             <h3 className="project-title">{project.title}</h3>
             <p className="project-summary">{project.summary}</p>
 
-            {project.metrics && project.metrics.length > 0 && (
+            {mode === "developer" && project.engineeringDecision && (
+              <div className="project-metrics-box" style={{ borderColor: "rgba(56, 189, 248, 0.4)", background: "rgba(12, 23, 44, 0.6)" }}>
+                <div className="metrics-label" style={{ color: "#38bdf8" }}>
+                  <Terminal size={12} color="#38bdf8" />
+                  <span>ARCHITECTURE DECISION</span>
+                </div>
+                <p className="metric-text">{project.engineeringDecision}</p>
+              </div>
+            )}
+
+            {project.metrics && project.metrics.length > 0 && mode !== "developer" && (
               <div className="project-metrics-box">
                 <div className="metrics-label">
                   <CheckCircle2 size={12} color="#34d399" />

@@ -11,14 +11,31 @@ import {
 } from "lucide-react";
 
 export default function HeroSection() {
-  const { changeRoom, openKAI, setAssistantFocus, reducedMotion } = useExperienceEngine();
+  const { changeRoom, openKAI, setAssistantFocus, reducedMotion, mode } = useExperienceEngine();
   const contact = knowledgeEngine.getContact();
 
   const handleTalkToKAI = () => {
-    setAssistantFocus({
-      contextPrompt: "Hello KAI, give me an overview of Kamalesh's engineering portfolio",
-    });
+    let contextPrompt = "Hello KAI, give me an overview of Kamalesh's engineering portfolio";
+    if (mode === "recruiter") {
+      contextPrompt = "Hello KAI, give me a quick recruiter summary of Kamalesh's background, qualifications, and role fit";
+    } else if (mode === "developer") {
+      contextPrompt = "Hello KAI, explain the system architecture, optical security protocols, and tech stacks used in Kamalesh's projects";
+    }
+
+    setAssistantFocus({ contextPrompt });
     openKAI();
+  };
+
+  const getModeBadge = () => {
+    switch (mode) {
+      case "recruiter":
+        return "// PERSPECTIVE: RECRUITER & TALENT FOCUS";
+      case "developer":
+        return "// PERSPECTIVE: ENGINEERING & ARCHITECTURE FOCUS";
+      case "neutral":
+      default:
+        return "// KAI HQ OPERATING SYSTEM v1.0";
+    }
   };
 
   return (
@@ -26,7 +43,7 @@ export default function HeroSection() {
       <div className="hero-content">
         <div className="hero-text">
           <div className="hero-badge-row">
-            <span className="hero-label">// KAI HQ OPERATING SYSTEM v1.0</span>
+            <span className="hero-label">{getModeBadge()}</span>
             <span className="hero-status-pill">
               <span className="pulse-dot"></span>
               SYSTEMS ONLINE
@@ -60,47 +77,138 @@ export default function HeroSection() {
             <span>{contact.availability}</span>
           </div>
 
+          {/* Action grid adapted for active mode */}
           <div className="hero-actions-grid">
-            <button
-              type="button"
-              className="btn-hero-primary"
-              onClick={() => changeRoom("EngineeringLaboratory")}
-              id="hero-explore-engineering-btn"
-            >
-              <FolderGit2 size={16} />
-              <span>Explore Engineering</span>
-              <ChevronRight size={15} />
-            </button>
+            {mode === "recruiter" ? (
+              <>
+                <button
+                  type="button"
+                  className="btn-hero-primary"
+                  onClick={() => changeRoom("DocumentVault")}
+                  id="hero-view-resume-btn"
+                >
+                  <FileText size={16} />
+                  <span>Download Resumes (4 Variants)</span>
+                  <ChevronRight size={15} />
+                </button>
 
-            <button
-              type="button"
-              className="btn-hero-secondary"
-              onClick={() => changeRoom("SkillProcessor")}
-              id="hero-view-skills-btn"
-            >
-              <Cpu size={16} />
-              <span>View Skills</span>
-            </button>
+                <button
+                  type="button"
+                  className="btn-hero-secondary"
+                  onClick={() => changeRoom("AchievementHall")}
+                  id="hero-view-achievements-btn"
+                >
+                  <ShieldCheck size={16} />
+                  <span>Verified Credentials</span>
+                </button>
 
-            <button
-              type="button"
-              className="btn-hero-secondary"
-              onClick={() => changeRoom("DocumentVault")}
-              id="hero-view-resume-btn"
-            >
-              <FileText size={16} />
-              <span>View Resumes</span>
-            </button>
+                <button
+                  type="button"
+                  className="btn-hero-secondary"
+                  onClick={() => changeRoom("EngineeringLaboratory")}
+                  id="hero-explore-engineering-btn"
+                >
+                  <FolderGit2 size={16} />
+                  <span>Key Projects</span>
+                </button>
 
-            <button
-              type="button"
-              className="btn-hero-kai"
-              onClick={handleTalkToKAI}
-              id="hero-talk-to-kai-btn"
-            >
-              <Bot size={16} />
-              <span>Talk to KAI</span>
-            </button>
+                <button
+                  type="button"
+                  className="btn-hero-kai"
+                  onClick={handleTalkToKAI}
+                  id="hero-talk-to-kai-btn"
+                >
+                  <Bot size={16} />
+                  <span>Screening Q&A</span>
+                </button>
+              </>
+            ) : mode === "developer" ? (
+              <>
+                <button
+                  type="button"
+                  className="btn-hero-primary"
+                  onClick={() => changeRoom("EngineeringLaboratory")}
+                  id="hero-explore-engineering-btn"
+                >
+                  <FolderGit2 size={16} />
+                  <span>Explore Engineering & Code</span>
+                  <ChevronRight size={15} />
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-hero-secondary"
+                  onClick={() => changeRoom("SkillProcessor")}
+                  id="hero-view-skills-btn"
+                >
+                  <Cpu size={16} />
+                  <span>Skill Matrix & Telemetry</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-hero-secondary"
+                  onClick={() => changeRoom("AchievementHall")}
+                  id="hero-view-research-btn"
+                >
+                  <ShieldCheck size={16} />
+                  <span>Protocol Research</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-hero-kai"
+                  onClick={handleTalkToKAI}
+                  id="hero-talk-to-kai-btn"
+                >
+                  <Bot size={16} />
+                  <span>Architecture Q&A</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="btn-hero-primary"
+                  onClick={() => changeRoom("EngineeringLaboratory")}
+                  id="hero-explore-engineering-btn"
+                >
+                  <FolderGit2 size={16} />
+                  <span>Explore Engineering</span>
+                  <ChevronRight size={15} />
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-hero-secondary"
+                  onClick={() => changeRoom("SkillProcessor")}
+                  id="hero-view-skills-btn"
+                >
+                  <Cpu size={16} />
+                  <span>View Skills</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-hero-secondary"
+                  onClick={() => changeRoom("DocumentVault")}
+                  id="hero-view-resume-btn"
+                >
+                  <FileText size={16} />
+                  <span>View Resumes</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-hero-kai"
+                  onClick={handleTalkToKAI}
+                  id="hero-talk-to-kai-btn"
+                >
+                  <Bot size={16} />
+                  <span>Talk to KAI</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
 

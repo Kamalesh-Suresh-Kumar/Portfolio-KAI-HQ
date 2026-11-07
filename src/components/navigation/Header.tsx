@@ -1,7 +1,8 @@
 import type { RefObject } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useExperienceEngine } from "../../experience-engine/useExperienceEngine";
-import type { Room } from "../../experience-engine/ExperienceEngineContext";
+import type { Room, VisitorMode } from "../../experience-engine/ExperienceEngineContext";
+import { Layers, UserCheck, Code2 } from "lucide-react";
 
 const ROOM_DISPLAY_NAMES: Record<Room, string> = {
   Lobby: "Lobby",
@@ -25,8 +26,29 @@ export default function Header({
   onToggleMobileNav,
   toggleButtonRef,
 }: HeaderProps) {
-  const { currentRoom } = useExperienceEngine();
+  const { currentRoom, mode, setMode } = useExperienceEngine();
   const displayName = ROOM_DISPLAY_NAMES[currentRoom] || currentRoom;
+
+  const modeOptions: { id: VisitorMode; label: string; icon: React.ReactNode; tooltip: string }[] = [
+    {
+      id: "neutral",
+      label: "Neutral",
+      icon: <Layers size={13} />,
+      tooltip: "Balanced comprehensive tour",
+    },
+    {
+      id: "recruiter",
+      label: "Recruiter",
+      icon: <UserCheck size={13} />,
+      tooltip: "Fast screening, resumes & credentials",
+    },
+    {
+      id: "developer",
+      label: "Developer",
+      icon: <Code2 size={13} />,
+      tooltip: "Architecture, code & protocol depth",
+    },
+  ];
 
   return (
     <header className="header" role="banner">
@@ -49,6 +71,35 @@ export default function Header({
           <p>Kamalesh Artificial Intelligence Headquarters</p>
         </div>
       </div>
+
+      {/* Visitor Mode Perspective Switcher */}
+      <nav
+        className="header-mode-nav"
+        role="radiogroup"
+        aria-label="Visitor Perspective Mode"
+      >
+        <span className="header-mode-label">// PERSPECTIVE:</span>
+        <div className="header-mode-group">
+          {modeOptions.map((opt) => {
+            const isSelected = mode === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                className={`header-mode-chip ${isSelected ? "active" : ""}`}
+                onClick={() => setMode(opt.id)}
+                title={opt.tooltip}
+              >
+                {opt.icon}
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
       <div className="header-right" aria-live="polite">
         <span className="room-label">CURRENT ROOM</span>
         <h2>{displayName}</h2>

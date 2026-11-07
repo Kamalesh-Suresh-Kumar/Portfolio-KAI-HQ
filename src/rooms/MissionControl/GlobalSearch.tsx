@@ -38,15 +38,15 @@ const ROOM_DISPLAY_NAMES: Record<Room, string> = {
 };
 
 export default function GlobalSearch({ onOpenCommandPalette }: GlobalSearchProps) {
-  const { changeRoom } = useExperienceEngine();
+  const { changeRoom, mode } = useExperienceEngine();
   const [query, setQuery] = useState("");
   const [activeType, setActiveType] = useState<TypeFilter>("all");
 
-  // Call the single-source-of-truth search API from Knowledge Engine
+  // Call the single-source-of-truth search API from Knowledge Engine with active mode weighting
   const rawResults = useMemo(() => {
     if (!query.trim()) return [];
-    return knowledgeEngine.search(query);
-  }, [query]);
+    return knowledgeEngine.search(query, { mode });
+  }, [query, mode]);
 
   // Compute filter counts for the current query
   const typeCounts = useMemo(() => {

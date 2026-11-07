@@ -6,7 +6,7 @@ export const resumeVariantsData: ResumeVariant[] = [
     label: 'Full-Stack Software Engineer',
     roleTitle: 'Full-Stack Developer (React / TypeScript / Node.js)',
     bestFor: 'Modern web engineering, frontend architecture, and full-stack product development roles.',
-    fileUrl: '#/documents/resume-fullstack.pdf',
+    fileUrl: '/documents/resume-fullstack.pdf',
     lastUpdated: '2026-08',
     highlights: [
       'Architected KAI HQ using React 19, TypeScript, and clean architectural separation',
@@ -20,7 +20,7 @@ export const resumeVariantsData: ResumeVariant[] = [
     label: 'Backend & Systems Developer',
     roleTitle: 'Backend Software Engineer & Systems Architect',
     bestFor: 'Backend services, distributed systems, API architecture, and database design roles.',
-    fileUrl: '#/documents/resume-backend.pdf',
+    fileUrl: '/documents/resume-backend.pdf',
     lastUpdated: '2026-08',
     highlights: [
       'Designed deterministic intent resolution engines and modular query APIs',
@@ -34,7 +34,7 @@ export const resumeVariantsData: ResumeVariant[] = [
     label: 'Cybersecurity & Security Analyst',
     roleTitle: 'Cybersecurity Analyst & Protocol Security Researcher',
     bestFor: 'Security engineering, penetration testing, network defense, and optical security analysis.',
-    fileUrl: '#/documents/resume-cybersecurity.pdf',
+    fileUrl: '/documents/resume-cybersecurity.pdf',
     lastUpdated: '2026-08',
     highlights: [
       'Researched and demonstrated optical penetration testing protocols to state Cybercrime Police',
@@ -48,7 +48,7 @@ export const resumeVariantsData: ResumeVariant[] = [
     label: 'AI & Systems Engineer',
     roleTitle: 'Intelligent Systems & Automation Engineer',
     bestFor: 'Software engineering roles focused on intelligent automation, intent routing, and AI workflows.',
-    fileUrl: '#/documents/resume-ai-systems.pdf',
+    fileUrl: '/documents/resume-ai-systems.pdf',
     lastUpdated: '2026-08',
     highlights: [
       'Developed sub-10ms deterministic conversational routers and knowledge retrieval systems',

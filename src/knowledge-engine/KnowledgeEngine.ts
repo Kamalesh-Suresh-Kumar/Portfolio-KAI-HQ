@@ -161,7 +161,10 @@ export class KnowledgeEngine {
    * Fast, client-side keyword and token matching search across all knowledge domains.
    * Delivers instantaneous (<10ms) deterministic results across rooms, projects, skills, timeline, and resumes.
    */
-  public search(query: string): SearchResult[] {
+  public search(
+    query: string,
+    options?: { mode?: 'neutral' | 'recruiter' | 'developer' }
+  ): SearchResult[] {
     const cleanQuery = query.trim().toLowerCase();
     if (!cleanQuery) return [];
 
@@ -299,6 +302,21 @@ export class KnowledgeEngine {
           matchedFields: ['name', 'domain', 'subtitle'],
           score: matchScore + 0.5, // Slight priority for exact room names
         });
+      }
+    }
+
+    // Mode-specific score weighting:
+    // Recruiter mode boosts resumes and credentials; Developer mode boosts projects and technical skills.
+    if (options?.mode === 'recruiter') {
+      for (const res of results) {
+        if (res.type === 'resume') res.score += 3.0;
+        if (res.type === 'achievement') res.score += 2.0;
+        if (res.type === 'timeline') res.score += 1.2;
+      }
+    } else if (options?.mode === 'developer') {
+      for (const res of results) {
+        if (res.type === 'project') res.score += 3.0;
+        if (res.type === 'skill') res.score += 2.0;
       }
     }
 

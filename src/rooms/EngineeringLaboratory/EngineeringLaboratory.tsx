@@ -10,7 +10,7 @@ import "./engineering-lab.css";
 type FilterTab = "all" | ProjectDomain;
 
 export default function EngineeringLaboratory() {
-  const { routeParams, changeRoom } = useExperienceEngine();
+  const { routeParams, changeRoom, mode } = useExperienceEngine();
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -75,6 +75,26 @@ export default function EngineeringLaboratory() {
     });
   }, [allProjects, activeFilter, searchQuery]);
 
+  // Mode-aware sorting (never hides content, only re-orders emphasis)
+  const displayProjects = useMemo(() => {
+    const list = [...filteredProjects];
+    if (mode === "recruiter") {
+      return list.sort((a, b) => {
+        if (a.status === "production" && b.status !== "production") return -1;
+        if (b.status === "production" && a.status !== "production") return 1;
+        return 0;
+      });
+    }
+    if (mode === "developer") {
+      return list.sort((a, b) => {
+        if (a.domain === "cybersecurity" && b.domain !== "cybersecurity") return -1;
+        if (b.domain === "cybersecurity" && a.domain !== "cybersecurity") return 1;
+        return 0;
+      });
+    }
+    return list;
+  }, [filteredProjects, mode]);
+
   const filterTabs: { key: FilterTab; label: string }[] = [
     { key: "all", label: "All Specimens" },
     { key: "cybersecurity", label: "Cybersecurity & Li-Fi" },
@@ -100,6 +120,31 @@ export default function EngineeringLaboratory() {
             metrics, and cross-linked proficiencies.
           </p>
         </div>
+
+        {/* Mode Perspective Lens Banner */}
+        {mode !== "neutral" && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: "10px 16px",
+              borderRadius: 8,
+              background: mode === "recruiter" ? "rgba(34, 197, 94, 0.12)" : "rgba(56, 189, 248, 0.12)",
+              border: `1px solid ${mode === "recruiter" ? "rgba(34, 197, 94, 0.3)" : "rgba(56, 189, 248, 0.3)"}`,
+              fontSize: "0.82rem",
+              color: mode === "recruiter" ? "#86efac" : "#7dd3fc",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <strong>{mode === "recruiter" ? "// RECRUITER LENS:" : "// DEVELOPER LENS:"}</strong>
+            <span>
+              {mode === "recruiter"
+                ? "Emphasizing production status, operational metrics, and delivery outcomes. All specimens remain fully accessible."
+                : "Emphasizing system architecture, protocols, and technical implementation depth. Inspect cards for full architecture notes."}
+            </span>
+          </div>
+        )}
 
         {/* Facility Telemetry Stats */}
         <div className="lab-stats-grid">
@@ -165,9 +210,9 @@ export default function EngineeringLaboratory() {
       </div>
 
       {/* Projects Grid */}
-      {filteredProjects.length > 0 ? (
+      {displayProjects.length > 0 ? (
         <div className="lab-projects-grid">
-          {filteredProjects.map((project) => (
+          {displayProjects.map((project) => (
             <ProjectCard
               key={project.id}
               project={project}

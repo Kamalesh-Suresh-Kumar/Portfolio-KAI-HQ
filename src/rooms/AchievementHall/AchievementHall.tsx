@@ -10,7 +10,7 @@ import "./achievement-hall.css";
 type FilterTab = "all" | AchievementCategory;
 
 export default function AchievementHall() {
-  const { routeParams, changeRoom } = useExperienceEngine();
+  const { routeParams, changeRoom, mode } = useExperienceEngine();
   const [activeCategory, setActiveCategory] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -83,6 +83,26 @@ export default function AchievementHall() {
     });
   }, [allAchievements, activeCategory, searchQuery]);
 
+  // Mode-aware sorting for display
+  const displayAchievements = useMemo(() => {
+    const list = [...filteredAchievements];
+    if (mode === "recruiter") {
+      return list.sort((a, b) => {
+        if (a.category === "certification" && b.category !== "certification") return -1;
+        if (b.category === "certification" && a.category !== "certification") return 1;
+        return 0;
+      });
+    }
+    if (mode === "developer") {
+      return list.sort((a, b) => {
+        if (a.category === "demonstration" && b.category !== "demonstration") return -1;
+        if (b.category === "demonstration" && a.category !== "demonstration") return 1;
+        return 0;
+      });
+    }
+    return list;
+  }, [filteredAchievements, mode]);
+
   // Featured / Highlighted records for the dedicated showcase
   const featuredAchievements = useMemo(() => {
     return allAchievements.filter((a) => a.highlight);
@@ -113,6 +133,31 @@ export default function AchievementHall() {
             society contributions.
           </p>
         </div>
+
+        {/* Mode Perspective Lens Banner */}
+        {mode !== "neutral" && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: "10px 16px",
+              borderRadius: 8,
+              background: mode === "recruiter" ? "rgba(34, 197, 94, 0.12)" : "rgba(56, 189, 248, 0.12)",
+              border: `1px solid ${mode === "recruiter" ? "rgba(34, 197, 94, 0.3)" : "rgba(56, 189, 248, 0.3)"}`,
+              fontSize: "0.82rem",
+              color: mode === "recruiter" ? "#86efac" : "#7dd3fc",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <strong>{mode === "recruiter" ? "// RECRUITER LENS:" : "// DEVELOPER LENS:"}</strong>
+            <span>
+              {mode === "recruiter"
+                ? "Emphasizing enterprise certifications, authenticated credentials, and verification links."
+                : "Emphasizing technical demonstrations and security protocol research (e.g. Police demonstration)."}
+            </span>
+          </div>
+        )}
 
         {/* Telemetry Statistics Grid */}
         <div className="hall-stats-grid">
@@ -203,9 +248,9 @@ export default function AchievementHall() {
       </div>
 
       {/* Achievements Grid */}
-      {filteredAchievements.length > 0 ? (
+      {displayAchievements.length > 0 ? (
         <div className="hall-achievements-grid">
-          {filteredAchievements.map((achievement) => (
+          {displayAchievements.map((achievement) => (
             <AchievementCard
               key={achievement.id}
               achievement={achievement}

@@ -1,11 +1,68 @@
 import { knowledgeEngine } from "../knowledge-engine";
 import type { RoomMetadata } from "../knowledge-engine/types";
-import type { Room } from "../experience-engine/ExperienceEngineContext";
+import type { Room, VisitorMode } from "../experience-engine/ExperienceEngineContext";
 import type { AssistantMessage } from "./types";
 import type { IntentRouteResult } from "./intentRouter";
 
-export function getGreetingMessage(): AssistantMessage {
+export function getGreetingMessage(mode: VisitorMode = "neutral"): AssistantMessage {
   const contact = knowledgeEngine.getContact();
+
+  if (mode === "recruiter") {
+    return {
+      id: `msg-${Date.now()}-greeting`,
+      role: "kai",
+      content: `Systems operational. I am KAI, configured for Recruiter & Talent Screening. ${contact.name} is a ${contact.title} with 4 production project specimens, 4 role-tailored resume specifications, and verified credentials. How can I expedite your candidate review?`,
+      timestamp: Date.now(),
+      intent: "greeting",
+      actions: [
+        {
+          label: "Open Document Vault",
+          targetRoom: "DocumentVault",
+          description: "Download role-tailored PDF resumes",
+        },
+        {
+          label: "Open Achievement Hall",
+          targetRoom: "AchievementHall",
+          description: "Inspect verified credentials and honors",
+        },
+      ],
+      quickReplies: [
+        "View resumes",
+        "Key qualifications",
+        "Career timeline",
+        "How to contact?",
+      ],
+    };
+  }
+
+  if (mode === "developer") {
+    return {
+      id: `msg-${Date.now()}-greeting`,
+      role: "kai",
+      content: `Systems operational. I am KAI, configured for Engineering & Architecture Deep Dive. ${contact.name} specializes in decoupled system engines, optical security protocols (Li-Fi transmission research briefed to law enforcement), and reactive web architectures. What technical subsystem would you like to inspect?`,
+      timestamp: Date.now(),
+      intent: "greeting",
+      actions: [
+        {
+          label: "Open Engineering Lab",
+          targetRoom: "EngineeringLaboratory",
+          description: "Inspect software architectures and code links",
+        },
+        {
+          label: "Open Skill Processor",
+          targetRoom: "SkillProcessor",
+          description: "Inspect capability matrix and telemetry",
+        },
+      ],
+      quickReplies: [
+        "Explain architecture",
+        "Show projects",
+        "What are your skills?",
+        "Inspect telemetry",
+      ],
+    };
+  }
+
   return {
     id: `msg-${Date.now()}-greeting`,
     role: "kai",
@@ -34,23 +91,38 @@ export function getGreetingMessage(): AssistantMessage {
   };
 }
 
-export function generateAssistantResponse(route: IntentRouteResult): AssistantMessage {
+export function generateAssistantResponse(
+  route: IntentRouteResult,
+  mode: VisitorMode = "neutral"
+): AssistantMessage {
   const id = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   const timestamp = Date.now();
 
   switch (route.intent) {
     case "greeting":
-      return getGreetingMessage();
+      return getGreetingMessage(mode);
 
     case "projects": {
       const projects = knowledgeEngine.getProjects();
       const featured = projects.slice(0, 3);
-      const projectList = featured.map((p) => `• ${p.title}: ${p.summary}`).join("\n");
+      
+      const content =
+        mode === "recruiter"
+          ? `Indexed ${projects.length} engineering projects with production deliverables:\n\n` +
+            featured.map((p) => `• ${p.title} (${p.status.toUpperCase()}): ${p.summary}`).join("\n") +
+            `\n\nProduction-ready specimens and live demos can be reviewed in the Engineering Laboratory.`
+          : mode === "developer"
+          ? `Indexed ${projects.length} engineering projects with full architectural blueprints:\n\n` +
+            featured.map((p) => `• ${p.title} [${p.domain.toUpperCase()}]: ${p.summary}\n  Tech: ${p.stack.slice(0, 4).join(", ")}`).join("\n") +
+            `\n\nFull architecture notes, security protocols, and repository links are available in the Engineering Laboratory.`
+          : `Indexed ${projects.length} engineering projects. Key featured projects include:\n\n` +
+            featured.map((p) => `• ${p.title}: ${p.summary}`).join("\n") +
+            `\n\nYou can inspect live demos, architecture specs, and metrics in the Engineering Laboratory.`;
 
       return {
         id,
         role: "kai",
-        content: `Indexed ${projects.length} engineering projects. Key featured projects include:\n\n${projectList}\n\nYou can inspect live demos, architecture specs, and metrics in the Engineering Laboratory.`,
+        content,
         timestamp,
         intent: "projects",
         actions: [
@@ -60,7 +132,9 @@ export function generateAssistantResponse(route: IntentRouteResult): AssistantMe
             description: "View all project specifications and code architectures",
           },
         ],
-        quickReplies: ["Inspect skills", "View timeline", "Open Resume"],
+        quickReplies: mode === "recruiter"
+          ? ["View resumes", "Contact channels", "Inspect credentials"]
+          : ["Inspect skills", "View timeline", "Open Resume"],
       };
     }
 

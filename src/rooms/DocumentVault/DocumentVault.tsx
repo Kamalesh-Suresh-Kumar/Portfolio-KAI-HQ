@@ -18,7 +18,7 @@ import {
 import "./document-vault.css";
 
 export default function DocumentVault() {
-  const { routeParams, changeRoom } = useExperienceEngine();
+  const { routeParams, changeRoom, mode } = useExperienceEngine();
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Derive selected resume directly from routeParams without cascading effect renders
@@ -106,6 +106,29 @@ export default function DocumentVault() {
             tailored highlights or download available specifications.
           </p>
         </div>
+
+        {/* Mode Perspective Lens Banner */}
+        {mode === "recruiter" && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: "10px 16px",
+              borderRadius: 8,
+              background: "rgba(34, 197, 94, 0.12)",
+              border: "1px solid rgba(34, 197, 94, 0.3)",
+              fontSize: "0.82rem",
+              color: "#86efac",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <strong>// RECRUITER PRIMARY DESTINATION:</strong>
+            <span>
+              All 4 role-tailored resume specifications are available with direct ATS-friendly PDF download and browser preview actions.
+            </span>
+          </div>
+        )}
 
         {/* Telemetry Statistics Grid */}
         <div className="vault-stats-grid">

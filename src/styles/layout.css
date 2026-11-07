@@ -101,6 +101,67 @@ body {
   white-space: nowrap;
 }
 
+/* ==========================================================================
+   VISITOR MODE PERSPECTIVE SWITCHER (HEADER)
+   ========================================================================== */
+
+.header-mode-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 19, 36, 0.85);
+  border: 1px solid var(--shell-border);
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+
+.header-mode-label {
+  font-family: monospace;
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.header-mode-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-mode-chip {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.header-mode-chip:hover {
+  color: #f1f5f9;
+  background: rgba(30, 58, 102, 0.4);
+}
+
+.header-mode-chip.active {
+  background: #162b4d;
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+.header-mode-chip:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 1px;
+}
+
 /* Mobile Menu Toggle Button (hidden on desktop) */
 .mobile-menu-btn {
   display: none;
@@ -316,6 +377,34 @@ body {
 
   .nav-icon {
     font-size: 18px;
+  }
+
+  .header-mode-label {
+    display: none;
+  }
+}
+
+/* Mobile (<= 768px, including 375px and 430px) */
+@media (max-width: 768px) {
+  .header-mode-nav {
+    padding: 2px 4px;
+    gap: 2px;
+  }
+
+  .header-mode-chip {
+    padding: 4px 6px;
+    font-size: 10px;
+    gap: 3px;
+  }
+}
+
+@media (max-width: 540px) {
+  .header-mode-chip span {
+    display: none;
+  }
+
+  .header-mode-chip {
+    padding: 5px 7px;
   }
 }
 

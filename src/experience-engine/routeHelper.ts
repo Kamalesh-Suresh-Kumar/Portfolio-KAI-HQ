@@ -290,3 +290,22 @@ export function getSearchResultParams(result: SearchResult): {
       };
   }
 }
+
+/**
+ * Resolves a public static asset path against the active base path.
+ * Examples:
+ * resolveAssetUrl("/documents/resume-fullstack.pdf")
+ *   => "/Portfolio-KAI-HQ/documents/resume-fullstack.pdf" (in production)
+ *   => "/documents/resume-fullstack.pdf" (in local dev / preview)
+ */
+export function resolveAssetUrl(assetPath: string): string {
+  if (!assetPath) return "";
+  if (assetPath.startsWith("http://") || assetPath.startsWith("https://")) {
+    return assetPath;
+  }
+  const cleanAsset = assetPath.replace(/^#+/, "");
+  const base = getAppBasePath();
+  const normalizedPath = cleanAsset.startsWith("/") ? cleanAsset : `/${cleanAsset}`;
+  return base ? `${base.replace(/\/+$/, "")}${normalizedPath}` : normalizedPath;
+}
+
