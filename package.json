@@ -5,14 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "tsc -b && vite build",
+    "build": "npm run generate:fallback && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "generate:resumes": "tsx scripts/generate-resumes.ts",
+    "generate:fallback": "tsx scripts/generate-fallback.ts",
     "test:phase4": "tsx scripts/test-phase4-voice-motion.ts",
     "test:routing": "tsx scripts/test-routing.ts",
     "test:knowledge": "tsx scripts/test-knowledge-engine.ts",
-    "test:phase6-1": "tsx scripts/test-phase6-1-accessibility.ts"
+    "test:phase6-1": "tsx scripts/test-phase6-1-accessibility.ts",
+    "test:phase6-2": "tsx scripts/test-phase6-2-fallback.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

@@ -363,19 +363,41 @@ Implements REQ-DEPLOY-003/004, REQ-KNOW-004, US-05.
 
 ### 8.3 Fallback Page Generation
 
-A dedicated pre-render step (Node script using the same `KnowledgeEngine` query API against the generated JSON) emits static HTML per room into `public/fallback/`, ensuring the fallback (UX-007) is generated from the *same data source* as the interactive app — eliminating any risk of the two experiences diverging in content, only in interactivity.
+A dedicated pre-render step (`scripts/generate-fallback.ts` using the same `KnowledgeEngine` query API) emits static HTML per room into `public/fallback/`, ensuring the fallback (UX-007) is generated from the *same data source* as the interactive app — eliminating any risk of the two experiences diverging in content, only in interactivity.
 
 ---
 
 ## 9. Fallback Rendering Strategy (AD-03, realizing UX-007)
 
-| Concern | Interactive App | Fallback |
+| Concern | Interactive App | Fallback (Phase 6.2) |
 |---|---|---|
-| Data source | `KnowledgeEngine` at runtime (client-side JSON fetch) | Same `KnowledgeEngine` API, invoked at build time |
-| Output | React SPA | Static semantic HTML, one file per room + index |
-| Navigation | Experience Engine-mediated | Plain `<a href>` links between static pages |
-| Search | Fuse.js client-side | Static sitemap-style index (no interactive search, per Volume 2 §11) |
-| Resume access | Document Vault UI | Direct `<a href download>` links, identical file targets |
+| Data source | `KnowledgeEngine` at runtime (in-memory TypeScript store) | Same `KnowledgeEngine` API, invoked at build time |
+| Output | React SPA (`index.html`) | Static semantic HTML in `public/fallback/` (10 files) |
+| Navigation | Experience Engine-mediated History API | Plain `<a href="./...">` relative links between static pages |
+| Search | Deterministic keyword/token scoring | Static sitemap-style index in Mission Control (per Volume 2 §11) |
+| Resume access | Document Vault UI | Direct `<a href="../documents/..." download>` links |
+| Accessibility | ARIA live regions, focus management | Semantic landmarks (`<main>`, `<header>`, `<footer>`, `<nav>`), skip-to-content links |
+
+**Phase 6.2 Static Fallback Architecture & Implementation Specifications:**
+- **Generator Location:** `scripts/generate-fallback.ts`
+- **Source of Truth:** `src/knowledge-engine/` (`KnowledgeEngine.ts` singleton query API)
+- **Output Directory:** `public/fallback/` (copied automatically to `dist/fallback/` during `vite build`)
+- **Generated File Inventory:**
+  1. `index.html` (Lobby / orientation point)
+  2. `lobby.html` (Lobby entry point mirror)
+  3. `engineering-laboratory.html` (Projects specimens & architecture decisions)
+  4. `memory-archive.html` (Career & academic chronological timeline)
+  5. `achievement-hall.html` (Verified honors, briefings & certifications)
+  6. `document-vault.html` (Role-tailored resume downloads & specifications)
+  7. `communication-center.html` (Direct email, GitHub & KAI Nexus coordinates)
+  8. `skill-processor.html` (Categorized technical proficiency matrix)
+  9. `mission-control.html` (Telemetry index & comprehensive sitemap replacement)
+  10. `fallback.css` (Self-contained high-contrast standalone stylesheet)
+- **Base-Path Agnosticism:** Every internal room link uses relative paths (`./<room>.html`) and resume downloads use `../documents/<resume>.pdf`. This guarantees flawless link resolution under both root development (`/fallback/`) and production GitHub Pages subpath hosting (`/Portfolio-KAI-HQ/fallback/`) without hardcoding URL prefixes.
+- **No-JavaScript Integration (`index.html`):** The application entry point embeds a semantic, inline-styled `<noscript>` block above `<div id="root"></div>`. Visitors with JavaScript disabled or unsupported receive an immediate, high-contrast notification with direct jump links to the static fallback experience.
+- **Build Pipeline Integration:** Integrated into `package.json` (`"generate:fallback": "tsx scripts/generate-fallback.ts"`, `"build": "npm run generate:fallback && tsc -b && vite build"`). The fallback files are generated before TypeScript checking and Vite asset packaging.
+- **Testing & Verification:** Dedicated automated test suite in `scripts/test-phase6-2-fallback.ts` (`npm run test:phase6-2`) verifying generator execution, document structure, relative link closure, KnowledgeEngine content parity, physical resume artifact existence, HTML entity escaping, and byte-for-byte deterministic reproducibility.
+- **Known Limitations:** Interactive search, speech recognition, and speech synthesis are not feasible without client-side scripts. Static search is replaced by the complete sitemap index in Mission Control per Volume 2 §11.
 
 This guarantees REQ-ACC-004 is met structurally, not through best-effort progressive enhancement alone — the fallback is a genuine build output, testable independently (see §14).
 
