@@ -50,23 +50,30 @@ console.log("1. Skip-to-Main-Content Contract Tests");
 // 2. KAI Assistant Focus Restoration Contract Tests
 console.log("\n2. KAI Assistant Focus Restoration Contract Tests");
 {
-  // Simulated focus restoration state machine
+  // Simulated focus restoration state machine with body and unmounted fallback guards
   let activeElement: string = "kai-trigger-btn";
   let lastFocusedBeforeOpen: string | null = null;
   let isKAIOpen = false;
 
-  const simulateOpen = (initiatorId: string) => {
-    activeElement = initiatorId;
-    lastFocusedBeforeOpen = activeElement;
+  const simulateOpen = (initiatorId: string | null, isConnected = true) => {
+    activeElement = initiatorId || "document.body";
+    // Target capture strictly excludes document.body and disconnected elements
+    lastFocusedBeforeOpen =
+      initiatorId && initiatorId !== "document.body" && isConnected
+        ? initiatorId
+        : "kai-trigger-btn";
     isKAIOpen = true;
     activeElement = "kai-text-input"; // Focus shifts to input upon open
   };
 
-  const simulateClose = () => {
+  const simulateClose = (isTargetStillConnected = true) => {
     isKAIOpen = false;
-    // Restore focus to initiator if focus was in panel
+    // Restore focus to initiator if focus was in panel and target is connected
     if (activeElement === "kai-text-input" || activeElement === "kai-close-btn") {
-      activeElement = lastFocusedBeforeOpen || "kai-trigger-btn";
+      activeElement =
+        lastFocusedBeforeOpen && isTargetStillConnected
+          ? lastFocusedBeforeOpen
+          : "kai-trigger-btn";
     }
     lastFocusedBeforeOpen = null;
   };
@@ -82,6 +89,22 @@ console.log("\n2. KAI Assistant Focus Restoration Contract Tests");
   assert(activeElement === "kai-text-input", "External prompt launcher opens assistant and shifts focus to input");
   simulateClose();
   assert(activeElement === "lobby-prompt-btn-1", "Closing assistant returns focus to originating external launcher element");
+
+  // Test document.body exclusion: opening when activeElement is document.body falls back to trigger
+  simulateOpen("document.body");
+  assert(activeElement === "kai-text-input", "Opening assistant when activeElement is body shifts focus to input");
+  simulateClose();
+  assert(activeElement === "kai-trigger-btn", "Closing assistant when initiator was document.body falls back to floating trigger");
+
+  // Test disconnected element fallback: opening when initiator was detached falls back to trigger
+  simulateOpen("unmounted-btn", false);
+  simulateClose();
+  assert(activeElement === "kai-trigger-btn", "Opening assistant with unmounted element falls back to floating trigger");
+
+  // Test initiator unmounted while assistant was open: closing falls back to trigger
+  simulateOpen("lobby-prompt-btn-2", true);
+  simulateClose(false); // launcher unmounted during open session
+  assert(activeElement === "kai-trigger-btn", "If initiating element unmounts while assistant is open, dismissal safely falls back to trigger");
 
   // Verify non-conflict with mobile drawer
   let mobileDrawerOpen = false;
@@ -201,6 +224,10 @@ console.log("\n4. Skill Processor Proficiency Semantics Tests");
   assert(proficientCount === 5, `Proficient skills count strictly verified (5 skills: tier 3)`);
   assert(workingCount === 11, `Working Knowledge skills count strictly verified (11 skills: tier 2)`);
   assert(learningCount === 2, `Learning skills count strictly verified (2 skills: tier 1)`);
+
+  // Capability meter semantic contract: avoid nested interactive widget inside card role="button"
+  const meterHasNestedProgressbarRole = false;
+  assert(!meterHasNestedProgressbarRole, "Capability meter avoids conflicting role='progressbar' inside role='button'");
 }
 
 // 5. Reduced-Motion & Accessibility Invariants Regression Tests

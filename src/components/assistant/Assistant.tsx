@@ -52,11 +52,18 @@ export default function Assistant() {
   useEffect(() => {
     if (!wasOpenRef.current && isKAIOpen) {
       // Just opened: capture the element that initiated opening or fall back to trigger
+      const active = document.activeElement as HTMLElement | null;
       lastFocusedBeforeOpenRef.current =
-        (document.activeElement as HTMLElement) || triggerBtnRef.current;
+        active && active !== document.body && document.contains(active)
+          ? active
+          : triggerBtnRef.current;
     } else if (wasOpenRef.current && !isKAIOpen) {
       // Just closed: return focus to trigger or originating element
-      const target = lastFocusedBeforeOpenRef.current || triggerBtnRef.current;
+      const targetCandidate = lastFocusedBeforeOpenRef.current;
+      const target =
+        targetCandidate && document.contains(targetCandidate)
+          ? targetCandidate
+          : triggerBtnRef.current;
       if (target && typeof target.focus === "function") {
         const currentActive = document.activeElement;
         const wasFocusInPanel =

@@ -77,15 +77,7 @@ export default function SkillCard({ skill, onSelect }: SkillCardProps) {
         )}
 
         {/* Discrete Capability Meter */}
-        <div
-          className="capability-meter-wrap"
-          role="progressbar"
-          aria-label={`${skill.name} capability tier`}
-          aria-valuemin={1}
-          aria-valuemax={4}
-          aria-valuenow={tier}
-          aria-valuetext={`${proficiencyLabel} (tier ${tier} of 4)`}
-        >
+        <div className="capability-meter-wrap">
           <div className="capability-meter-header">
             <span style={{ color: "#94a3b8" }}>Proficiency Tier</span>
             <span className={`capability-level-label level-${skill.proficiencyLevel}`}>
