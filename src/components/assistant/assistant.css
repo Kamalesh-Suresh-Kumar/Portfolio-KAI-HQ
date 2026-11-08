@@ -598,6 +598,91 @@
   background: rgba(239, 68, 68, 0.25);
 }
 
+/* Explicit Voice Processing Consent Dialog */
+.kai-consent-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #091224;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.kai-consent-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.kai-consent-desc {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.kai-consent-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.kai-consent-btn-allow {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.55);
+  color: #fef3c7;
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  min-height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.kai-consent-btn-allow:hover {
+  background: rgba(245, 158, 11, 0.35);
+  color: #ffffff;
+}
+
+.kai-consent-btn-allow:focus-visible {
+  outline: 2px solid #fbbf24;
+  outline-offset: 1px;
+}
+
+.kai-consent-btn-decline {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #94a3b8;
+  font-family: monospace;
+  font-size: 0.72rem;
+  padding: 5px 12px;
+  min-height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.kai-consent-btn-decline:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}
+
+.kai-consent-btn-decline:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: 1px;
+}
+
 /* Reduced Motion Override */
 @media (prefers-reduced-motion: reduce) {
   .kai-pulse-ring {

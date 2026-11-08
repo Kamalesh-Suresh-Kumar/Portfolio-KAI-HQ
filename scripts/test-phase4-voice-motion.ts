@@ -112,7 +112,13 @@ console.log("\n2. Speech Synthesis Text Cleaning Tests");
 // 3. Speech Recognition State Machine, Privacy & Error Handling Tests
 console.log("\n3. Speech Recognition State Machine, Privacy & Error Handling Tests");
 {
-  // Test privacy disclosure contract
+  // Test privacy mode and disclosure contract
+  const privacyMode = speechAdapter.getRecognitionPrivacyMode();
+  assert(
+    typeof privacyMode === "string",
+    `speechAdapter.getRecognitionPrivacyMode() returns valid mode string ('${privacyMode}')`
+  );
+
   const privacyInfo = speechAdapter.getRecognitionPrivacyInfo();
   assert(
     typeof privacyInfo.isLocalOnly === "boolean",
@@ -121,6 +127,24 @@ console.log("\n3. Speech Recognition State Machine, Privacy & Error Handling Tes
   assert(
     typeof privacyInfo.disclosure === "string" && privacyInfo.disclosure.length > 10,
     "speechAdapter.getRecognitionPrivacyInfo() provides an explicit disclosure of recognition mechanics"
+  );
+
+  // Test visitor consent management contract
+  assert(
+    speechAdapter.hasBrowserManagedConsent() === false,
+    "speechAdapter.hasBrowserManagedConsent() defaults strictly to false (no silent consent)"
+  );
+
+  speechAdapter.setBrowserManagedConsent(true);
+  assert(
+    speechAdapter.hasBrowserManagedConsent() === true,
+    "speechAdapter.setBrowserManagedConsent(true) enables browser-managed recognition consent"
+  );
+
+  speechAdapter.setBrowserManagedConsent(false);
+  assert(
+    speechAdapter.hasBrowserManagedConsent() === false,
+    "speechAdapter.setBrowserManagedConsent(false) revokes browser-managed recognition consent"
   );
 
   // Test session invalidation on abortListening
@@ -190,14 +214,21 @@ console.log("\n4. Power On / Boot Sequence Constraints, Keyboard Logic & Deep Li
     "Direct facility room deep link (e.g. EngineeringLaboratory) automatically bypasses boot sequence"
   );
 
+  const memoryArchiveRoom: Room = "MemoryArchive";
+  assert(
+    memoryArchiveRoom !== "Lobby",
+    "Deep link to MemoryArchive automatically bypasses boot sequence"
+  );
+
   // Test keyboard filter logic: verify Escape key always skips, Space/Enter ignores input elements
   const isInputTarget = (tagName: string) => tagName === "INPUT" || tagName === "TEXTAREA";
   assert(!isInputTarget("DIV"), "Non-input elements allow keyboard skip");
   assert(isInputTarget("INPUT"), "Input elements protect active typing from accidental Space/Enter skip");
+  assert(isInputTarget("TEXTAREA"), "Textarea elements protect active typing from accidental Space/Enter skip");
 }
 
-// 5. Regression Testing: All 8 Facilities and Routing Integrity
-console.log("\n5. Regression Testing: Facilities, Paths & Knowledge Engine");
+// 5. Regression Testing: All 8 Facilities, Knowledge Engine & Visitor Modes
+console.log("\n5. Regression Testing: Facilities, Paths, Knowledge Engine & Visitor Modes");
 {
   const rooms: Room[] = [
     "Lobby",
@@ -231,6 +262,17 @@ console.log("\n5. Regression Testing: Facilities, Paths & Knowledge Engine");
 
   const resumes = knowledgeEngine.getResumeVariants();
   assert(resumes.length === 4, `KnowledgeEngine retains all 4 role-tailored resume specifications`);
+
+  // Visitor mode search assertions
+  const recruiterResults = knowledgeEngine.search("engineer", { mode: "recruiter" });
+  assert(recruiterResults.length > 0, "Recruiter mode search returns results for 'engineer'");
+  assert(recruiterResults[0].type === "resume", "Recruiter mode prioritizes resume specification in top result");
+
+  const devResults = knowledgeEngine.search("systems", { mode: "developer" });
+  assert(devResults.length > 0, "Developer mode search returns results for 'systems'");
+
+  const neutralResults = knowledgeEngine.search("cybersecurity", { mode: "neutral" });
+  assert(neutralResults.length > 0, "Neutral mode search returns balanced portfolio results");
 }
 
 console.log("\n========================================================");

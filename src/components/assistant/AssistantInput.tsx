@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, memo } from "react";
-import { Send, Mic, MicOff, AlertCircle, X, Info } from "lucide-react";
+import { Send, Mic, MicOff, AlertCircle, X, Info, ShieldAlert } from "lucide-react";
 import { speechAdapter, type VoiceInputState } from "../../assistant/speechAdapter";
 
 interface AssistantInputProps {
@@ -12,6 +12,7 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
   const [text, setText] = useState("");
   const [voiceState, setVoiceState] = useState<VoiceInputState>("idle");
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [showConsentPrompt, setShowConsentPrompt] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isVoiceSupported = speechAdapter.isRecognitionSupported();
@@ -35,16 +36,20 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
 
   // Global Escape key listener while listening to abort capture immediately
   useEffect(() => {
-    if (voiceState !== "listening") return;
+    if (voiceState !== "listening" && !showConsentPrompt) return;
     const handleGlobalEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        speechAdapter.abortListening();
-        setVoiceState("idle");
+        if (showConsentPrompt) {
+          setShowConsentPrompt(false);
+        } else {
+          speechAdapter.abortListening();
+          setVoiceState("idle");
+        }
       }
     };
     window.addEventListener("keydown", handleGlobalEsc);
     return () => window.removeEventListener("keydown", handleGlobalEsc);
-  }, [voiceState]);
+  }, [voiceState, showConsentPrompt]);
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -61,14 +66,7 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
     setVoiceError(null);
   };
 
-  const handleToggleVoice = () => {
-    if (voiceState === "listening") {
-      speechAdapter.abortListening();
-      setVoiceState("idle");
-      return;
-    }
-
-    setVoiceError(null);
+  const initiateListening = () => {
     speechAdapter.startListening({
       onStateChange: (state) => {
         setVoiceState(state);
@@ -88,6 +86,37 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
     });
   };
 
+  const handleToggleVoice = () => {
+    if (voiceState === "listening") {
+      speechAdapter.abortListening();
+      setVoiceState("idle");
+      return;
+    }
+
+    setVoiceError(null);
+
+    const privacyMode = speechAdapter.getRecognitionPrivacyMode();
+    // If browser-managed cloud recognition requires visitor consent, prompt first!
+    if (privacyMode === "browser-managed-consent-required") {
+      setShowConsentPrompt(true);
+      return;
+    }
+
+    initiateListening();
+  };
+
+  const handleGrantConsent = () => {
+    speechAdapter.setBrowserManagedConsent(true);
+    setShowConsentPrompt(false);
+    initiateListening();
+  };
+
+  const handleDeclineConsent = () => {
+    speechAdapter.setBrowserManagedConsent(false);
+    setShowConsentPrompt(false);
+    inputRef.current?.focus();
+  };
+
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape" && voiceState === "listening") {
       e.stopPropagation();
@@ -105,6 +134,38 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
           ? `Voice input active. ${privacyInfo.disclosure} Press Escape to cancel.`
           : ""}
       </span>
+
+      {showConsentPrompt && (
+        <div
+          className="kai-consent-dialog"
+          role="region"
+          aria-labelledby="kai-consent-title"
+        >
+          <div className="kai-consent-header">
+            <ShieldAlert size={14} />
+            <span id="kai-consent-title">BROWSER VOICE PROCESSING NOTICE</span>
+          </div>
+          <p className="kai-consent-desc">
+            Your browser uses cloud-assisted speech recognition. Microphone audio may be processed by your browser vendor&apos;s speech service (such as Google or Apple). KAI HQ never records or stores your audio. Do you consent to proceed with browser-managed recognition?
+          </p>
+          <div className="kai-consent-actions">
+            <button
+              type="button"
+              className="kai-consent-btn-allow"
+              onClick={handleGrantConsent}
+            >
+              Consent &amp; Enable
+            </button>
+            <button
+              type="button"
+              className="kai-consent-btn-decline"
+              onClick={handleDeclineConsent}
+            >
+              Decline (Keep Typing)
+            </button>
+          </div>
+        </div>
+      )}
 
       {isListening && (
         <div className="kai-voice-info" role="status" aria-live="polite">

@@ -56,6 +56,14 @@ interface WindowWithSpeech extends Window {
   webkitSpeechRecognition?: { new (): ISpeechRecognition };
 }
 
+export type RecognitionPrivacyMode =
+  | "local-guaranteed"
+  | "local-model-missing"
+  | "browser-managed-consent-required"
+  | "browser-managed-consented"
+  | "unsupported"
+  | "permission-denied";
+
 export type VoiceInputState = "idle" | "listening" | "processing" | "error" | "unsupported";
 
 export interface SpeechRecognitionCallbacks {
@@ -64,12 +72,19 @@ export interface SpeechRecognitionCallbacks {
   onError: (errorMessage: string) => void;
 }
 
+interface ActiveSpeechSession {
+  readonly id: number;
+  readonly instance: ISpeechRecognition;
+  aborted: boolean;
+}
+
 class SpeechAdapter {
-  private recognitionInstance: ISpeechRecognition | null = null;
+  private activeSession: ActiveSpeechSession | null = null;
+  private sessionCounter: number = 0;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private activeSpeakingCallback: (() => void) | null = null;
   private availableVoices: SpeechSynthesisVoice[] = [];
-  private currentSessionId: number = 0;
+  private browserManagedConsent: boolean = false;
 
   constructor() {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -105,6 +120,91 @@ class SpeechAdapter {
   }
 
   /**
+   * Evaluates the granular privacy characteristics of the speech recognition engine.
+   * Distinguishes on-device local engines from browser-managed cloud services.
+   */
+  public getRecognitionPrivacyMode(): RecognitionPrivacyMode {
+    if (!this.isRecognitionSupported()) {
+      return "unsupported";
+    }
+
+    const win = window as unknown as WindowWithSpeech;
+    const RecognitionConstructor = win.SpeechRecognition || win.webkitSpeechRecognition;
+    const proto = RecognitionConstructor ? (RecognitionConstructor.prototype as Record<string, unknown>) : null;
+    const supportsProcessLocally = Boolean(proto && "processLocally" in proto);
+
+    if (supportsProcessLocally) {
+      // Check if language availability API is present and indicates missing model
+      const ctor = RecognitionConstructor as unknown as { available?: (lang: string) => string };
+      if (typeof ctor?.available === "function") {
+        try {
+          const avail = ctor.available("en-US");
+          if (avail === "downloadable" || avail === "not-installed") {
+            return "local-model-missing";
+          }
+        } catch {
+          // Fall back to local-guaranteed
+        }
+      }
+      return "local-guaranteed";
+    }
+
+    // Browser-managed engine (audio may be processed by vendor servers)
+    return this.browserManagedConsent ? "browser-managed-consented" : "browser-managed-consent-required";
+  }
+
+  /**
+   * Explicit visitor consent getter for browser-managed recognition.
+   */
+  public hasBrowserManagedConsent(): boolean {
+    return this.browserManagedConsent;
+  }
+
+  /**
+   * Explicit visitor consent setter for browser-managed recognition.
+   */
+  public setBrowserManagedConsent(consent: boolean): void {
+    this.browserManagedConsent = consent;
+  }
+
+  /**
+   * Returns a structured privacy descriptor with current mode and human-readable disclosure.
+   */
+  public getRecognitionPrivacyInfo(): {
+    mode: RecognitionPrivacyMode;
+    isLocalOnly: boolean;
+    disclosure: string;
+  } {
+    const mode = this.getRecognitionPrivacyMode();
+    const isLocalOnly = mode === "local-guaranteed";
+    let disclosure: string;
+
+    switch (mode) {
+      case "local-guaranteed":
+        disclosure = "On-device speech recognition active (local model).";
+        break;
+      case "local-model-missing":
+        disclosure = "Local speech model is missing. Browser download may be required.";
+        break;
+      case "browser-managed-consented":
+        disclosure = "Browser-managed speech active (consented). Audio processed by browser vendor.";
+        break;
+      case "browser-managed-consent-required":
+        disclosure = "Browser-managed speech requires explicit visitor consent before microphone activation.";
+        break;
+      case "permission-denied":
+        disclosure = "Microphone permission denied in browser settings.";
+        break;
+      case "unsupported":
+      default:
+        disclosure = "Voice recognition is unsupported in this browser environment.";
+        break;
+    }
+
+    return { mode, isLocalOnly, disclosure };
+  }
+
+  /**
    * Clean raw markdown, bullet characters, emojis, and URLs before speech synthesis
    * so KAI sounds natural, fluent, and professional.
    */
@@ -133,31 +233,6 @@ class SpeechAdapter {
   }
 
   /**
-   * Evaluates privacy characteristics of the browser's speech recognition engine.
-   * If on-device local recognition cannot be guaranteed, discloses that microphone
-   * audio may be processed by the browser vendor's recognition service.
-   */
-  public getRecognitionPrivacyInfo(): { isLocalOnly: boolean; disclosure: string } {
-    if (typeof window === "undefined") {
-      return {
-        isLocalOnly: false,
-        disclosure: "Voice recognition unavailable in headless environment.",
-      };
-    }
-    const win = window as unknown as WindowWithSpeech;
-    const RecognitionConstructor = win.SpeechRecognition || win.webkitSpeechRecognition;
-    const proto = RecognitionConstructor ? (RecognitionConstructor.prototype as Record<string, unknown>) : null;
-    const supportsProcessLocally = Boolean(proto && "processLocally" in proto);
-
-    return {
-      isLocalOnly: supportsProcessLocally,
-      disclosure: supportsProcessLocally
-        ? "On-device speech recognition requested (local model)."
-        : "Audio is processed by your browser's Web Speech engine (may use browser vendor servers). Text typing is always 100% on-device.",
-    };
-  }
-
-  /**
    * Starts listening for voice input.
    * Feeds transcripts back to the provided callbacks.
    */
@@ -168,9 +243,16 @@ class SpeechAdapter {
       return;
     }
 
+    const privacyMode = this.getRecognitionPrivacyMode();
+    if (privacyMode === "browser-managed-consent-required") {
+      callbacks.onStateChange("unsupported");
+      callbacks.onError("Browser-managed speech recognition requires explicit visitor consent before audio capture can begin.");
+      return;
+    }
+
     try {
       this.abortListening();
-      const sessionId = ++this.currentSessionId;
+      const sessionId = ++this.sessionCounter;
 
       const win = window as unknown as WindowWithSpeech;
       const RecognitionConstructor = win.SpeechRecognition || win.webkitSpeechRecognition;
@@ -187,7 +269,7 @@ class SpeechAdapter {
       rec.maxAlternatives = 1;
 
       // Evaluate processLocally if supported to prefer on-device recognition
-      if ("processLocally" in rec) {
+      if ("processLocally" in rec && privacyMode === "local-guaranteed") {
         try {
           (rec as unknown as { processLocally: boolean }).processLocally = true;
         } catch {
@@ -195,13 +277,20 @@ class SpeechAdapter {
         }
       }
 
+      const session: ActiveSpeechSession = {
+        id: sessionId,
+        instance: rec,
+        aborted: false,
+      };
+      this.activeSession = session;
+
       rec.onstart = () => {
-        if (sessionId !== this.currentSessionId) return;
+        if (this.activeSession !== session || session.aborted) return;
         callbacks.onStateChange("listening");
       };
 
       rec.onresult = (event: SpeechRecognitionEvent) => {
-        if (sessionId !== this.currentSessionId) return;
+        if (this.activeSession !== session || session.aborted) return;
 
         let interim = "";
         let final = "";
@@ -224,11 +313,11 @@ class SpeechAdapter {
       };
 
       rec.onerror = (event: SpeechRecognitionErrorEvent) => {
-        if (sessionId !== this.currentSessionId) return;
+        if (this.activeSession !== session || session.aborted) return;
 
         if (event.error === "aborted") {
           callbacks.onStateChange("idle");
-          this.recognitionInstance = null;
+          this.activeSession = null;
           return;
         }
 
@@ -249,17 +338,16 @@ class SpeechAdapter {
       };
 
       rec.onend = () => {
-        if (sessionId !== this.currentSessionId) return;
+        if (this.activeSession !== session || session.aborted) return;
         callbacks.onStateChange("idle");
-        this.recognitionInstance = null;
+        this.activeSession = null;
       };
 
-      this.recognitionInstance = rec;
       rec.start();
     } catch {
       callbacks.onStateChange("error");
       callbacks.onError("Unable to initialize microphone input.");
-      this.recognitionInstance = null;
+      this.activeSession = null;
     }
   }
 
@@ -268,14 +356,14 @@ class SpeechAdapter {
    * Invalidates session to prevent stale trailing callbacks.
    */
   public stopListening(): void {
-    this.currentSessionId++;
-    if (this.recognitionInstance) {
+    if (this.activeSession) {
+      this.activeSession.aborted = true;
       try {
-        this.recognitionInstance.stop();
+        this.activeSession.instance.stop();
       } catch {
         // Ignore if already stopped
       }
-      this.recognitionInstance = null;
+      this.activeSession = null;
     }
   }
 
@@ -284,14 +372,14 @@ class SpeechAdapter {
    * Invalidates session to prevent stale trailing callbacks.
    */
   public abortListening(): void {
-    this.currentSessionId++;
-    if (this.recognitionInstance) {
+    if (this.activeSession) {
+      this.activeSession.aborted = true;
       try {
-        this.recognitionInstance.abort();
+        this.activeSession.instance.abort();
       } catch {
         // Ignore if already aborted
       }
-      this.recognitionInstance = null;
+      this.activeSession = null;
     }
   }
 
