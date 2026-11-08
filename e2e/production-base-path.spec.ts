@@ -14,7 +14,7 @@ const ROOM_PATHS = [
   { name: "Engineering Laboratory", path: `${BASE_PREFIX}/engineering-laboratory`, content: "Engineering Laboratory" },
   { name: "Memory Archive", path: `${BASE_PREFIX}/memory-archive`, content: "Memory Archive" },
   { name: "Achievement Hall", path: `${BASE_PREFIX}/achievement-hall`, content: "Achievement Hall" },
-  { name: "Document Vault", path: `${BASE_PREFIX}/document-vault`, content: "Role-Tailored Specifications" },
+  { name: "Document Vault", path: `${BASE_PREFIX}/document-vault`, content: "Curated Career Variants" },
   { name: "Communication Center", path: `${BASE_PREFIX}/communication-center`, content: "Communication Center" },
   { name: "Skill Processor", path: `${BASE_PREFIX}/skill-processor`, content: "Skill Processor" },
   { name: "Mission Control", path: `${BASE_PREFIX}/mission-control`, content: "Mission Control" },

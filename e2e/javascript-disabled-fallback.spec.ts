@@ -104,7 +104,7 @@ test.describe("JavaScript-Disabled Static Fallback Suite", () => {
     await page.goto("/");
 
     // In JS-disabled browser, the <noscript> block is displayed
-    const noscriptLink = page.locator('noscript a[href*="fallback/index.html"]');
+    const noscriptLink = page.locator('noscript a[href*="fallback/index.html"]').first();
     await expect(noscriptLink).toBeAttached();
 
     const fallbackHref = await noscriptLink.getAttribute("href");

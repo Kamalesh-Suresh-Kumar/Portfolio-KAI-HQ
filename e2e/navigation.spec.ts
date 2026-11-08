@@ -36,7 +36,7 @@ const ROOMS = [
     name: "Document Vault",
     slug: "document-vault",
     expectedHeading: "Document Vault",
-    expectedContent: "Role-Tailored Specifications",
+    expectedContent: "Curated Career Variants",
   },
   {
     name: "Communication Center",
@@ -54,7 +54,7 @@ const ROOMS = [
     name: "Mission Control",
     slug: "mission-control",
     expectedHeading: "Mission Control",
-    expectedContent: "Global Telemetry",
+    expectedContent: "Command Palette",
   },
 ];
 
