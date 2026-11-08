@@ -8,6 +8,9 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [react()],
     base: process.env.GITHUB_ACTIONS ? "/Portfolio-KAI-HQ/" : "/",
+    build: {
+      manifest: true,
+    },
     server: {
       host: "0.0.0.0",
       port: 3000,
