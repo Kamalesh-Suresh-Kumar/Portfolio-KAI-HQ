@@ -372,7 +372,7 @@ A dedicated pre-render step (`scripts/generate-fallback.ts` using the same `Know
 | Concern | Interactive App | Fallback (Phase 6.2) |
 |---|---|---|
 | Data source | `KnowledgeEngine` at runtime (in-memory TypeScript store) | Same `KnowledgeEngine` API, invoked at build time |
-| Output | React SPA (`index.html`) | Static semantic HTML in `public/fallback/` (10 files) |
+| Output | React SPA (`index.html`) | Static semantic HTML & CSS in `public/fallback/` (9 HTML files, 1 CSS stylesheet; 10 assets total) |
 | Navigation | Experience Engine-mediated History API | Plain `<a href="./...">` relative links between static pages |
 | Search | Deterministic keyword/token scoring | Static sitemap-style index in Mission Control (per Volume 2 §11) |
 | Resume access | Document Vault UI | Direct `<a href="../documents/..." download>` links |
@@ -382,7 +382,7 @@ A dedicated pre-render step (`scripts/generate-fallback.ts` using the same `Know
 - **Generator Location:** `scripts/generate-fallback.ts`
 - **Source of Truth:** `src/knowledge-engine/` (`KnowledgeEngine.ts` singleton query API)
 - **Output Directory:** `public/fallback/` (copied automatically to `dist/fallback/` during `vite build`)
-- **Generated File Inventory:**
+- **Generated File Inventory (9 HTML files + 1 CSS stylesheet; 10 assets total):**
   1. `index.html` (Lobby / orientation point)
   2. `lobby.html` (Lobby entry point mirror)
   3. `engineering-laboratory.html` (Projects specimens & architecture decisions)

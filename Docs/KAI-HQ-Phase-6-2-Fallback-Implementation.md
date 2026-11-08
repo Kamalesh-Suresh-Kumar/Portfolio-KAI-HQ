@@ -28,7 +28,7 @@
 Phase 6.2 realizes Architectural Decision **AD-03** and Experience Design Specification **UX-007**, satisfying requirement **REQ-ACC-004**:
 > *"Core content (projects, resume, contact) shall remain accessible with JavaScript disabled, where technically practical (e.g., via static HTML fallback or pre-rendering)."*
 
-Rather than offering a degraded single-page error view or maintaining a separate out-of-sync dataset, KAI HQ implements a deterministic build-time generator (`scripts/generate-fallback.ts`) that queries the single source of truth (`src/knowledge-engine/`) and emits 10 semantic, accessible, high-contrast HTML/CSS assets into `public/fallback/`.
+Rather than offering a degraded single-page error view or maintaining a separate out-of-sync dataset, KAI HQ implements a deterministic build-time generator (`scripts/generate-fallback.ts`) that queries the single source of truth (`src/knowledge-engine/`) and emits 10 semantic, accessible, high-contrast assets (9 HTML documents and 1 CSS stylesheet) into `public/fallback/`.
 
 When JavaScript is disabled, visitors navigating to `index.html` encounter an immediate, high-contrast `<noscript>` notification with direct links to the static fallback room pages. All 8 facility rooms, 4 engineering projects, 5 career milestones, 5 verified credentials, 20 technical skills, and 4 role-tailored PDF resume downloads remain 100% accessible and readable with **zero client-side JavaScript execution**.
 
@@ -74,7 +74,7 @@ When JavaScript is disabled, visitors navigating to `index.html` encounter an im
 
 ## 4. Generated Fallback File Inventory
 
-The generator emits 10 static assets into `public/fallback/` (which are copied by Vite into `dist/fallback/`):
+The generator emits 10 static assets into `public/fallback/` (9 semantic HTML documents and 1 standalone CSS stylesheet, which are copied by Vite into `dist/fallback/`):
 
 | File | Room ID | Room Code | Purpose & Content |
 |---|---|---|---|
@@ -109,7 +109,7 @@ In `index.html`, a semantic `<noscript>` block is positioned directly inside `<b
         Kamalesh Artificial Intelligence Headquarters operates as an interactive terminal when JavaScript is active. Because JavaScript is disabled or unsupported in this browser environment, you can explore the complete, pre-rendered static fallback containing all engineering projects, career milestones, verified credentials, and direct resume downloads.
       </p>
       <p style="margin-bottom: 20px;">
-        <a href="./fallback/index.html" style="display: inline-block; background: #0284c7; color: #ffffff; padding: 10px 18px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.95rem;">
+        <a href="./fallback/index.html" style="display: inline-block; background: #0369a1; color: #ffffff; border: 1px solid #0284c7; padding: 10px 18px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.95rem;">
           Enter Static Headquarters Fallback &rarr;
         </a>
       </p>
@@ -135,12 +135,28 @@ In `index.html`, a semantic `<noscript>` block is positioned directly inside `<b
   - Sans-serif: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`
   - Monospace: `ui-monospace, Menlo, Consolas, monospace`
 
-### Accessibility Features
+### Accessibility Features & WCAG 2.1 Contrast Standards
 - **Skip to Content:** Every generated page provides `<a href="#main-content" class="skip-link">Skip to main content</a>` as the first keyboard focusable element.
 - **Semantic Landmark Structure:** Every page adheres to valid landmark structure: `<header>`, `<nav>`, `<main id="main-content">`, `<section>`, `<article>`, and `<footer>`.
 - **Heading Hierarchy:** `<h1>` for application identity, `<h2>` for facility room title, `<h3>` for sections/cards, and `<h4>` for sub-specimens.
-- **Focus Rings:** Explicit `:focus-visible` outlines (`outline: 2px solid #38bdf8; outline-offset: 2px`).
+- **Focus Rings:** Explicit `:focus-visible` outlines (`outline: 2px solid #38bdf8; outline-offset: 2px`). Contrast against card background (`#0c1527`) is **8.51:1** and shell background (`#050b16`) is **9.20:1**, far exceeding the 3.0:1 non-text contrast threshold (WCAG 2.1 SC 1.4.11).
 - **Target Sizes:** Touch/click targets for navigation and download buttons strictly exceed 40px height.
+
+#### Verified Contrast Ratios (WCAG 2.1 Mathematical Luminance)
+| Element & State | Foreground | Background | Calculated Ratio | WCAG 2.1 Standard | Status |
+|---|---|---|:---:|---|:---:|
+| Headings (`<h1>`–`<h3>`) | `#f8fafc` | `#050b16` / `#0c1527` | **18.83:1 / 17.42:1** | SC 1.4.3 (AAA: 7.0:1) | **PASS (AAA)** |
+| Main Body Text | `#cbd5e1` | `#050b16` / `#0c1527` | **13.27:1 / 12.28:1** | SC 1.4.3 (AAA: 7.0:1) | **PASS (AAA)** |
+| Muted Text | `#94a3b8` | `#050b16` / `#0c1527` | **7.68:1 / 7.11:1** | SC 1.4.3 (AAA: 7.0:1) | **PASS (AAA)** |
+| Interactive Links | `#38bdf8` | `#050b16` / `#0c1527` | **9.20:1 / 8.51:1** | SC 1.4.3 (AAA: 7.0:1) | **PASS (AAA)** |
+| Link Hover State | `#7dd3fc` | `#050b16` / `#0c1527` | **11.82:1 / 10.93:1** | SC 1.4.3 (AAA: 7.0:1) | **PASS (AAA)** |
+| Primary Action Button (`.btn-primary`) | `#ffffff` | `#0369a1` (Resting) | **5.93:1** | SC 1.4.3 Normal Text (AA: 4.5:1) | **PASS (AA)** |
+| Primary Button Hover | `#ffffff` | `#075985` (Hover) | **7.56:1** | SC 1.4.3 (AAA: 7.0:1) | **PASS (AAA)** |
+| Primary Button Active | `#ffffff` | `#0c4a6e` (Active) | **9.46:1** | SC 1.4.3 (AAA: 7.0:1) | **PASS (AAA)** |
+| Secondary Button (`.btn-secondary`) | `#f1f5f9` | `#1e293b` | **13.35:1** | SC 1.4.3 (AAA: 7.0:1) | **PASS (AAA)** |
+| Disabled Button State | `#94a3b8` | `#1e293b` | **5.71:1** | Inactive/disabled exempt | **PASS** |
+
+*Note: The previous resting background `#0284c7` provided 4.10:1 contrast against white text, failing the 4.5:1 threshold for normal text (0.88rem / 14.08px). The corrected background `#0369a1` achieves 5.93:1, fully compliant with WCAG 2.1 AA.*
 
 ---
 
