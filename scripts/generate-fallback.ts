@@ -549,6 +549,19 @@ a:focus-visible {
 `;
 
 /**
+ * Formats a raw proficiency level identifier into a title-cased display label.
+ */
+function formatProficiency(level: string): string {
+  const map: Record<string, string> = {
+    advanced: "Advanced",
+    proficient: "Proficient",
+    working_knowledge: "Working Knowledge",
+    learning: "Learning",
+  };
+  return map[level] || level.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+/**
  * Builds the common page wrapper including skip link, static mode notice,
  * branding header, 8-room navigation tabs, main content, and footer.
  */
@@ -580,7 +593,7 @@ ${FALLBACK_CSS}
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Static Fallback Mode Notice -->
-  <aside class="fallback-notice-banner" role="status" aria-label="Static Fallback Notice">
+  <div class="fallback-notice-banner" role="status" aria-label="Static Fallback Notice">
     <div class="fallback-notice-container">
       <span class="fallback-badge">KAI HQ // STATIC NO-JAVASCRIPT FALLBACK (UX-007, AD-03)</span>
       <p class="fallback-notice-text">
@@ -588,7 +601,7 @@ ${FALLBACK_CSS}
         All portfolio records, technical architectures, and direct resume downloads are fully accessible below without JavaScript.
       </p>
     </div>
-  </aside>
+  </div>
 
   <!-- Header & Navigation -->
   <header class="fallback-header">
@@ -639,6 +652,7 @@ ${contentHtml}
 function renderLobbyContent(): string {
   const contact = knowledgeEngine.getContact();
   const featuredProjects = knowledgeEngine.getFeaturedProjects();
+  const stats = knowledgeEngine.getStats();
 
   const directoryList = ROOM_DEFINITIONS.filter((r) => r.id !== "Lobby")
     .map(
@@ -649,7 +663,7 @@ function renderLobbyContent(): string {
           </div>
           <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">${escapeHtml(r.subtitle)}</p>
           <p style="font-size: 0.88rem; margin: 0;">${escapeHtml(r.description)}</p>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./${r.filename}" class="btn-action btn-secondary">Enter ${escapeHtml(r.name)} &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./${r.filename}" class="btn-action btn-secondary" aria-label="Enter ${escapeHtml(r.name)} (${escapeHtml(r.code)})">Enter ${escapeHtml(r.name)} &rarr;</a></p>
         </div>`
     )
     .join("\n");
@@ -666,7 +680,7 @@ function renderLobbyContent(): string {
           <div class="tag-list">
             ${p.stack.slice(0, 5).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}
           </div>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html#project-${escapeHtml(p.id)}" class="btn-action btn-secondary">Inspect in Lab &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html#project-${escapeHtml(p.id)}" class="btn-action btn-secondary" aria-label="Inspect ${escapeHtml(p.title)} in Engineering Laboratory">Inspect in Lab &rarr;</a></p>
         </div>`
     )
     .join("\n");
@@ -691,6 +705,32 @@ function renderLobbyContent(): string {
     </section>
 
     <section class="section-block">
+      <h3 class="section-title">Headquarters Telemetry Overview</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">${stats.projectsCount}</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Engineering Projects</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">${stats.skillsCount}</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Technical Skills</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">${stats.achievementsCount}</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Verified Honors</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">${stats.timelineCount}</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Timeline Milestones</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">${stats.resumeVariantsCount}</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Resume Variants</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
       <h3 class="section-title">Facility Directory (All Rooms)</h3>
       <div class="card-grid">
 ${directoryList}
@@ -708,10 +748,10 @@ ${featuredProjectsHtml}
       <h3 class="section-title">Verified Resume Artifacts</h3>
       <p style="margin-bottom: 14px;">Direct PDF downloads for all 4 role-tailored specifications:</p>
       <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="../documents/resume-fullstack.pdf" download class="btn-action btn-primary">Download Full-Stack Resume (PDF)</a>
-        <a href="../documents/resume-backend.pdf" download class="btn-action btn-primary">Download Backend Resume (PDF)</a>
-        <a href="../documents/resume-cybersecurity.pdf" download class="btn-action btn-primary">Download Cybersecurity Resume (PDF)</a>
-        <a href="../documents/resume-ai-systems.pdf" download class="btn-action btn-primary">Download AI Systems Resume (PDF)</a>
+        <a href="../documents/resume-fullstack.pdf" download class="btn-action btn-primary" aria-label="Download Full-Stack Resume PDF">Download Full-Stack Resume (PDF)</a>
+        <a href="../documents/resume-backend.pdf" download class="btn-action btn-primary" aria-label="Download Backend Resume PDF">Download Backend Resume (PDF)</a>
+        <a href="../documents/resume-cybersecurity.pdf" download class="btn-action btn-primary" aria-label="Download Cybersecurity Resume PDF">Download Cybersecurity Resume (PDF)</a>
+        <a href="../documents/resume-ai-systems.pdf" download class="btn-action btn-primary" aria-label="Download AI Systems Resume PDF">Download AI Systems Resume (PDF)</a>
       </div>
     </section>`;
 }
@@ -723,8 +763,10 @@ function renderEngineeringLabContent(): string {
     .map((p) => {
       const metricsHtml = p.metrics && p.metrics.length > 0
         ? `<div style="background: #091222; border-left: 3px solid #34d399; padding: 8px 12px; margin-top: 8px; border-radius: 4px;">
-            <strong style="color: #34d399; font-size: 0.78rem; text-transform: uppercase;">Key Metric &amp; Impact</strong>
-            <p style="margin: 0; font-size: 0.88rem;">${escapeHtml(p.metrics[0])}</p>
+            <strong style="color: #34d399; font-size: 0.78rem; text-transform: uppercase;">Key Metrics &amp; Impact</strong>
+            <ul style="margin: 4px 0 0 18px; font-size: 0.88rem; padding: 0;">
+              ${p.metrics.map((m) => `<li>${escapeHtml(m)}</li>`).join("")}
+            </ul>
           </div>`
         : "";
 
@@ -736,11 +778,14 @@ function renderEngineeringLabContent(): string {
         : "";
 
       const linksHtml: string[] = [];
-      if (p.repositoryUrl) {
-        linksHtml.push(`<a href="${escapeHtml(p.repositoryUrl)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary">Source Repository &rarr;</a>`);
+      if (p.links?.repo) {
+        linksHtml.push(`<a href="${escapeHtml(p.links.repo)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary" aria-label="Source Repository for ${escapeHtml(p.title)}">Source Repository &rarr;</a>`);
       }
-      if (p.demoUrl) {
-        linksHtml.push(`<a href="${escapeHtml(p.demoUrl)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-primary">Live Deployment &rarr;</a>`);
+      if (p.links?.demo) {
+        linksHtml.push(`<a href="${escapeHtml(p.links.demo)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-primary" aria-label="Live Deployment for ${escapeHtml(p.title)}">Live Deployment &rarr;</a>`);
+      }
+      if (p.links?.documentation) {
+        linksHtml.push(`<a href="${escapeHtml(p.links.documentation)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary" aria-label="Documentation for ${escapeHtml(p.title)}">Documentation &rarr;</a>`);
       }
 
       return `      <article id="project-${escapeHtml(p.id)}" class="fallback-card">
@@ -751,8 +796,8 @@ function renderEngineeringLabContent(): string {
           </div>
           <span class="badge ${p.status === "production" ? "badge-production" : "badge-completed"}">${escapeHtml(p.status)}</span>
         </div>
-        <p style="font-style: italic; color: #94a3b8; margin: 0; font-size: 0.92rem;">${escapeHtml(p.tagline)}</p>
-        <p style="line-height: 1.5; font-size: 0.92rem;">${escapeHtml(p.summary)}</p>
+        <p style="font-weight: 600; color: #cbd5e1; margin: 0; font-size: 0.92rem;">${escapeHtml(p.summary)}</p>
+        <p style="line-height: 1.5; font-size: 0.92rem; margin-top: 6px; color: #94a3b8;">${escapeHtml(p.description)}</p>
         ${metricsHtml}
         ${decisionHtml}
         <div style="margin-top: 8px;">
@@ -761,7 +806,7 @@ function renderEngineeringLabContent(): string {
             ${p.stack.map((s) => `<span class="tag">${escapeHtml(s)}</span>`).join("")}
           </div>
         </div>
-        ${linksHtml.length > 0 ? `<div style="display: flex; gap: 8px; margin-top: auto; padding-top: 10px;">${linksHtml.join("")}</div>` : ""}
+        ${linksHtml.length > 0 ? `<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 10px;">${linksHtml.join("")}</div>` : ""}
       </article>`;
     })
     .join("\n\n");
@@ -818,8 +863,21 @@ function renderAchievementHallContent(): string {
 
   const itemsHtml = achievements
     .map((ach) => {
+      const relatedProjectsHtml = ach.relatedProjectIds && ach.relatedProjectIds.length > 0
+        ? `<div style="margin-top: 10px; font-size: 0.85rem; color: #94a3b8;">
+            <strong style="text-transform: uppercase; font-size: 0.78rem;">Related Engineering Specimen:</strong>
+            <div style="margin-top: 4px;">
+              ${ach.relatedProjectIds.map((pid) => {
+                const proj = knowledgeEngine.getProjectById(pid);
+                const title = proj ? proj.title : pid;
+                return `<a href="./engineering-laboratory.html#project-${escapeHtml(pid)}" class="tag" style="text-decoration: underline;" aria-label="Inspect related project ${escapeHtml(title)} in Engineering Laboratory">${escapeHtml(title)} &rarr;</a>`;
+              }).join(" ")}
+            </div>
+          </div>`
+        : "";
+
       const linkHtml = ach.credentialUrl
-        ? `<p style="margin-top: auto; padding-top: 8px;"><a href="${escapeHtml(ach.credentialUrl)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary">Verify Credential &rarr;</a></p>`
+        ? `<p style="margin-top: auto; padding-top: 8px;"><a href="${escapeHtml(ach.credentialUrl)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary" aria-label="Verify Credential for ${escapeHtml(ach.title)}">Verify Credential &rarr;</a></p>`
         : "";
 
       return `      <article id="achievement-${escapeHtml(ach.id)}" class="fallback-card">
@@ -832,6 +890,7 @@ function renderAchievementHallContent(): string {
         </div>
         <p style="font-size: 0.82rem; color: #94a3b8; margin: 0; text-transform: uppercase;">Category: ${escapeHtml(ach.category)}</p>
         <p style="line-height: 1.5; font-size: 0.92rem; margin-top: 6px;">${escapeHtml(ach.description)}</p>
+        ${relatedProjectsHtml}
         ${linkHtml}
       </article>`;
     })
@@ -886,8 +945,8 @@ function renderDocumentVaultContent(): string {
           ${skillsTags}
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 12px; border-top: 1px solid #1b3358;">
-          <a href="${escapeHtml(relativePdfUrl)}" download class="btn-action btn-primary">Download PDF (${escapeHtml(r.label)})</a>
-          <a href="${escapeHtml(relativePdfUrl)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary">View PDF</a>
+          <a href="${escapeHtml(relativePdfUrl)}" download class="btn-action btn-primary" aria-label="Download ${escapeHtml(r.label)} resume PDF">Download PDF (${escapeHtml(r.label)})</a>
+          <a href="${escapeHtml(relativePdfUrl)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary" aria-label="View ${escapeHtml(r.label)} resume PDF in browser">View PDF</a>
         </div>
       </article>`;
     })
@@ -902,6 +961,8 @@ ${cardsHtml}
 
 function renderCommunicationCenterContent(): string {
   const contact = knowledgeEngine.getContact();
+  const githubCleanUrl = contact.github.startsWith("http") ? contact.github : `https://github.com/${contact.github}`;
+  const githubDisplayText = contact.github.replace(/^https?:\/\//, "");
 
   return `    <section class="section-block" style="margin-top: 0;">
       <h3 class="section-title">Direct Communication Channels</h3>
@@ -912,25 +973,25 @@ function renderCommunicationCenterContent(): string {
           <p style="font-size: 1.1rem; font-weight: 700; margin: 12px 0;">
             <a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a>
           </p>
-          <p><a href="mailto:${escapeHtml(contact.email)}" class="btn-action btn-primary">Dispatch Email &rarr;</a></p>
+          <p><a href="mailto:${escapeHtml(contact.email)}" class="btn-action btn-primary" aria-label="Dispatch Email to ${escapeHtml(contact.email)}">Dispatch Email &rarr;</a></p>
         </div>
 
         <div class="fallback-card">
           <h4 class="card-title">GitHub Developer Profile</h4>
           <p style="font-size: 0.9rem; color: #94a3b8;">Public open-source repositories, system architectures, and commit histories.</p>
           <p style="font-size: 1.1rem; font-weight: 700; margin: 12px 0;">
-            <a href="https://github.com/${escapeHtml(contact.github)}" target="_blank" rel="noopener noreferrer">github.com/${escapeHtml(contact.github)}</a>
+            <a href="${escapeHtml(githubCleanUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(githubDisplayText)}</a>
           </p>
-          <p><a href="https://github.com/${escapeHtml(contact.github)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary">Visit GitHub Profile &rarr;</a></p>
+          <p><a href="${escapeHtml(githubCleanUrl)}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary" aria-label="Visit GitHub Profile for ${escapeHtml(contact.name)}">Visit GitHub Profile &rarr;</a></p>
         </div>
 
         <div class="fallback-card">
-          <h4 class="card-title">${escapeHtml(contact.kaiNexus?.title || "KAI Nexus")}</h4>
+          <h4 class="card-title">${escapeHtml(contact.kaiNexus?.name || "KAI Nexus")}</h4>
           <p style="font-size: 0.9rem; color: #94a3b8;">${escapeHtml(contact.kaiNexus?.description || "Secondary communication and operational channel.")}</p>
           <p style="font-size: 1.1rem; font-weight: 700; margin: 12px 0;">
             <a href="${escapeHtml(contact.kaiNexus?.url || "https://kamalesh-suresh-kumar.github.io/KAI-Nexus/")}" target="_blank" rel="noopener noreferrer">Access KAI Nexus</a>
           </p>
-          <p><a href="${escapeHtml(contact.kaiNexus?.url || "https://kamalesh-suresh-kumar.github.io/KAI-Nexus/")}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary">Open KAI Nexus &rarr;</a></p>
+          <p><a href="${escapeHtml(contact.kaiNexus?.url || "https://kamalesh-suresh-kumar.github.io/KAI-Nexus/")}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary" aria-label="Open KAI Nexus external site">Open KAI Nexus &rarr;</a></p>
         </div>
       </div>
     </section>
@@ -940,23 +1001,23 @@ function renderCommunicationCenterContent(): string {
       <table class="info-table">
         <tbody>
           <tr>
-            <th>Full Name</th>
+            <th scope="row">Full Name</th>
             <td>${escapeHtml(contact.name)}</td>
           </tr>
           <tr>
-            <th>Professional Title</th>
+            <th scope="row">Professional Title</th>
             <td>${escapeHtml(contact.title)}</td>
           </tr>
           <tr>
-            <th>Geographic Base</th>
+            <th scope="row">Geographic Base</th>
             <td>${escapeHtml(contact.location)}</td>
           </tr>
           <tr>
-            <th>Current Availability</th>
+            <th scope="row">Current Availability</th>
             <td>${escapeHtml(contact.availability)}</td>
           </tr>
           <tr>
-            <th>Operational Mode</th>
+            <th scope="row">Operational Mode</th>
             <td>Static Fallback Interface (JavaScript Disabled)</td>
           </tr>
         </tbody>
@@ -980,14 +1041,24 @@ function renderSkillProcessorContent(): string {
 
       const skillsCards = skills
         .map(
-          (s) => `        <div id="skill-${escapeHtml(s.id)}" class="fallback-card">
+          (s) => {
+            const linkedProjectsHtml = s.linkedProjectIds.length > 0
+              ? `<p style="font-size: 0.8rem; color: #94a3b8; margin-top: auto; padding-top: 8px;">Used in: ${s.linkedProjectIds.map((pid) => {
+                  const proj = knowledgeEngine.getProjectById(pid);
+                  const title = proj ? proj.title : pid;
+                  return `<a href="./engineering-laboratory.html#project-${escapeHtml(pid)}" aria-label="Inspect ${escapeHtml(title)} in Engineering Laboratory">${escapeHtml(title)}</a>`;
+                }).join(", ")}</p>`
+              : "";
+
+            return `        <div id="skill-${escapeHtml(s.id)}" class="fallback-card">
           <div class="card-header-row">
             <h4 class="card-title">${escapeHtml(s.name)}</h4>
-            <span class="badge badge-tier">${escapeHtml(s.proficiencyLevel)}</span>
+            <span class="badge badge-tier" data-proficiency="${escapeHtml(s.proficiencyLevel)}">${escapeHtml(formatProficiency(s.proficiencyLevel))}</span>
           </div>
           <p style="font-size: 0.88rem; line-height: 1.5;">${escapeHtml(s.description || "")}</p>
-          ${s.linkedProjectIds.length > 0 ? `<p style="font-size: 0.8rem; color: #94a3b8; margin-top: auto;">Used in: <a href="./engineering-laboratory.html">${escapeHtml(s.linkedProjectIds.join(", "))}</a></p>` : ""}
-        </div>`
+          ${linkedProjectsHtml}
+        </div>`;
+          }
         )
         .join("\n");
 

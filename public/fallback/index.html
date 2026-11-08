@@ -447,7 +447,7 @@ a:focus-visible {
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Static Fallback Mode Notice -->
-  <aside class="fallback-notice-banner" role="status" aria-label="Static Fallback Notice">
+  <div class="fallback-notice-banner" role="status" aria-label="Static Fallback Notice">
     <div class="fallback-notice-container">
       <span class="fallback-badge">KAI HQ // STATIC NO-JAVASCRIPT FALLBACK (UX-007, AD-03)</span>
       <p class="fallback-notice-text">
@@ -455,7 +455,7 @@ a:focus-visible {
         All portfolio records, technical architectures, and direct resume downloads are fully accessible below without JavaScript.
       </p>
     </div>
-  </aside>
+  </div>
 
   <!-- Header & Navigation -->
   <header class="fallback-header">
@@ -503,6 +503,32 @@ a:focus-visible {
     </section>
 
     <section class="section-block">
+      <h3 class="section-title">Headquarters Telemetry Overview</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">4</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Engineering Projects</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">20</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Technical Skills</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">5</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Verified Honors</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">5</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Timeline Milestones</div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); font-family: ui-monospace, Menlo, Consolas, monospace;">4</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Resume Variants</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
       <h3 class="section-title">Facility Directory (All Rooms)</h3>
       <div class="card-grid">
         <div class="fallback-card">
@@ -512,7 +538,7 @@ a:focus-visible {
           </div>
           <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Project Specimen &amp; Engineering Research</p>
           <p style="font-size: 0.88rem; margin: 0;">Filterable collection of engineering specimens, deep-dive architectural notes, and project repositories.</p>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html" class="btn-action btn-secondary">Enter Engineering Laboratory &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html" class="btn-action btn-secondary" aria-label="Enter Engineering Laboratory (ROOM-02)">Enter Engineering Laboratory &rarr;</a></p>
         </div>
         <div class="fallback-card">
           <div class="card-header-row">
@@ -521,7 +547,7 @@ a:focus-visible {
           </div>
           <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Timeline &amp; Career Chronology</p>
           <p style="font-size: 0.88rem; margin: 0;">Chronological timeline of education, software engineering internships, naval cadetship, and technical society roles.</p>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./memory-archive.html" class="btn-action btn-secondary">Enter Memory Archive &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./memory-archive.html" class="btn-action btn-secondary" aria-label="Enter Memory Archive (ROOM-03)">Enter Memory Archive &rarr;</a></p>
         </div>
         <div class="fallback-card">
           <div class="card-header-row">
@@ -530,7 +556,7 @@ a:focus-visible {
           </div>
           <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Honors, Certifications &amp; Credentials</p>
           <p style="font-size: 0.88rem; margin: 0;">Evidentiary gallery showcasing law enforcement demonstrations, verified enterprise certifications, and leadership honors.</p>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./achievement-hall.html" class="btn-action btn-secondary">Enter Achievement Hall &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./achievement-hall.html" class="btn-action btn-secondary" aria-label="Enter Achievement Hall (ROOM-04)">Enter Achievement Hall &rarr;</a></p>
         </div>
         <div class="fallback-card">
           <div class="card-header-row">
@@ -539,7 +565,7 @@ a:focus-visible {
           </div>
           <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Role-Tailored Resumes &amp; Technical Papers</p>
           <p style="font-size: 0.88rem; margin: 0;">Role-tailored resume variants (Full-Stack, Backend, Cybersecurity, AI/Systems) with direct download capabilities.</p>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./document-vault.html" class="btn-action btn-secondary">Enter Document Vault &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./document-vault.html" class="btn-action btn-secondary" aria-label="Enter Document Vault (ROOM-05)">Enter Document Vault &rarr;</a></p>
         </div>
         <div class="fallback-card">
           <div class="card-header-row">
@@ -548,7 +574,7 @@ a:focus-visible {
           </div>
           <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Direct Frequency &amp; Contact Coordinates</p>
           <p style="font-size: 0.88rem; margin: 0;">Direct communication channels, GitHub repository coordinates, email links, and network presence.</p>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./communication-center.html" class="btn-action btn-secondary">Enter Communication Center &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./communication-center.html" class="btn-action btn-secondary" aria-label="Enter Communication Center (ROOM-06)">Enter Communication Center &rarr;</a></p>
         </div>
         <div class="fallback-card">
           <div class="card-header-row">
@@ -557,7 +583,7 @@ a:focus-visible {
           </div>
           <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Categorized Technical Matrix &amp; Toolchains</p>
           <p style="font-size: 0.88rem; margin: 0;">Structured matrix of programming languages, frameworks, security toolchains, and architectural domains with project linkages.</p>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./skill-processor.html" class="btn-action btn-secondary">Enter Skill Processor &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./skill-processor.html" class="btn-action btn-secondary" aria-label="Enter Skill Processor (ROOM-07)">Enter Skill Processor &rarr;</a></p>
         </div>
         <div class="fallback-card">
           <div class="card-header-row">
@@ -566,7 +592,7 @@ a:focus-visible {
           </div>
           <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Global Telemetry, Search &amp; Mode Controller</p>
           <p style="font-size: 0.88rem; margin: 0;">Central command surface offering full-text knowledge search, system telemetry, and visitor mode configuration.</p>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./mission-control.html" class="btn-action btn-secondary">Enter Mission Control &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./mission-control.html" class="btn-action btn-secondary" aria-label="Enter Mission Control (ROOM-08)">Enter Mission Control &rarr;</a></p>
         </div>
       </div>
     </section>
@@ -584,7 +610,7 @@ a:focus-visible {
           <div class="tag-list">
             <span class="tag">Python</span><span class="tag">C/C++</span><span class="tag">Optical Wireless Communication (OWC)</span><span class="tag">Signal Processing</span><span class="tag">Network Security</span>
           </div>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html#project-lifi-security-protocols" class="btn-action btn-secondary">Inspect in Lab &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html#project-lifi-security-protocols" class="btn-action btn-secondary" aria-label="Inspect Li-Fi Penetration Testing &amp; Optical Security Protocols in Engineering Laboratory">Inspect in Lab &rarr;</a></p>
         </div>
         <div class="fallback-card">
           <div class="card-header-row">
@@ -596,7 +622,7 @@ a:focus-visible {
           <div class="tag-list">
             <span class="tag">React 19</span><span class="tag">TypeScript</span><span class="tag">Tailwind CSS</span><span class="tag">Vite</span><span class="tag">CSS Variables</span>
           </div>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html#project-kai-headquarters-os" class="btn-action btn-secondary">Inspect in Lab &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html#project-kai-headquarters-os" class="btn-action btn-secondary" aria-label="Inspect KAI HQ — Headquarter Operating System in Engineering Laboratory">Inspect in Lab &rarr;</a></p>
         </div>
         <div class="fallback-card">
           <div class="card-header-row">
@@ -608,7 +634,7 @@ a:focus-visible {
           <div class="tag-list">
             <span class="tag">GitHub Actions</span><span class="tag">Node.js</span><span class="tag">Vite</span><span class="tag">Bash/Shell</span><span class="tag">YAML</span>
           </div>
-          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html#project-ci-cd-knowledge-automation" class="btn-action btn-secondary">Inspect in Lab &rarr;</a></p>
+          <p style="margin-top: auto; padding-top: 8px;"><a href="./engineering-laboratory.html#project-ci-cd-knowledge-automation" class="btn-action btn-secondary" aria-label="Inspect Automated CI/CD Knowledge &amp; Build Pipeline in Engineering Laboratory">Inspect in Lab &rarr;</a></p>
         </div>
       </div>
     </section>
@@ -617,10 +643,10 @@ a:focus-visible {
       <h3 class="section-title">Verified Resume Artifacts</h3>
       <p style="margin-bottom: 14px;">Direct PDF downloads for all 4 role-tailored specifications:</p>
       <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="../documents/resume-fullstack.pdf" download class="btn-action btn-primary">Download Full-Stack Resume (PDF)</a>
-        <a href="../documents/resume-backend.pdf" download class="btn-action btn-primary">Download Backend Resume (PDF)</a>
-        <a href="../documents/resume-cybersecurity.pdf" download class="btn-action btn-primary">Download Cybersecurity Resume (PDF)</a>
-        <a href="../documents/resume-ai-systems.pdf" download class="btn-action btn-primary">Download AI Systems Resume (PDF)</a>
+        <a href="../documents/resume-fullstack.pdf" download class="btn-action btn-primary" aria-label="Download Full-Stack Resume PDF">Download Full-Stack Resume (PDF)</a>
+        <a href="../documents/resume-backend.pdf" download class="btn-action btn-primary" aria-label="Download Backend Resume PDF">Download Backend Resume (PDF)</a>
+        <a href="../documents/resume-cybersecurity.pdf" download class="btn-action btn-primary" aria-label="Download Cybersecurity Resume PDF">Download Cybersecurity Resume (PDF)</a>
+        <a href="../documents/resume-ai-systems.pdf" download class="btn-action btn-primary" aria-label="Download AI Systems Resume PDF">Download AI Systems Resume (PDF)</a>
       </div>
     </section>
   </main>

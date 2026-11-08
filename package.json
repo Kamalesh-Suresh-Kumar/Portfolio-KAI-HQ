@@ -15,6 +15,8 @@
     "test:knowledge": "tsx scripts/test-knowledge-engine.ts",
     "test:phase6-1": "tsx scripts/test-phase6-1-accessibility.ts",
     "test:phase6-2": "tsx scripts/test-phase6-2-fallback.ts",
+    "test:parity": "vitest run tests/fallback-parity.test.ts",
+    "test:fallback-a11y": "vitest run tests/fallback-accessibility.test.ts",
     "test:unit": "vitest run",
     "typecheck": "tsc -b && tsc -p tsconfig.test.json --noEmit"
   },
