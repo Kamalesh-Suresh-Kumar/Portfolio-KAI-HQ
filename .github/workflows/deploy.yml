@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -24,17 +27,38 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: "npm"
 
-      - run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npm run build
+      - name: Code style & lint verification gate
+        run: npm run lint
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: TypeScript type checking gate
+        run: npm run typecheck
+
+      - name: Regression & accessibility test suites gate
+        run: npm run test:all
+
+      - name: Install Playwright Chromium browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end browser testing gate
+        run: npm run test:e2e
+
+      - name: Production application build
+        run: npm run build
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
   deploy:
     needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     environment:
