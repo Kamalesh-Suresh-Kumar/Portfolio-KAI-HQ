@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, memo } from "react";
-import { Send, Mic, MicOff, AlertCircle, X } from "lucide-react";
+import { Send, Mic, MicOff, AlertCircle, X, Info } from "lucide-react";
 import { speechAdapter, type VoiceInputState } from "../../assistant/speechAdapter";
 
 interface AssistantInputProps {
@@ -15,6 +15,7 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isVoiceSupported = speechAdapter.isRecognitionSupported();
+  const privacyInfo = speechAdapter.getRecognitionPrivacyInfo();
 
   // Auto focus input when opened
   useEffect(() => {
@@ -25,12 +26,25 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
     }
   }, [isOpen]);
 
-  // Clean up speech recognition on unmount
+  // Clean up speech recognition on unmount immediately discarding any pending transcripts
   useEffect(() => {
     return () => {
-      speechAdapter.stopListening();
+      speechAdapter.abortListening();
     };
   }, []);
+
+  // Global Escape key listener while listening to abort capture immediately
+  useEffect(() => {
+    if (voiceState !== "listening") return;
+    const handleGlobalEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        speechAdapter.abortListening();
+        setVoiceState("idle");
+      }
+    };
+    window.addEventListener("keydown", handleGlobalEsc);
+    return () => window.removeEventListener("keydown", handleGlobalEsc);
+  }, [voiceState]);
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -87,8 +101,17 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
   return (
     <footer className="kai-panel-footer">
       <span className="sr-only" role="status" aria-live="polite">
-        {isListening ? "Listening for speech. Speak your question now." : ""}
+        {isListening
+          ? `Voice input active. ${privacyInfo.disclosure} Press Escape to cancel.`
+          : ""}
       </span>
+
+      {isListening && (
+        <div className="kai-voice-info" role="status" aria-live="polite">
+          <Info size={13} style={{ flexShrink: 0 }} />
+          <span>{privacyInfo.disclosure} [ESC] to cancel.</span>
+        </div>
+      )}
 
       {voiceError && (
         <div className="kai-voice-notice" role="alert" aria-live="assertive">
@@ -133,14 +156,14 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
               ? "Voice input is not supported in this browser; typing is available"
               : isListening
               ? "Stop listening"
-              : "Ask via voice"
+              : `Ask via voice (${privacyInfo.isLocalOnly ? "On-device processing" : "Browser Web Speech service"})`
           }
           aria-label={
             !isVoiceSupported
               ? "Voice input not supported"
               : isListening
               ? "Stop voice input"
-              : "Start voice input"
+              : `Start voice input (${privacyInfo.isLocalOnly ? "On-device processing" : "Browser Web Speech service"})`
           }
           aria-pressed={isListening}
         >

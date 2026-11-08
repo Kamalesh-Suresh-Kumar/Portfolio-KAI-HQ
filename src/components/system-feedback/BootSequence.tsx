@@ -59,6 +59,13 @@ export default function BootSequence({ onComplete, reducedMotion = false }: Boot
     setIsExiting(true);
     setTimeout(() => {
       onComplete();
+      // Restore focus to the main landmark for seamless keyboard navigation
+      if (typeof document !== "undefined") {
+        const mainContent = document.getElementById("main-content");
+        if (mainContent) {
+          mainContent.focus();
+        }
+      }
     }, reducedMotion ? 0 : 250);
   }, [onComplete, reducedMotion]);
 
@@ -74,10 +81,29 @@ export default function BootSequence({ onComplete, reducedMotion = false }: Boot
     skipBtnRef.current?.focus();
   }, []);
 
-  // Keyboard skip listener: Escape, Enter, or Space immediately skips
+  // Keyboard skip listener: Escape predictability, Space/Enter only when appropriate
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
+      const activeEl = document.activeElement;
+      const isInput =
+        activeEl &&
+        (activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "TEXTAREA" ||
+          (activeEl as HTMLElement).isContentEditable);
+
+      // Escape always dismisses the sequence cleanly
+      if (e.key === "Escape") {
+        e.preventDefault();
+        finishSequence();
+        return;
+      }
+
+      // Space and Enter should only dismiss if not typing and not already handled by a focused button
+      if (!isInput && (e.key === "Enter" || e.key === " ")) {
+        if (activeEl === skipBtnRef.current) {
+          // Native button click handles invocation
+          return;
+        }
         e.preventDefault();
         finishSequence();
       }

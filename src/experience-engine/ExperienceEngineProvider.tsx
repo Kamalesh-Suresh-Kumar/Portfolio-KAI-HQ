@@ -102,6 +102,15 @@ export function ExperienceEngineProvider({
   // Listen for browser Back/Forward (popstate) and handle initial legacy hash clean-up
   useEffect(() => {
     function handlePopState() {
+      // Cancel ongoing speech synthesis if user navigates back/forward
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.cancel();
+        } catch {
+          // Safe catch
+        }
+      }
+
       const { room, params } = parsePath(
         window.location.pathname,
         window.location.search

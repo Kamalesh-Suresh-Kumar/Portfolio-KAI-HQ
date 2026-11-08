@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "generate:resumes": "tsx scripts/generate-resumes.ts",
-    "test:phase4": "tsx scripts/test-phase4-voice-motion.ts"
+    "test:phase4": "tsx scripts/test-phase4-voice-motion.ts",
+    "test:routing": "tsx scripts/test-routing.ts",
+    "test:knowledge": "tsx scripts/test-knowledge-engine.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

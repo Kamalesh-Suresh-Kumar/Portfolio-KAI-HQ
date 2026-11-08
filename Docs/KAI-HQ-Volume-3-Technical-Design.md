@@ -301,9 +301,9 @@ IntentClassifier (pattern/keyword matching + lightweight scoring)
 `SpeechAdapter` wraps the Web Speech API behind a feature-detection boundary. If unsupported or permission is denied, the text input path is unaffected — `ConversationRouter` never knows or cares whether input arrived via typing or speech (REQ-KAI-003 stays strictly additive).
 
 **Phase 4 Voice Implementation Decisions:**
-- **Voice Input (`SpeechRecognition`):** Feature-detected across `SpeechRecognition` and `webkitSpeechRecognition`. Never requested on page load; triggered only on explicit microphone activation. Discarded via `abortListening()` on cancel or Escape.
-- **Voice Output (`SpeechSynthesis`):** Independent toggle in KAI Assistant header (`voiceEnabled`). Utterances are pre-cleaned (`cleanTextForSpeech`) to strip markdown, raw URLs, and code blocks. Overlapping speech is canceled with `stopSpeaking()`, and voices are dynamically initialized via `onvoiceschanged`.
-- **Zero Cloud Leakage:** Fully executed within the browser's native Web Speech implementation with zero audio transmission or telemetry.
+- **Voice Input (`SpeechRecognition`):** Feature-detected across standard `SpeechRecognition` and `webkitSpeechRecognition`. Never requested on page load; triggered strictly by explicit user microphone activation. Discarded via `abortListening()` on cancel, unmount, or Escape with session token invalidation to prevent stale or accidental submissions. Evaluates modern `processLocally = true` where supported to request on-device recognition.
+- **Voice Output (`SpeechSynthesis`):** Independent toggle in KAI Assistant header (`voiceEnabled`). Utterances are pre-cleaned (`cleanTextForSpeech`) to strip markdown, raw URLs, and code blocks. Overlapping speech is canceled with `stopSpeaking()`, voices are dynamically cached via `onvoiceschanged`, and audio playback is halted immediately on room navigation and browser popstate.
+- **Privacy Architecture & Disclosures:** KAI HQ stores zero audio recordings, maintains zero server-side telemetry, and integrates zero paid or third-party audio APIs. Because standard browser Web Speech implementations (notably Chromium) may stream audio to vendor recognition servers unless on-device models and `processLocally` are available, KAI HQ explicitly discloses this browser service dependency in UI status notices and tooltips. Text input remains 100% on-device, offline-capable, and private at all times.
 
 ---
 

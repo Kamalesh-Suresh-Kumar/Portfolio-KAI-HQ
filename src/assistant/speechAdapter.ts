@@ -41,6 +41,7 @@ interface ISpeechRecognition extends EventTarget {
   interimResults: boolean;
   lang: string;
   maxAlternatives: number;
+  processLocally?: boolean;
   start(): void;
   stop(): void;
   abort(): void;
@@ -68,6 +69,7 @@ class SpeechAdapter {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private activeSpeakingCallback: (() => void) | null = null;
   private availableVoices: SpeechSynthesisVoice[] = [];
+  private currentSessionId: number = 0;
 
   constructor() {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -131,6 +133,31 @@ class SpeechAdapter {
   }
 
   /**
+   * Evaluates privacy characteristics of the browser's speech recognition engine.
+   * If on-device local recognition cannot be guaranteed, discloses that microphone
+   * audio may be processed by the browser vendor's recognition service.
+   */
+  public getRecognitionPrivacyInfo(): { isLocalOnly: boolean; disclosure: string } {
+    if (typeof window === "undefined") {
+      return {
+        isLocalOnly: false,
+        disclosure: "Voice recognition unavailable in headless environment.",
+      };
+    }
+    const win = window as unknown as WindowWithSpeech;
+    const RecognitionConstructor = win.SpeechRecognition || win.webkitSpeechRecognition;
+    const proto = RecognitionConstructor ? (RecognitionConstructor.prototype as Record<string, unknown>) : null;
+    const supportsProcessLocally = Boolean(proto && "processLocally" in proto);
+
+    return {
+      isLocalOnly: supportsProcessLocally,
+      disclosure: supportsProcessLocally
+        ? "On-device speech recognition requested (local model)."
+        : "Audio is processed by your browser's Web Speech engine (may use browser vendor servers). Text typing is always 100% on-device.",
+    };
+  }
+
+  /**
    * Starts listening for voice input.
    * Feeds transcripts back to the provided callbacks.
    */
@@ -142,7 +169,9 @@ class SpeechAdapter {
     }
 
     try {
-      this.stopListening();
+      this.abortListening();
+      const sessionId = ++this.currentSessionId;
+
       const win = window as unknown as WindowWithSpeech;
       const RecognitionConstructor = win.SpeechRecognition || win.webkitSpeechRecognition;
 
@@ -157,11 +186,23 @@ class SpeechAdapter {
       rec.lang = "en-US";
       rec.maxAlternatives = 1;
 
+      // Evaluate processLocally if supported to prefer on-device recognition
+      if ("processLocally" in rec) {
+        try {
+          (rec as unknown as { processLocally: boolean }).processLocally = true;
+        } catch {
+          // Graceful fallback if readonly or unsupported
+        }
+      }
+
       rec.onstart = () => {
+        if (sessionId !== this.currentSessionId) return;
         callbacks.onStateChange("listening");
       };
 
       rec.onresult = (event: SpeechRecognitionEvent) => {
+        if (sessionId !== this.currentSessionId) return;
+
         let interim = "";
         let final = "";
 
@@ -183,6 +224,8 @@ class SpeechAdapter {
       };
 
       rec.onerror = (event: SpeechRecognitionErrorEvent) => {
+        if (sessionId !== this.currentSessionId) return;
+
         if (event.error === "aborted") {
           callbacks.onStateChange("idle");
           this.recognitionInstance = null;
@@ -206,6 +249,7 @@ class SpeechAdapter {
       };
 
       rec.onend = () => {
+        if (sessionId !== this.currentSessionId) return;
         callbacks.onStateChange("idle");
         this.recognitionInstance = null;
       };
@@ -221,8 +265,10 @@ class SpeechAdapter {
 
   /**
    * Stops the active speech recognition instance if running.
+   * Invalidates session to prevent stale trailing callbacks.
    */
   public stopListening(): void {
+    this.currentSessionId++;
     if (this.recognitionInstance) {
       try {
         this.recognitionInstance.stop();
@@ -235,8 +281,10 @@ class SpeechAdapter {
 
   /**
    * Aborts the active speech recognition session immediately, discarding pending input.
+   * Invalidates session to prevent stale trailing callbacks.
    */
   public abortListening(): void {
+    this.currentSessionId++;
     if (this.recognitionInstance) {
       try {
         this.recognitionInstance.abort();

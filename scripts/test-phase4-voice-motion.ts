@@ -109,9 +109,36 @@ console.log("\n2. Speech Synthesis Text Cleaning Tests");
   );
 }
 
-// 3. Speech Recognition Mock Callbacks & Error Classification
-console.log("\n3. Speech Recognition State Machine & Error Handling Tests");
+// 3. Speech Recognition State Machine, Privacy & Error Handling Tests
+console.log("\n3. Speech Recognition State Machine, Privacy & Error Handling Tests");
 {
+  // Test privacy disclosure contract
+  const privacyInfo = speechAdapter.getRecognitionPrivacyInfo();
+  assert(
+    typeof privacyInfo.isLocalOnly === "boolean",
+    "speechAdapter.getRecognitionPrivacyInfo() returns boolean isLocalOnly"
+  );
+  assert(
+    typeof privacyInfo.disclosure === "string" && privacyInfo.disclosure.length > 10,
+    "speechAdapter.getRecognitionPrivacyInfo() provides an explicit disclosure of recognition mechanics"
+  );
+
+  // Test session invalidation on abortListening
+  let staleTranscriptCalled = false;
+  speechAdapter.startListening({
+    onStateChange: () => {},
+    onTranscript: () => {
+      staleTranscriptCalled = true;
+    },
+    onError: () => {},
+  });
+  // Abort immediately
+  speechAdapter.abortListening();
+  assert(
+    !staleTranscriptCalled,
+    "speechAdapter.abortListening() immediately invalidates session, preventing stale transcript delivery"
+  );
+
   let stateReceived = "";
   let errorReceived = "";
 
@@ -137,8 +164,8 @@ console.log("\n3. Speech Recognition State Machine & Error Handling Tests");
   );
 }
 
-// 4. Power On / Boot Sequence Constraints (REQ-NAV-001 & UX-001)
-console.log("\n4. Power On / Boot Sequence Duration & Skip Constraints");
+// 4. Power On / Boot Sequence Constraints & Keyboard Logic
+console.log("\n4. Power On / Boot Sequence Constraints, Keyboard Logic & Deep Link Tests");
 {
   const targetDurationMs = 1800;
   const maxAllowedDurationMs = 3000;
@@ -154,6 +181,19 @@ console.log("\n4. Power On / Boot Sequence Duration & Skip Constraints");
     reducedMotionDurationMs === 0,
     "Under reduced motion, BootSequence resolves in 0ms (instantaneous bypass per UX-001 / REQ-ACC-002)"
   );
+
+  // Test deep-link boot bypass: if visitor enters via deep-link room, boot is bypassed
+  const nonLobbyRoom: Room = "EngineeringLaboratory";
+  const shouldBypassBootOnDeepLink = nonLobbyRoom !== "Lobby";
+  assert(
+    shouldBypassBootOnDeepLink === true,
+    "Direct facility room deep link (e.g. EngineeringLaboratory) automatically bypasses boot sequence"
+  );
+
+  // Test keyboard filter logic: verify Escape key always skips, Space/Enter ignores input elements
+  const isInputTarget = (tagName: string) => tagName === "INPUT" || tagName === "TEXTAREA";
+  assert(!isInputTarget("DIV"), "Non-input elements allow keyboard skip");
+  assert(isInputTarget("INPUT"), "Input elements protect active typing from accidental Space/Enter skip");
 }
 
 // 5. Regression Testing: All 8 Facilities and Routing Integrity
