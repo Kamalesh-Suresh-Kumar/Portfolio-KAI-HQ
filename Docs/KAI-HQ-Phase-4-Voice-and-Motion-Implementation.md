@@ -122,14 +122,28 @@ interface ISpeechRecognition extends EventTarget {
 
 ## 6. Speech Recognition Privacy Model
 
-The application strictly differentiates on-device processing from cloud-assisted vendor recognition.
+The application strictly differentiates on-device processing from cloud-assisted vendor recognition. Speech recognition is **not** universally offline or entirely local: on-device recognition operates exclusively when the visitor's browser exposes the relevant draft Web Speech APIs and when a local acoustic/language model is pre-installed on the host operating system.
+
+### On-Device Capabilities and Technical Boundaries
+1. **Feature Detection (`processLocally` and `available()`):**
+   - The engine checks for the presence of `"processLocally"` on the `SpeechRecognition.prototype`.
+   - If present, it checks `(SpeechRecognition as any).available?.("en-US")` to verify language pack availability.
+2. **`SpeechRecognition.install()` Non-Implementation:**
+   - The browser `SpeechRecognition.install()` routine is **not implemented** in KAI HQ.
+   - When a local model is missing or marked downloadable (`local-model-missing`), KAI HQ **does not silently download one** in the background or trigger an automatic installation.
+   - The user is notified of the missing local model, and recognition routes to browser-managed recognition requiring explicit consent.
+3. **Informed Consent for Browser-Managed Recognition:**
+   - On standard desktop and mobile browsers lacking verified on-device models (e.g. desktop Google Chrome, Microsoft Edge, and Apple Safari), speech recognition relies on vendor cloud services.
+   - KAI HQ **never silently captures or transmits audio**. An explicit, blocking inline consent dialog must be approved by the visitor before the microphone is energized.
+4. **Reliable Fallback to Typed Input:**
+   - If speech recognition is unsupported, permission is denied, a local model is absent, or consent is withheld, text input remains 100% operational as the primary deterministic communication channel.
 
 ### Privacy Status States
 
 | State | Definition | UI Treatment |
 |---|---|---|
 | `local-guaranteed` | Native engine with `processLocally` confirmed | Mic active, badge: "On-device processing requested" |
-| `local-model-missing` | On-device engine detected; language model not installed | Informs user that model download may be required |
+| `local-model-missing` | On-device engine detected; language model not installed (`install()` not implemented; no silent download) | Informs user that model is missing; directs to consent or typing |
 | `browser-managed-consent-required` | Cloud-assisted engine; consent not yet granted | Mic blocked; displays explicit consent modal |
 | `browser-managed-consented` | Cloud-assisted engine; explicit consent granted | Mic active, badge: "Browser Web Speech active (consented)" |
 | `unsupported` | Browser lacks `SpeechRecognition` constructor | Mic disabled with tooltip explaining text fallback |
@@ -325,15 +339,27 @@ Because KAI HQ is architected as an instantaneous simulation facility, all 8 roo
 
 ---
 
-## 18. Browser Compatibility Matrix
+## 18. Browser Compatibility and QA Status
 
-| Environment | Engine | Speech Recognition (STT) | Speech Synthesis (TTS) | Power On Sequence |
-|---|---|---|---|---|
-| **Google Chrome (Desktop/Android)** | Chromium | Supported (Cloud-assisted; requires explicit consent; on-device where model installed) | Supported (Natural Google voices available) | Supported (Full 60fps CSS animation) |
-| **Microsoft Edge** | Chromium | Supported (Cloud-assisted; requires explicit consent) | Supported (Natural Microsoft voices) | Supported (Full 60fps CSS animation) |
-| **Mozilla Firefox** | Gecko | Unsupported by default (Gracefully degrades to text typing) | Supported (System voices) | Supported (Full 60fps CSS animation) |
-| **Apple Safari (macOS/iOS)** | WebKit | Supported via `webkitSpeechRecognition` (Requires explicit consent) | Supported (Samantha/Daniel/System voices) | Supported (Full 60fps CSS animation) |
-| **Headless / Node.js** | V8 | Handled safely (`isRecognitionSupported() === false`, no exceptions) | Handled safely (`isSynthesisSupported() === false`, no exceptions) | Bypassed in tests via assertions |
+### Verification Scope and Methodology Disclaimer
+The compatibility status in this specification reflects structural code design, API contract conformance, and automated unit tests executed in **headless Node.js (V8)** (`tsx scripts/test-phase4-voice-motion.ts`). 
+
+**Important Testing and Runtime Disclaimers:**
+1. **Automated Headless Testing:** All unit and contract test suites (`test:phase4`, `test:routing`, `test:knowledge`) run exclusively in headless Node.js.
+2. **Physical Browser & Microphone QA:** **Physical browser QA has NOT been performed** on desktop or mobile devices. Real-world speech input and audio capture have **not** been tested against physical microphone hardware.
+3. **Browser API & Service Dependencies:** Real runtime speech recognition is strictly dependent on the visitor's specific browser vendor, operating system version, microphone hardware permissions, and cloud service reachability (Google Cloud Speech for Chrome, Apple Dictation for Safari, Microsoft Speech Services for Edge).
+4. **Animation Performance (CSS Compositing):** The Power On and cybernetic UI transitions are architected around GPU-composited CSS properties (`transform`, `opacity`) without layout thrashing. However, **animation frame rates have NOT been physically measured at 60 FPS** on real mobile or desktop displays. Frame rate guarantees are not asserted.
+5. **No Universal Offline Speech:** True on-device speech recognition is not universally available; it is contingent upon browser draft API exposure (`processLocally`) and installed language packs. When unavailable, browser-managed cloud recognition requires explicit visitor consent, or the system falls back to typed input.
+
+### Environment & Compatibility Matrix
+
+| Environment / Browser | Engine | Speech Recognition (STT) Status | Speech Synthesis (TTS) Status | Motion & Power On Status | Physical QA Status |
+|---|---|---|---|---|:---:|
+| **Headless Node.js (CI / Test Runner)** | V8 | **Verified by automated tests:** Feature detection returns strict boolean `false`; degrades safely without unhandled exceptions. | **Verified by automated tests:** Feature detection returns strict boolean `false`; execution degrades cleanly. | **Verified by automated tests:** 1.8s duration budget, input typing protection, and deep-link bypass asserted. | **PASS (Automated Unit Tests)** |
+| **Google Chrome (Desktop / Android)** | Chromium | **Browser-dependent:** Web Speech API supported. Requires explicit visitor consent unless native on-device model is exposed and installed. | **Browser-dependent:** Supported via native synthesis engine; selects English voices when available. | **Architectural design:** Compositor-thread CSS keyframes; instantaneous bypass under reduced motion. | **NOT PERFORMED (No physical browser/mic QA)** |
+| **Microsoft Edge** | Chromium | **Browser-dependent:** Web Speech API supported; routes to Microsoft speech services with explicit consent requirement. | **Browser-dependent:** Supported via Windows/Edge synthesis voices. | **Architectural design:** Compositor-thread CSS keyframes; instantaneous bypass under reduced motion. | **NOT PERFORMED (No physical browser/mic QA)** |
+| **Mozilla Firefox** | Gecko | **Browser-dependent:** SpeechRecognition unsupported by default; gracefully falls back to text typing. | **Browser-dependent:** Supported via operating system speech synthesis voices. | **Architectural design:** Compositor-thread CSS keyframes; instantaneous bypass under reduced motion. | **NOT PERFORMED (No physical browser/mic QA)** |
+| **Apple Safari (macOS / iOS)** | WebKit | **Browser-dependent:** Supported via `webkitSpeechRecognition`; requires explicit consent; subject to OS dictation availability. | **Browser-dependent:** Supported via system voices (e.g. Samantha/Daniel). | **Architectural design:** Compositor-thread CSS keyframes; instantaneous bypass under reduced motion. | **NOT PERFORMED (No physical browser/mic QA)** |
 
 ---
 

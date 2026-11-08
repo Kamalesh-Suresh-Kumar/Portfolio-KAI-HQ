@@ -321,15 +321,15 @@ IntentClassifier (pattern/keyword matching + lightweight scoring)
 ```
 
 **Phase 4 Voice Architecture & Privacy Decisions:**
-- **Voice Input (`SpeechRecognition`):** Feature-detected across standard `SpeechRecognition` and `webkitSpeechRecognition`. Never requested on page load; triggered strictly by explicit user microphone activation.
+- **Voice Input (`SpeechRecognition`):** Feature-detected across standard `SpeechRecognition` and `webkitSpeechRecognition`. Never requested on page load; triggered strictly by explicit user microphone activation. Speech recognition is not universally offline or entirely local: on-device processing occurs only when natively supported and when language models are locally available.
 - **Privacy Status Model (`RecognitionPrivacyMode`):** Distinguishes six granular runtime privacy states:
   1. `local-guaranteed`: Native on-device engine detected and `processLocally = true` configured.
-  2. `local-model-missing`: Native engine present, but requested language model requires device download.
+  2. `local-model-missing`: Native engine present, but requested language model requires device download (`SpeechRecognition.install()` is not implemented; missing models are not silently or automatically downloaded).
   3. `browser-managed-consent-required`: Browser-managed recognition available; explicit consent required before microphone capture.
   4. `browser-managed-consented`: Visitor has explicitly reviewed and granted informed consent for browser-managed recognition.
   5. `unsupported`: Web Speech API absent in browser runtime.
   6. `permission-denied`: Microphone access blocked by visitor or browser permission settings.
-- **Explicit Visitor Consent Protocol:** For browsers without guaranteed local processing (such as standard desktop Chromium and WebKit), KAI HQ **never silently falls back to cloud recognition**. An explicit inline consent prompt explains that audio may be processed by the browser vendor's recognition service (Google or Apple), and provides immediate `[Consent & Enable]` and `[Decline (Keep Typing)]` options.
+- **Explicit Visitor Consent Protocol:** For browsers without guaranteed local processing (such as standard desktop Chromium and WebKit), KAI HQ **never silently falls back to cloud recognition**. An explicit inline consent prompt explains that audio may be processed by the browser vendor's recognition service (Google or Apple), and provides immediate `[Consent & Enable]` and `[Decline (Keep Typing)]` options. Deterministic text typing remains fully available at all times as the reliable fallback.
 - **Instance-Bound Session Lifecycle:** To prevent delayed or out-of-order events from older recognition objects from corrupting newer sessions, every session binds an atomic `ActiveSpeechSession` record containing `{ id, instance, aborted }`. Any event from a mismatched or aborted session is dropped immediately, guaranteeing that cancelled or stale transcripts can never be submitted accidentally.
 - **Voice Output (`SpeechSynthesis`):** Independent toggle in KAI Assistant header (`voiceEnabled`). Utterances are pre-cleaned (`cleanTextForSpeech`) to strip markdown, raw URLs, and code blocks. Overlapping speech is canceled with `stopSpeaking()`, voices are dynamically cached via `onvoiceschanged`, and audio playback is halted immediately on room navigation and browser popstate.
 - **Typed Query Privacy Guarantee:** Typed queries are processed 100% client-side by KAI HQ's in-memory Knowledge Engine and deterministic pattern router. No typed query data is ever sent to external AI APIs or cloud servers.
@@ -426,8 +426,6 @@ A lightweight runtime FPS sampler (rolling average over ~2s windows) informs a `
 
 These budgets are the concrete target supporting NFR-PERF-001's 2.5s meaningful-paint requirement.
 
-These budgets are the concrete target supporting NFR-PERF-001's 2.5s meaningful-paint requirement.
-
 ---
 
 ## 12. State Management Summary
@@ -481,7 +479,7 @@ Given the no-backend, no-auth, no-database architecture (AD-02), the attack surf
 
 ## 16. Browser Support & Compatibility
 
-Consistent with NFR-COMPAT-001: last two major versions of Chrome, Firefox, Safari, Edge. Feature-detection (not user-agent sniffing) gates all progressive enhancements (WebGL via `Three.js` capability check, voice via `SpeechRecognition` presence check, motion via `matchMedia('(prefers-reduced-motion)')`).
+Consistent with NFR-COMPAT-001: last two major versions of Chrome, Firefox, Safari, Edge. Feature-detection (not user-agent sniffing) gates all progressive enhancements (voice recognition via `SpeechRecognition` presence check, speech synthesis via `speechSynthesis` check, and motion preferences via `matchMedia('(prefers-reduced-motion: reduce)')`; Three.js was formally excluded in ADR-04 in favor of native CSS GPU-compositor animations).
 
 ---
 

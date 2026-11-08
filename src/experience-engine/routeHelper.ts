@@ -16,6 +16,20 @@ export const ROOM_SLUG_MAP: Record<Room, string> = {
   MissionControl: "mission-control",
 };
 
+/**
+ * Human-readable room display names for headers and screen reader announcements.
+ */
+export const ROOM_DISPLAY_NAMES: Record<Room, string> = {
+  Lobby: "Lobby",
+  EngineeringLaboratory: "Engineering Laboratory",
+  MemoryArchive: "Memory Archive",
+  AchievementHall: "Achievement Hall",
+  DocumentVault: "Document Vault",
+  CommunicationCenter: "Communication Center",
+  SkillProcessor: "Skill Processor",
+  MissionControl: "Mission Control",
+};
+
 export interface ParsedRoute {
   room: Room;
   entityType?: "project" | "skill" | "resume" | "achievement" | "timeline";

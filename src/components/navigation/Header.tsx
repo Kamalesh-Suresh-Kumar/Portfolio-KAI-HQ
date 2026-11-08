@@ -1,19 +1,9 @@
 import type { RefObject } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useExperienceEngine, resolveAssetUrl } from "../../experience-engine";
-import type { Room, VisitorMode } from "../../experience-engine/ExperienceEngineContext";
+import { ROOM_DISPLAY_NAMES } from "../../experience-engine/routeHelper";
+import type { VisitorMode } from "../../experience-engine/ExperienceEngineContext";
 import { Layers, UserCheck, Code2 } from "lucide-react";
-
-const ROOM_DISPLAY_NAMES: Record<Room, string> = {
-  Lobby: "Lobby",
-  EngineeringLaboratory: "Engineering Laboratory",
-  MemoryArchive: "Memory Archive",
-  AchievementHall: "Achievement Hall",
-  DocumentVault: "Document Vault",
-  CommunicationCenter: "Communication Center",
-  SkillProcessor: "Skill Processor",
-  MissionControl: "Mission Control",
-};
 
 interface HeaderProps {
   isMobileNavOpen?: boolean;

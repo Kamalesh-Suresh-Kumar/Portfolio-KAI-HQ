@@ -44,6 +44,31 @@ export default function Assistant() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const triggerBtnRef = useRef<HTMLButtonElement>(null);
+  const lastFocusedBeforeOpenRef = useRef<HTMLElement | null>(null);
+  const wasOpenRef = useRef(isKAIOpen);
+
+  // Return focus to trigger button or originating element when assistant closes
+  useEffect(() => {
+    if (!wasOpenRef.current && isKAIOpen) {
+      // Just opened: capture the element that initiated opening or fall back to trigger
+      lastFocusedBeforeOpenRef.current =
+        (document.activeElement as HTMLElement) || triggerBtnRef.current;
+    } else if (wasOpenRef.current && !isKAIOpen) {
+      // Just closed: return focus to trigger or originating element
+      const target = lastFocusedBeforeOpenRef.current || triggerBtnRef.current;
+      if (target && typeof target.focus === "function") {
+        const currentActive = document.activeElement;
+        const wasFocusInPanel =
+          panelRef.current && panelRef.current.contains(currentActive);
+        if (!currentActive || currentActive === document.body || wasFocusInPanel) {
+          target.focus();
+        }
+      }
+      lastFocusedBeforeOpenRef.current = null;
+    }
+    wasOpenRef.current = isKAIOpen;
+  }, [isKAIOpen]);
 
   // Auto-scroll to bottom of messages
   const scrollToBottom = useCallback(() => {
@@ -206,6 +231,7 @@ export default function Assistant() {
       {/* Floating Trigger Button */}
       <div className="kai-trigger-wrapper">
         <button
+          ref={triggerBtnRef}
           type="button"
           className={`kai-trigger-btn ${isKAIOpen ? "active" : ""}`}
           onClick={handleToggleKAI}
