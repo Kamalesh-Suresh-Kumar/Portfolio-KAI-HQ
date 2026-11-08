@@ -67,6 +67,23 @@ class SpeechAdapter {
   private recognitionInstance: ISpeechRecognition | null = null;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private activeSpeakingCallback: (() => void) | null = null;
+  private availableVoices: SpeechSynthesisVoice[] = [];
+
+  constructor() {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      const updateVoices = () => {
+        try {
+          this.availableVoices = window.speechSynthesis.getVoices();
+        } catch {
+          // Safe catch in sandboxed environments
+        }
+      };
+      updateVoices();
+      if (typeof window.speechSynthesis.onvoiceschanged !== "undefined") {
+        window.speechSynthesis.onvoiceschanged = updateVoices;
+      }
+    }
+  }
 
   /**
    * Feature-detection for SpeechRecognition (Voice-to-Text).
@@ -166,6 +183,12 @@ class SpeechAdapter {
       };
 
       rec.onerror = (event: SpeechRecognitionErrorEvent) => {
+        if (event.error === "aborted") {
+          callbacks.onStateChange("idle");
+          this.recognitionInstance = null;
+          return;
+        }
+
         callbacks.onStateChange("error");
         let msg = "Voice capture failed.";
 
@@ -175,6 +198,8 @@ class SpeechAdapter {
           msg = "No speech detected. Please tap the microphone and try again.";
         } else if (event.error === "network") {
           msg = "Voice network services unavailable. Please use text input.";
+        } else if (event.error === "audio-capture") {
+          msg = "No microphone was found or microphone is busy.";
         }
 
         callbacks.onError(msg);
@@ -209,6 +234,20 @@ class SpeechAdapter {
   }
 
   /**
+   * Aborts the active speech recognition session immediately, discarding pending input.
+   */
+  public abortListening(): void {
+    if (this.recognitionInstance) {
+      try {
+        this.recognitionInstance.abort();
+      } catch {
+        // Ignore if already aborted
+      }
+      this.recognitionInstance = null;
+    }
+  }
+
+  /**
    * Speaks the provided text via Web Speech API Synthesis.
    * Cancels any previously active speech to ensure speech output never overlaps.
    */
@@ -233,8 +272,8 @@ class SpeechAdapter {
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
 
-      // Select an English voice if available
-      const voices = window.speechSynthesis.getVoices();
+      // Select an English voice if available (from cached list or active API)
+      const voices = this.availableVoices.length > 0 ? this.availableVoices : window.speechSynthesis.getVoices();
       if (voices && voices.length > 0) {
         const preferredVoice =
           voices.find((v) => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Samantha"))) ||

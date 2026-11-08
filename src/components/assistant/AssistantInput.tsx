@@ -49,7 +49,7 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
 
   const handleToggleVoice = () => {
     if (voiceState === "listening") {
-      speechAdapter.stopListening();
+      speechAdapter.abortListening();
       setVoiceState("idle");
       return;
     }
@@ -74,10 +74,22 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
     });
   };
 
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape" && voiceState === "listening") {
+      e.stopPropagation();
+      speechAdapter.abortListening();
+      setVoiceState("idle");
+    }
+  };
+
   const isListening = voiceState === "listening";
 
   return (
     <footer className="kai-panel-footer">
+      <span className="sr-only" role="status" aria-live="polite">
+        {isListening ? "Listening for speech. Speak your question now." : ""}
+      </span>
+
       {voiceError && (
         <div className="kai-voice-notice" role="alert" aria-live="assertive">
           <AlertCircle size={13} style={{ flexShrink: 0 }} />
@@ -98,6 +110,7 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
           ref={inputRef}
           type="text"
           className="kai-text-input"
+          onKeyDown={handleInputKeyDown}
           placeholder={
             isListening
               ? "Listening... speak query now..."

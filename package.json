@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
-    "generate:resumes": "tsx scripts/generate-resumes.ts"
+    "generate:resumes": "tsx scripts/generate-resumes.ts",
+    "test:phase4": "tsx scripts/test-phase4-voice-motion.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

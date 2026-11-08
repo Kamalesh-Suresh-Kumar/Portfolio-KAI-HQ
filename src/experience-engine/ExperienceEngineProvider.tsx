@@ -78,6 +78,15 @@ export function ExperienceEngineProvider({
 
   // Change room and push clean path state to browser History API
   const changeRoom = useCallback((room: Room, params?: Record<string, string>) => {
+    // Terminate any ongoing speech synthesis on room change
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // Safe catch
+      }
+    }
+
     const targetPath = buildPath(room, params);
     if (typeof window !== "undefined") {
       const currentFull = window.location.pathname + window.location.search;

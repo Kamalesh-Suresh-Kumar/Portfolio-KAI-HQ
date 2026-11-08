@@ -300,6 +300,11 @@ IntentClassifier (pattern/keyword matching + lightweight scoring)
 
 `SpeechAdapter` wraps the Web Speech API behind a feature-detection boundary. If unsupported or permission is denied, the text input path is unaffected — `ConversationRouter` never knows or cares whether input arrived via typing or speech (REQ-KAI-003 stays strictly additive).
 
+**Phase 4 Voice Implementation Decisions:**
+- **Voice Input (`SpeechRecognition`):** Feature-detected across `SpeechRecognition` and `webkitSpeechRecognition`. Never requested on page load; triggered only on explicit microphone activation. Discarded via `abortListening()` on cancel or Escape.
+- **Voice Output (`SpeechSynthesis`):** Independent toggle in KAI Assistant header (`voiceEnabled`). Utterances are pre-cleaned (`cleanTextForSpeech`) to strip markdown, raw URLs, and code blocks. Overlapping speech is canceled with `stopSpeaking()`, and voices are dynamically initialized via `onvoiceschanged`.
+- **Zero Cloud Leakage:** Fully executed within the browser's native Web Speech implementation with zero audio transmission or telemetry.
+
 ---
 
 ## 8. Automation Pipeline (CI/CD)
@@ -372,7 +377,12 @@ A lightweight runtime FPS sampler (rolling average over ~2s windows) informs a `
 
 ### 11.2 Reduced Motion
 
-`accessibility.reducedMotion` (sourced from `prefers-reduced-motion` media query, §5.2) is checked once at the top of every GSAP timeline and Framer Motion variant definition; when true, transition durations are set to 0 and only opacity cross-fades are used — directly implementing Volume 2 §10's reduced-motion parity rule.
+`accessibility.reducedMotion` (sourced from `prefers-reduced-motion` media query, §5.2) is checked once at the top of every transition definition; when true, transition durations are set to 0 and only opacity cross-fades or immediate state switches are used — directly implementing Volume 2 §10's reduced-motion parity rule.
+
+**Phase 4 Motion & Library Evaluation Decisions:**
+- **GSAP Evaluation:** Evaluated. Excluded in favor of native CSS animations and Web Animations API. GPU-accelerated CSS keyframes satisfy the 60fps requirement without adding a ~65KB bundle penalty.
+- **Three.js Evaluation:** Evaluated. Excluded for initial critical path. KAI HQ functions as an accessible, high-contrast engineering headquarters dashboard; retaining semantic SVG/CSS telemetry preserves sub-180KB initial gzip performance.
+- **Power On Sequence (`BootSequence.tsx`):** Implemented with a 1.8-second deterministic duration (< 3.0s limit per UX-001). Skippable in a single interaction (Escape, Space, Enter, or Click), and immediately bypassed under reduced motion or direct room deep-linking.
 
 ### 11.3 Performance Budget
 
