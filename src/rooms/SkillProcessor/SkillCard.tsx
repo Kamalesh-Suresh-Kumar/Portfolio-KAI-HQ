@@ -18,31 +18,16 @@ export default function SkillCard({ skill, onSelect }: SkillCardProps) {
   // Map qualitative proficiency level to discrete capability bar count (1 to 4)
   const getProficiencyTier = (level: Skill["proficiencyLevel"]): number => {
     switch (level) {
-      case "advanced":
+      case "expert":
         return 4;
-      case "proficient":
-        return 3;
-      case "working_knowledge":
-        return 2;
-      case "learning":
-        return 1;
-      default:
-        return 1;
-    }
-  };
-
-  const getProficiencyLabel = (level: Skill["proficiencyLevel"]): string => {
-    switch (level) {
       case "advanced":
-        return "Advanced";
-      case "proficient":
-        return "Proficient";
-      case "working_knowledge":
-        return "Working Knowledge";
-      case "learning":
-        return "Learning";
+        return 3;
+      case "intermediate":
+        return 2;
+      case "foundational":
+        return 1;
       default:
-        return level;
+        return 1;
     }
   };
 
@@ -63,7 +48,7 @@ export default function SkillCard({ skill, onSelect }: SkillCardProps) {
       role="button"
       onClick={() => onSelect(skill)}
       onKeyDown={handleKeyDown}
-      aria-label={`Inspect ${skill.name} capability (${getProficiencyLabel(skill.proficiencyLevel)} tier)`}
+      aria-label={`Inspect ${skill.name} capability (${skill.proficiencyLevel} tier)`}
     >
       <div className="skill-card-top">
         <div className="skill-card-header">
@@ -76,11 +61,11 @@ export default function SkillCard({ skill, onSelect }: SkillCardProps) {
         )}
 
         {/* Discrete Capability Meter */}
-        <div className="capability-meter-wrap" aria-label={`Proficiency: ${getProficiencyLabel(skill.proficiencyLevel)}`}>
+        <div className="capability-meter-wrap" aria-label={`Proficiency: ${skill.proficiencyLevel}`}>
           <div className="capability-meter-header">
             <span style={{ color: "#94a3b8" }}>Proficiency Tier</span>
             <span className={`capability-level-label level-${skill.proficiencyLevel}`}>
-              {getProficiencyLabel(skill.proficiencyLevel)}
+              {skill.proficiencyLevel}
             </span>
           </div>
 

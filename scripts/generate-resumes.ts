@@ -39,7 +39,7 @@ const variants: ResumeDetails[] = [
     filename: "resume-fullstack.pdf",
     roleTitle: "Full-Stack Software Engineer",
     summary:
-      "Computer Science undergraduate at Rajalakshmi Engineering College (Expected 2027) and Full-Stack Software Engineer with proven ability in architecting decoupled, high-performance web applications, modern component architectures (React 19, TypeScript), and automated deployment pipelines. Creator of KAI HQ, a fully client-side portfolio operating system featuring deterministic state management, sub-10ms search capabilities, and 100% static hosting on GitHub Pages.",
+      "Computer Science undergraduate and Full-Stack Software Engineer with proven ability in architecting decoupled, high-performance web applications, modern component architectures (React 19, TypeScript), and automated deployment pipelines. Creator of KAI HQ, a fully client-side portfolio operating system featuring deterministic state management, sub-10ms search capabilities, and 100% static hosting on GitHub Pages.",
     coreCompetencies: [
       "Full-Stack Web Architecture",
       "Component Design & Custom Hooks",
@@ -93,12 +93,12 @@ const variants: ResumeDetails[] = [
         ],
       },
       {
-        role: "Virtual Intern / Technical Trainee",
+        role: "Technical Trainee / Intern",
         organization: "Infosys SpringBoard",
         period: "2023 — 2024",
         location: "Virtual / India",
         bullets: [
-          "Completed structured virtual internship training covering cloud computing principles, enterprise software engineering methodologies, and structured algorithmic problem solving.",
+          "Completed rigorous enterprise curriculum covering cloud computing principles, modern software engineering methodologies, and structured algorithmic problem solving.",
         ],
       },
       {
@@ -125,7 +125,7 @@ const variants: ResumeDetails[] = [
     filename: "resume-backend.pdf",
     roleTitle: "Backend & Systems Software Engineer",
     summary:
-      "Computer Science undergraduate at Rajalakshmi Engineering College (Expected 2027) specializing in backend architecture, systems programming, and high-efficiency deterministic routing engines. Demonstrated hands-on experience in TypeScript, Node.js, Python, C/C++, and SQL with focus on modular API design, low-latency client-side query evaluation, and systems security. Proven ability to design reliable, decoupled services with strict data typing and zero-downtime automated workflows.",
+      "Computer Science undergraduate specializing in backend architecture, systems programming, and high-efficiency deterministic routing engines. Demonstrated hands-on experience in TypeScript, Node.js, Python, C/C++, and SQL with focus on modular API design, low-latency client-side query evaluation, and systems security. Proven ability to design reliable, decoupled services with strict data typing and zero-downtime automated workflows.",
     coreCompetencies: [
       "Backend & Systems Architecture",
       "API Design & Intent Routing",
@@ -169,12 +169,12 @@ const variants: ResumeDetails[] = [
     ],
     experience: [
       {
-        role: "Virtual Intern / Technical Trainee",
+        role: "Technical Trainee / Intern",
         organization: "Infosys SpringBoard",
         period: "2023 — 2024",
         location: "Virtual / India",
         bullets: [
-          "Completed structured virtual internship training covering enterprise backend paradigms, cloud architectures, and algorithmic data processing.",
+          "Completed advanced training in enterprise backend paradigms, cloud architectures, and algorithmic data processing.",
         ],
       },
       {
@@ -209,7 +209,7 @@ const variants: ResumeDetails[] = [
     filename: "resume-cybersecurity.pdf",
     roleTitle: "Cybersecurity Analyst & Protocol Security Researcher",
     summary:
-      "Computer Science undergraduate at Rajalakshmi Engineering College (Expected 2027) and security researcher with demonstrated practical experience in physical-layer and packet-level optical wireless security (Li-Fi), network vulnerability analysis, and penetration testing. Formally demonstrated custom exploit testing harnesses and protocol evaluations before the state Cybercrime Police Department. Strong command of network security protocols, Linux environments, applied cryptography, and disciplined operational defense.",
+      "Computer Science undergraduate and security researcher with demonstrated practical experience in physical-layer and packet-level optical wireless security (Li-Fi), network vulnerability analysis, and penetration testing. Formally demonstrated custom exploit testing harnesses and protocol evaluations before the state Cybercrime Police Department. Strong command of network security protocols, Linux environments, applied cryptography, and disciplined operational defense.",
     coreCompetencies: [
       "Optical Wireless Security (Li-Fi RX 2.0/3.0)",
       "Penetration Testing & Exploit Analysis",
@@ -273,12 +273,12 @@ const variants: ResumeDetails[] = [
         ],
       },
       {
-        role: "Virtual Intern / Technical Trainee",
+        role: "Technical Trainee / Intern",
         organization: "Infosys SpringBoard",
         period: "2023 — 2024",
         location: "Virtual / India",
         bullets: [
-          "Completed structured virtual internship training covering enterprise network models, cloud security fundamentals, and distributed computing.",
+          "Completed comprehensive coursework on enterprise network models, cloud security fundamentals, and distributed computing.",
         ],
       },
     ],
@@ -295,7 +295,7 @@ const variants: ResumeDetails[] = [
     filename: "resume-ai-systems.pdf",
     roleTitle: "Intelligent Systems & Automation Engineer",
     summary:
-      "Computer Science undergraduate at Rajalakshmi Engineering College (Expected 2027) focusing on intelligent automation, deterministic intent resolution engines, and automated knowledge pipelines. Developer of client-side natural language routers capable of sub-10ms query-to-route resolution with zero external API dependencies. Deep foundational skills in algorithms, TypeScript, Python, and CI/CD automation, with an architectural emphasis on low latency, privacy-preserving static systems, and clean interfaces for generative model integration.",
+      "Computer Science undergraduate focusing on intelligent automation, deterministic intent resolution engines, and automated knowledge pipelines. Developer of client-side natural language routers capable of sub-10ms query-to-route resolution with zero external API dependencies. Deep foundational skills in algorithms, TypeScript, Python, and CI/CD automation, with an architectural emphasis on low latency, privacy-preserving static systems, and clean interfaces for generative model integration.",
     coreCompetencies: [
       "Deterministic Intent Routing & NLP",
       "Knowledge Engine Architecture & Indexing",
@@ -340,12 +340,12 @@ const variants: ResumeDetails[] = [
     ],
     experience: [
       {
-        role: "Virtual Intern / Technical Trainee",
+        role: "Technical Trainee / Intern",
         organization: "Infosys SpringBoard",
         period: "2023 — 2024",
         location: "Virtual / India",
         bullets: [
-          "Completed structured virtual internship training covering enterprise problem-solving paradigms, cloud computing infrastructure, and modular software engineering.",
+          "Mastered enterprise problem-solving paradigms, cloud computing infrastructure, and modular software engineering.",
         ],
       },
       {
@@ -539,11 +539,11 @@ function generatePDF(variant: ResumeDetails) {
     .text("B.E. in Computer Science and Engineering", { continued: true })
     .font("Helvetica")
     .fillColor(bodyColor)
-    .text(" — Rajalakshmi Engineering College", { continued: true })
+    .text(" — Undergraduate Engineering Program", { continued: true })
     .font("Helvetica-Oblique")
     .fontSize(8)
     .fillColor(mutedColor)
-    .text("  (2022 — 2027 (Expected)  |  India)", { align: "right" });
+    .text("  (2022 — Present  |  India)", { align: "right" });
 
   doc
     .font("Helvetica")

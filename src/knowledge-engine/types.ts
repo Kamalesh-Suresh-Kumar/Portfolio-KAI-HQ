@@ -47,17 +47,11 @@ export type SkillCategory =
   | 'tools_infrastructure'
   | 'domains';
 
-export type SkillProficiency =
-  | 'advanced'
-  | 'proficient'
-  | 'working_knowledge'
-  | 'learning';
-
 export interface Skill {
   id: string;
   name: string;
   category: SkillCategory;
-  proficiencyLevel: SkillProficiency;
+  proficiencyLevel: 'expert' | 'advanced' | 'intermediate' | 'foundational';
   linkedProjectIds: string[];
   description?: string;
   iconName?: string;

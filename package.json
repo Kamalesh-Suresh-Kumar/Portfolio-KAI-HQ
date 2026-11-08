@@ -8,9 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
-    "generate:resumes": "tsx scripts/generate-resumes.ts",
-    "test:knowledge": "tsx scripts/test-knowledge-engine.ts",
-    "test:routes": "tsx scripts/test-routing.ts"
+    "generate:resumes": "tsx scripts/generate-resumes.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

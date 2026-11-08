@@ -374,8 +374,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 1 1 96px;
-  min-width: fit-content;
+  flex: 1 1 82px;
+  min-width: 0;
   gap: 6px;
   padding: 8px 10px;
   border-radius: 6px;
@@ -553,15 +553,6 @@
   }
   to {
     opacity: 1;
-  }
-}
-
-@media (max-width: 480px) {
-  .vault-resumes-grid {
-    grid-template-columns: 1fr;
-  }
-  .resume-card {
-    padding: 16px;
   }
 }
 

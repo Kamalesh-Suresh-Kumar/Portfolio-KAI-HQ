@@ -77,9 +77,9 @@ export default function SkillProcessor() {
   // Compute telemetry metrics derived strictly from actual skill data
   const telemetry = useMemo(() => {
     const totalSkills = allSkills.length;
+    const expertCount = allSkills.filter((s) => s.proficiencyLevel === "expert").length;
     const advancedCount = allSkills.filter((s) => s.proficiencyLevel === "advanced").length;
-    const proficientCount = allSkills.filter((s) => s.proficiencyLevel === "proficient").length;
-    const highTierCount = advancedCount + proficientCount;
+    const highTierCount = expertCount + advancedCount;
     const allLinkedProjects = new Set(allSkills.flatMap((s) => s.linkedProjectIds));
 
     return {
@@ -141,7 +141,7 @@ export default function SkillProcessor() {
             <span className="skill-stat-value" style={{ color: "#38bdf8" }}>
               {telemetry.highTierCount}
             </span>
-            <span className="skill-stat-label">Advanced & Proficient</span>
+            <span className="skill-stat-label">Expert & Advanced</span>
           </div>
           <div className="skill-stat-box">
             <span className="skill-stat-value" style={{ color: "#34d399" }}>

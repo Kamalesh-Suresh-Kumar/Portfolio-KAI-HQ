@@ -209,7 +209,7 @@ export default function ProjectDetailModal({
                   <div key={skill!.id} className="modal-skill-chip">
                     <span>{skill!.name}</span>
                     <span className="modal-skill-level">
-                      {skill!.proficiencyLevel.replace(/_/g, " ")}
+                      {skill!.proficiencyLevel}
                     </span>
                   </div>
                 ))}
