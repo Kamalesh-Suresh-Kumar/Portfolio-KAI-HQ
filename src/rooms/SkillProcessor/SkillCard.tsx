@@ -18,21 +18,37 @@ export default function SkillCard({ skill, onSelect }: SkillCardProps) {
   // Map qualitative proficiency level to discrete capability bar count (1 to 4)
   const getProficiencyTier = (level: Skill["proficiencyLevel"]): number => {
     switch (level) {
-      case "expert":
-        return 4;
       case "advanced":
+        return 4;
+      case "proficient":
         return 3;
-      case "intermediate":
+      case "working_knowledge":
         return 2;
-      case "foundational":
+      case "learning":
         return 1;
       default:
         return 1;
     }
   };
 
+  const formatProficiencyLabel = (level: Skill["proficiencyLevel"]): string => {
+    switch (level) {
+      case "advanced":
+        return "Advanced";
+      case "proficient":
+        return "Proficient";
+      case "working_knowledge":
+        return "Working Knowledge";
+      case "learning":
+        return "Learning";
+      default:
+        return level;
+    }
+  };
+
   const tier = getProficiencyTier(skill.proficiencyLevel);
   const categoryLabel = CATEGORY_LABELS[skill.category] || skill.category;
+  const proficiencyLabel = formatProficiencyLabel(skill.proficiencyLevel);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
@@ -48,7 +64,7 @@ export default function SkillCard({ skill, onSelect }: SkillCardProps) {
       role="button"
       onClick={() => onSelect(skill)}
       onKeyDown={handleKeyDown}
-      aria-label={`Inspect ${skill.name} capability (${skill.proficiencyLevel} tier)`}
+      aria-label={`Inspect ${skill.name} capability (${proficiencyLabel} tier)`}
     >
       <div className="skill-card-top">
         <div className="skill-card-header">
@@ -61,11 +77,11 @@ export default function SkillCard({ skill, onSelect }: SkillCardProps) {
         )}
 
         {/* Discrete Capability Meter */}
-        <div className="capability-meter-wrap" aria-label={`Proficiency: ${skill.proficiencyLevel}`}>
+        <div className="capability-meter-wrap" aria-label={`Proficiency: ${proficiencyLabel}`}>
           <div className="capability-meter-header">
             <span style={{ color: "#94a3b8" }}>Proficiency Tier</span>
             <span className={`capability-level-label level-${skill.proficiencyLevel}`}>
-              {skill.proficiencyLevel}
+              {proficiencyLabel}
             </span>
           </div>
 

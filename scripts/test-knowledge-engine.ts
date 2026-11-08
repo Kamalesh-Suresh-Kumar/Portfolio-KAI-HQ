@@ -101,8 +101,15 @@ assert(knowledgeEngine.getRoomMetadata("Lobby") !== undefined, "getRoomMetadata(
 const fullstackProjects = knowledgeEngine.getProjects({ domain: "fullstack" });
 assert(fullstackProjects.length > 0 && fullstackProjects.every(p => p.domain === "fullstack"), `getProjects({ domain: 'fullstack' }) returns ${fullstackProjects.length} filtered items`);
 
-const expertSkills = knowledgeEngine.getSkills().filter(s => s.proficiencyLevel === "expert");
-assert(expertSkills.length > 0, `getSkills() returns ${expertSkills.length} expert level skills`);
+const advancedSkills = knowledgeEngine.getSkills().filter(s => s.proficiencyLevel === "advanced");
+const proficientSkills = knowledgeEngine.getSkills().filter(s => s.proficiencyLevel === "proficient");
+const workingKnowledgeSkills = knowledgeEngine.getSkills().filter(s => s.proficiencyLevel === "working_knowledge");
+const learningSkills = knowledgeEngine.getSkills().filter(s => s.proficiencyLevel === "learning");
+
+assert(advancedSkills.length > 0, `getSkills() returns ${advancedSkills.length} advanced level skills`);
+assert(proficientSkills.length > 0, `getSkills() returns ${proficientSkills.length} proficient level skills`);
+assert(workingKnowledgeSkills.length > 0, `getSkills() returns ${workingKnowledgeSkills.length} working_knowledge level skills`);
+assert(learningSkills.length > 0, `getSkills() returns ${learningSkills.length} learning level skills`);
 
 // 4. Search Tokenization & Scoring
 console.log("\n4. Search Tokenization, Scoring & Ranking Checks");

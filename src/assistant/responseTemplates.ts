@@ -141,7 +141,7 @@ export function generateAssistantResponse(
     case "skills": {
       const skills = knowledgeEngine.getSkills();
       const topSkills = skills
-        .filter((s) => s.proficiencyLevel === "expert" || s.proficiencyLevel === "advanced")
+        .filter((s) => s.proficiencyLevel === "advanced" || s.proficiencyLevel === "proficient")
         .slice(0, 6)
         .map((s) => s.name)
         .join(", ");
@@ -149,7 +149,7 @@ export function generateAssistantResponse(
       return {
         id,
         role: "kai",
-        content: `Indexed ${skills.length} technical skills across Languages, Frameworks, Cybersecurity & Infrastructure.\n\nCore advanced competencies: ${topSkills}.\n\nAccess proficiency telemetry, domain filters, and detailed specs in the Skill Processor.`,
+        content: `Indexed ${skills.length} technical skills across Languages, Frameworks, Cybersecurity & Infrastructure.\n\nCore advanced & proficient competencies: ${topSkills}.\n\nAccess proficiency telemetry, domain filters, and detailed specs in the Skill Processor.`,
         timestamp,
         intent: "skills",
         actions: [
@@ -235,7 +235,7 @@ export function generateAssistantResponse(
       return {
         id,
         role: "kai",
-        content: `Direct communication outlets for ${contact.name}:\n\n• Email: ${contact.email}\n• Location: ${contact.location}\n• GitHub: github.com/${contact.github}\n• KAI Nexus: ${contact.kaiNexus?.url || "https://kamalesh-suresh-kumar.github.io/KAI-Nexus/"}\n\nYou can dispatch direct messages or copy communication handles in the Communication Center.`,
+        content: `Direct communication outlets for ${contact.name}:\n\n• Email: ${contact.email}\n• Location: ${contact.location}\n• GitHub: ${contact.github}\n• KAI Nexus: ${contact.kaiNexus?.url || "https://kamalesh-suresh-kumar.github.io/KAI-Nexus/"}\n\nYou can dispatch direct messages or copy communication handles in the Communication Center.`,
         timestamp,
         intent: "contact",
         actions: [

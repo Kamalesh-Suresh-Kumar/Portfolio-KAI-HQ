@@ -42,7 +42,7 @@ export const achievementsData: Achievement[] = [
     id: 'ach-academic-excellence',
     title: 'Computer Science & Engineering Academic & Technical Milestones',
     issuer: 'Department of Computer Science and Engineering',
-    date: '2022 — Present',
+    date: '2023 — 2027 (Expected)',
     category: 'academic',
     description: 'Demonstrated continuous technical depth across software architectures, distributed networking projects, algorithms, and applied security labs.',
     highlight: false,
