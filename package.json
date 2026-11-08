@@ -14,7 +14,9 @@
     "test:routing": "tsx scripts/test-routing.ts",
     "test:knowledge": "tsx scripts/test-knowledge-engine.ts",
     "test:phase6-1": "tsx scripts/test-phase6-1-accessibility.ts",
-    "test:phase6-2": "tsx scripts/test-phase6-2-fallback.ts"
+    "test:phase6-2": "tsx scripts/test-phase6-2-fallback.ts",
+    "test:unit": "vitest run",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json --noEmit"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -30,6 +32,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
@@ -38,9 +42,12 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "jsdom": "^26.0.0",
     "prettier": "^3.9.5",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.62.0",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vitest": "^5.1.0",
+    "vitest-axe": "^0.1.0"
   }
 }
