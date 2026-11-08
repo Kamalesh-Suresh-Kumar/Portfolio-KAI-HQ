@@ -14,7 +14,7 @@ export const contactData: ContactPayload = {
   },
   location: 'India',
   availability: 'Available for full-time software engineering roles & research projects',
-  bio: 'Computer Science and Engineering undergraduate with a strong foundation in full-stack web architecture, cybersecurity research, and automated pipelines. Creator of KAI HQ, an interactive portfolio operating system designed to showcase technical rigor and system architecture.',
+  bio: 'Computer Science and Engineering undergraduate at Rajalakshmi Engineering College (Expected 2027) with a strong foundation in full-stack web architecture, cybersecurity research, and automated pipelines. Creator of KAI HQ, an interactive portfolio operating system designed to showcase technical rigor and system architecture.',
   systemStatus: {
     status: 'ONLINE',
     version: '1.0.0',

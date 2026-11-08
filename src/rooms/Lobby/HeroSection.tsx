@@ -237,14 +237,14 @@ export default function HeroSection() {
             <div className="core-center">
               <img
                 src={resolveAssetUrl("/assets/kamalesh-portrait.png")}
-                alt="Kamalesh S P"
+                alt={contact.name}
                 className="core-portrait-img"
               />
               <div className="core-portrait-glow" aria-hidden="true" />
             </div>
           </button>
           <div className="core-caption">
-            <span>KAMALESH S P</span>
+            <span>{contact.name.toUpperCase()}</span>
             <small>Click core to interact with KAI</small>
           </div>
         </div>

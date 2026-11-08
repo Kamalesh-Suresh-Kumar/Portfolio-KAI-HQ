@@ -90,6 +90,21 @@ export default function SkillDetailModal({
 
   if (!skill) return null;
 
+  const getProficiencyLabel = (level: string): string => {
+    switch (level) {
+      case "advanced":
+        return "Advanced";
+      case "proficient":
+        return "Proficient";
+      case "working_knowledge":
+        return "Working Knowledge";
+      case "learning":
+        return "Learning";
+      default:
+        return level;
+    }
+  };
+
   const modalContent = (
     <div
       className="skill-modal-backdrop"
@@ -109,7 +124,7 @@ export default function SkillDetailModal({
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span className={`capability-level-label level-${skill.proficiencyLevel}`}>
-                ● {skill.proficiencyLevel.toUpperCase()}
+                ● {getProficiencyLabel(skill.proficiencyLevel).toUpperCase()}
               </span>
               <span className="skill-cat-pill" style={{ color: "#94a3b8" }}>
                 // {skill.category.replace(/_/g, " ").toUpperCase()}
@@ -177,7 +192,7 @@ export default function SkillDetailModal({
                 <CheckCircle2 size={18} color="#38bdf8" />
                 <div>
                   <span style={{ fontSize: "0.88rem", fontWeight: 600, color: "#f8fafc" }}>
-                    {skill.proficiencyLevel.charAt(0).toUpperCase() + skill.proficiencyLevel.slice(1)} Competency
+                    {getProficiencyLabel(skill.proficiencyLevel)} Competency
                   </span>
                   <p style={{ fontSize: "0.76rem", color: "#94a3b8", margin: 0 }}>
                     Integrated in core engineering pipelines & project architectures

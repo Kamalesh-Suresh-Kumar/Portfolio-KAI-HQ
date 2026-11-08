@@ -41,10 +41,10 @@ export const achievementsData: Achievement[] = [
   {
     id: 'ach-academic-excellence',
     title: 'Computer Science & Engineering Academic & Technical Milestones',
-    issuer: 'Department of Computer Science and Engineering',
+    issuer: 'Department of Computer Science and Engineering, Rajalakshmi Engineering College',
     date: '2022 — Present',
     category: 'academic',
-    description: 'Demonstrated continuous technical depth across software architectures, distributed networking projects, algorithms, and applied security labs.',
+    description: 'Demonstrated continuous technical depth across software architectures, distributed networking projects, algorithms, and applied security labs at Rajalakshmi Engineering College.',
     highlight: false,
   },
 ];
