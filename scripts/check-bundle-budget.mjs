@@ -22,17 +22,13 @@
  *
  * Exits with status code 0 on success; exits with status code 1 on budget violation
  * or if assets cannot be located/read.
+ *
+ * Native ESM Node.js script — zero external runtime or transpile dependencies.
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
-
-interface AssetSizeReport {
-  file: string;
-  rawBytes: number;
-  gzipBytes: number;
-}
 
 const JS_BUDGET_KB = 180;
 const CSS_BUDGET_KB = 25;
@@ -40,26 +36,26 @@ const CSS_BUDGET_KB = 25;
 const JS_BUDGET_BYTES = JS_BUDGET_KB * 1000;
 const CSS_BUDGET_BYTES = CSS_BUDGET_KB * 1000;
 
-function formatSize(bytes: number): string {
+function formatSize(bytes) {
   const kb = (bytes / 1000).toFixed(2);
   const kib = (bytes / 1024).toFixed(2);
   return `${kb} KB (${kib} KiB / ${bytes.toLocaleString()} B)`;
 }
 
-function getGzipSize(filePath: string): { rawBytes: number; gzipBytes: number } {
+function getGzipSize(filePath) {
   const content = fs.readFileSync(filePath);
   const stat = fs.statSync(filePath);
   const gzip = zlib.gzipSync(content, { level: 9 });
   return { rawBytes: stat.size, gzipBytes: gzip.length };
 }
 
-function resolveEntryJsFile(distDir: string): { entryFile: string; manifestFound: boolean } {
+function resolveEntryJsFile(distDir) {
   // Check Vite 5/6+ default location: dist/.vite/manifest.json
   const dotViteManifest = path.join(distDir, ".vite", "manifest.json");
   // Check root dist location: dist/manifest.json
   const rootManifest = path.join(distDir, "manifest.json");
 
-  let manifestPath: string | null = null;
+  let manifestPath = null;
   if (fs.existsSync(dotViteManifest)) {
     manifestPath = dotViteManifest;
   } else if (fs.existsSync(rootManifest)) {
@@ -70,8 +66,8 @@ function resolveEntryJsFile(distDir: string): { entryFile: string; manifestFound
     try {
       const manifestContent = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
       // Search for isEntry: true
-      for (const record of Object.values<{ file?: string; isEntry?: boolean }>(manifestContent)) {
-        if (record.isEntry && record.file && record.file.endsWith(".js")) {
+      for (const record of Object.values(manifestContent)) {
+        if (record && record.isEntry && record.file && record.file.endsWith(".js")) {
           return { entryFile: record.file, manifestFound: true };
         }
       }
@@ -106,7 +102,7 @@ function resolveEntryJsFile(distDir: string): { entryFile: string; manifestFound
   );
 }
 
-function runBundleBudgetCheck(): void {
+function runBundleBudgetCheck() {
   const distDir = path.resolve(process.cwd(), "dist");
   const assetsDir = path.join(distDir, "assets");
 
@@ -128,13 +124,13 @@ function runBundleBudgetCheck(): void {
   }
 
   // 1. Resolve entry JavaScript bundle
-  let entryRelativePath: string;
+  let entryRelativePath;
   let manifestFound = false;
   try {
     const resolution = resolveEntryJsFile(distDir);
     entryRelativePath = resolution.entryFile;
     manifestFound = resolution.manifestFound;
-  } catch (err: unknown) {
+  } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`[FAIL] ${message}`);
     process.exit(1);
@@ -149,7 +145,7 @@ function runBundleBudgetCheck(): void {
   }
 
   // 2. Scan all JS and CSS assets in dist/assets
-  let entries: string[];
+  let entries;
   try {
     entries = fs.readdirSync(assetsDir);
   } catch (err) {
@@ -157,15 +153,15 @@ function runBundleBudgetCheck(): void {
     process.exit(1);
   }
 
-  let entryJsReport: AssetSizeReport | null = null;
-  const lazyJsReports: AssetSizeReport[] = [];
-  const cssReports: AssetSizeReport[] = [];
+  let entryJsReport = null;
+  const lazyJsReports = [];
+  const cssReports = [];
 
   for (const entry of entries) {
     if (entry.endsWith(".map")) continue;
 
     const fullPath = path.join(assetsDir, entry);
-    let stat: fs.Stats;
+    let stat;
     try {
       stat = fs.statSync(fullPath);
     } catch (err) {
@@ -177,7 +173,7 @@ function runBundleBudgetCheck(): void {
 
     if (entry.endsWith(".js")) {
       const { rawBytes, gzipBytes } = getGzipSize(fullPath);
-      const report: AssetSizeReport = { file: entry, rawBytes, gzipBytes };
+      const report = { file: entry, rawBytes, gzipBytes };
       if (entry === entryFileName) {
         entryJsReport = report;
       } else {

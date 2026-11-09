@@ -22,7 +22,7 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
     "test:all": "npm run test:knowledge && npm run test:routing && npm run test:phase4 && npm run test:phase6-1 && npm run test:phase6-2 && npm run test:unit",
-    "check:bundle": "tsx scripts/check-bundle-budget.ts",
+    "check:bundle": "node scripts/check-bundle-budget.mjs",
     "typecheck": "tsc -b && tsc -p tsconfig.test.json --noEmit"
   },
   "dependencies": {
