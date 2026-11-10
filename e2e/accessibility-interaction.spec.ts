@@ -13,7 +13,7 @@ test.describe("Accessibility Interaction & Keyboard Navigation Suite", () => {
     await page.addInitScript(() => {
       sessionStorage.setItem("kai_hq_booted", "true");
     });
-    await page.goto("/");
+    await page.goto("");
     await page.waitForSelector(".skip-to-content-link");
 
     // Press Tab once to bring focus to the skip link
@@ -40,7 +40,7 @@ test.describe("Accessibility Interaction & Keyboard Navigation Suite", () => {
     await page.addInitScript(() => {
       sessionStorage.setItem("kai_hq_booted", "true");
     });
-    await page.goto("/");
+    await page.goto("");
     await page.waitForSelector("#kai-sidebar-nav");
 
     // Focus the first button in the sidebar nav
@@ -75,7 +75,7 @@ test.describe("Accessibility Interaction & Keyboard Navigation Suite", () => {
     await page.addInitScript(() => {
       sessionStorage.setItem("kai_hq_booted", "true");
     });
-    await page.goto("/");
+    await page.goto("");
     await page.waitForSelector("#kai-sidebar-nav");
 
     const navButton = page.locator("#kai-sidebar-nav button").first();
@@ -105,7 +105,7 @@ test.describe("Accessibility Interaction & Keyboard Navigation Suite", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
 
     const startTime = Date.now();
-    await page.goto("/");
+    await page.goto("");
     await page.waitForSelector("main");
     const elapsed = Date.now() - startTime;
 

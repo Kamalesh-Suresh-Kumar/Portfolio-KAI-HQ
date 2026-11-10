@@ -67,7 +67,7 @@ test.describe("Critical Facility Room Navigation Suite", () => {
   });
 
   test("verifies that all eight facility rooms can be navigated via sidebar controls", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("");
     await page.waitForSelector("#kai-sidebar-nav");
 
     for (const room of ROOMS) {
@@ -94,7 +94,7 @@ test.describe("Critical Facility Room Navigation Suite", () => {
   test.describe("Direct URL Routing & Page Reload", () => {
     for (const room of ROOMS) {
       test(`verifies direct URL navigation and refresh for ${room.name}`, async ({ page }) => {
-        const targetUrl = room.slug ? `/${room.slug}` : "/";
+        const targetUrl = room.slug || "";
         await page.goto(targetUrl);
         await page.waitForSelector("main");
 
@@ -116,7 +116,7 @@ test.describe("Critical Facility Room Navigation Suite", () => {
   });
 
   test("verifies browser Back and Forward history navigation maintains state", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("");
     await page.waitForSelector("#kai-sidebar-nav");
 
     // 1. Navigate Lobby -> Engineering Laboratory

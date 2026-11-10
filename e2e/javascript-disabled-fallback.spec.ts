@@ -24,7 +24,7 @@ test.describe("JavaScript-Disabled Static Fallback Suite", () => {
   test.use({ javaScriptEnabled: false });
 
   test("verifies that static Lobby fallback loads with status notice and identity summary", async ({ page }) => {
-    await page.goto("/fallback/index.html");
+    await page.goto("fallback/index.html");
 
     // Title and Static Mode Notice
     await expect(page).toHaveTitle(/Lobby — KAI HQ Static Fallback/);
@@ -43,7 +43,7 @@ test.describe("JavaScript-Disabled Static Fallback Suite", () => {
 
   for (const room of FALLBACK_ROOMS) {
     test(`verifies static fallback page ${room.file} is directly reachable and readable without JS`, async ({ page }) => {
-      await page.goto(`/fallback/${room.file}`);
+      await page.goto(`fallback/${room.file}`);
 
       // Verify page title and notice
       await expect(page).toHaveTitle(new RegExp(room.title));
@@ -61,7 +61,7 @@ test.describe("JavaScript-Disabled Static Fallback Suite", () => {
   }
 
   test("verifies internal navigation between fallback rooms works via pure static HTML links", async ({ page }) => {
-    await page.goto("/fallback/index.html");
+    await page.goto("fallback/index.html");
 
     // 1. Click Engineering Laboratory in the static fallback nav
     await page.click('.fallback-nav a:has-text("Engineering Laboratory")');
@@ -80,7 +80,7 @@ test.describe("JavaScript-Disabled Static Fallback Suite", () => {
   });
 
   test("verifies direct resume PDF downloads resolve with HTTP 200 without JavaScript", async ({ page, request }) => {
-    await page.goto("/fallback/document-vault.html");
+    await page.goto("fallback/document-vault.html");
 
     // Check all 4 resume download buttons
     const downloadLinks = page.locator('a[download][href*="resume-"]');
@@ -92,8 +92,8 @@ test.describe("JavaScript-Disabled Static Fallback Suite", () => {
       const href = await link.getAttribute("href");
       expect(href).toBeTruthy();
 
-      // Resolve relative path against /fallback/
-      const absoluteUrl = new URL(href!, "http://127.0.0.1:4173/fallback/").toString();
+      // Resolve relative path against current page URL
+      const absoluteUrl = new URL(href!, page.url()).toString();
       const res = await request.get(absoluteUrl);
       expect(res.status(), `Resume PDF ${href} must return HTTP 200`).toBe(200);
       expect(res.headers()["content-type"]).toMatch(/application\/pdf/i);
@@ -101,7 +101,7 @@ test.describe("JavaScript-Disabled Static Fallback Suite", () => {
   });
 
   test("verifies index.html noscript element links cleanly to static fallback", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("");
 
     // In JS-disabled browser, the <noscript> block is displayed
     const noscriptLink = page.locator('noscript a[href*="fallback/index.html"]').first();

@@ -7,6 +7,9 @@ import { defineConfig, devices } from "@playwright/test";
  * validating all eight facility rooms, production base paths, keyboard interaction,
  * and zero-JS static fallback compliance.
  */
+const BASE_PATH = process.env.GITHUB_ACTIONS ? "/Portfolio-KAI-HQ/" : "/";
+const BASE_URL = `http://127.0.0.1:4173${BASE_PATH}`;
+
 export default defineConfig({
   testDir: "./e2e",
   /* Run tests sequentially for deterministic stability in resource-constrained environments */
@@ -25,7 +28,7 @@ export default defineConfig({
   reporter: [["list"]],
   /* Shared settings for all projects */
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: BASE_URL,
     /* Collect trace and screenshot when a test fails */
     trace: "retain-on-failure",
     screenshot: "only-on-failure",

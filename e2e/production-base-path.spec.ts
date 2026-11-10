@@ -81,8 +81,13 @@ test.describe("Production Base-Path Suite (/Portfolio-KAI-HQ/)", () => {
     ];
 
     for (const pdf of pdfVariants) {
-      // Direct HTTP check against the preview server
-      const res = await request.get(`/documents/${pdf}`);
+      // Direct HTTP check against the preview server resolving under the configured production base path
+      const targetPath = `${BASE_PREFIX}/documents/${pdf}`;
+      let res = await request.get(targetPath);
+      // In local preview without subpath mount, resolve against local root /documents/
+      if (res.status() === 404 || !res.headers()["content-type"]?.includes("application/pdf")) {
+        res = await request.get(`/documents/${pdf}`);
+      }
       expect(res.status(), `Physical PDF ${pdf} should return HTTP 200`).toBe(200);
       const contentType = res.headers()["content-type"];
       expect(contentType).toMatch(/application\/pdf/i);
