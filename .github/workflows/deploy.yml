@@ -50,17 +50,17 @@ jobs:
       - name: Regression & accessibility test suites gate
         run: npm run test:all
 
-      - name: Install Playwright Chromium browser
-        run: npx playwright install --with-deps chromium
-
-      - name: End-to-end browser testing gate
-        run: npm run test:e2e
-
       - name: Production application build
         run: npm run build
 
       - name: Automated bundle budget verification gate
         run: npm run check:bundle
+
+      - name: Install Playwright Chromium browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end browser testing gate
+        run: npm run test:e2e
 
       # actions/upload-pages-artifact@v3.0.1
       - name: Upload GitHub Pages artifact
