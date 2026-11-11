@@ -23,13 +23,41 @@ const __dirname = path.dirname(__filename);
 const OUTPUT_DIR = path.resolve(__dirname, "..", "public", "fallback");
 const ROOT_DIR = path.resolve(__dirname, "..");
 
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  process.env.GITHUB_ACTIONS === "true" ||
+  process.argv.includes("--production");
+
 // Safely load environment variables across both local (.env.local) and CI (process.env)
 const loadedEnv = {
   ...loadEnv("production", ROOT_DIR, "VITE_"),
   ...loadEnv("development", ROOT_DIR, "VITE_"),
   ...process.env,
 };
-const WEB3FORMS_ACCESS_KEY = loadedEnv.VITE_WEB3FORMS_ACCESS_KEY || "";
+
+export const DEV_PLACEHOLDER_ACCESS_KEY = "DEV_ACCESS_KEY_UNSET";
+
+export function resolveWeb3FormsAccessKey(options: {
+  isProduction?: boolean;
+  accessKey?: string;
+} = {}): string {
+  const prod = options.isProduction ?? isProduction;
+  const key = (options.accessKey ?? loadedEnv.VITE_WEB3FORMS_ACCESS_KEY ?? "").trim();
+
+  if (prod) {
+    if (!key || key === "YOUR_ACCESS_KEY_HERE" || key === DEV_PLACEHOLDER_ACCESS_KEY) {
+      throw new Error(
+        "Production build failure: VITE_WEB3FORMS_ACCESS_KEY is required for production static fallback generation. " +
+        "Ensure the VITE_WEB3FORMS_ACCESS_KEY secret or environment variable is configured and non-empty. " +
+        "Never generate a production fallback with placeholder access keys."
+      );
+    }
+    return key;
+  }
+
+  // Development mode: Return the configured key if present, otherwise safe dev placeholder
+  return key || DEV_PLACEHOLDER_ACCESS_KEY;
+}
 
 /**
  * Escapes HTML sensitive characters to prevent raw injection and ensure valid markup.
@@ -43,6 +71,7 @@ function escapeHtml(str: string | null | undefined): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
 
 interface RoomDefinition {
   id: RoomId;
@@ -974,8 +1003,10 @@ ${cardsHtml}
 }
 
 export function renderCommunicationCenterContent(
-  captchaEnabled: boolean = HCAPTCHA_CONFIG.enabled
+  captchaEnabled: boolean = HCAPTCHA_CONFIG.enabled,
+  accessKey?: string
 ): string {
+  const resolvedAccessKey = accessKey !== undefined ? accessKey : resolveWeb3FormsAccessKey();
   const contact = knowledgeEngine.getContact();
   const githubCleanUrl = contact.github.startsWith("http") ? contact.github : `https://github.com/${contact.github}`;
   const githubDisplayText = contact.github.replace(/^https?:\/\//, "");
@@ -1042,8 +1073,9 @@ export function renderCommunicationCenterContent(
     <section class="section-block">
       <h3 class="section-title">Transmit Message (Web3Forms Native Submission)</h3>
       <form action="https://api.web3forms.com/submit" method="POST" class="fallback-card" style="gap: 16px;">
-        <input type="hidden" name="access_key" value="${escapeHtml(WEB3FORMS_ACCESS_KEY || "YOUR_ACCESS_KEY_HERE")}" />
+        <input type="hidden" name="access_key" value="${escapeHtml(resolvedAccessKey)}" />
         <input type="hidden" name="from_name" value="KAI HQ Static Fallback" />
+
 
         <div>
           <label for="fallback-name" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Your Name / Organization <span style="color: #f87171;">*</span></label>
@@ -1254,14 +1286,23 @@ function renderMissionControlContent(): string {
 
 export interface FallbackGeneratorOptions {
   captchaEnabled?: boolean;
+  accessKey?: string;
+  isProduction?: boolean;
 }
 
 export function generateStaticFallback(
   options: FallbackGeneratorOptions = {}
 ): { generatedFiles: string[]; totalBytes: number } {
   const captchaEnabled = options.captchaEnabled ?? HCAPTCHA_CONFIG.enabled;
+  const prod = options.isProduction ?? isProduction;
+  const resolvedAccessKey = resolveWeb3FormsAccessKey({
+    isProduction: prod,
+    accessKey: options.accessKey,
+  });
+
   console.log("=== KAI HQ Phase 6.2: Generating Static No-JS Fallback ===");
   console.log(`Output Directory: ${OUTPUT_DIR}`);
+  console.log(`Environment:      ${prod ? "production (Strict Access Key Validation)" : "development"}`);
   console.log(`CAPTCHA Enabled:  ${captchaEnabled} (Source: src/config/captchaConfig.ts)`);
 
   if (!fs.existsSync(OUTPUT_DIR)) {
@@ -1298,7 +1339,7 @@ export function generateStaticFallback(
         contentHtml = renderDocumentVaultContent();
         break;
       case "CommunicationCenter":
-        contentHtml = renderCommunicationCenterContent(captchaEnabled);
+        contentHtml = renderCommunicationCenterContent(captchaEnabled, resolvedAccessKey);
         break;
       case "SkillProcessor":
         contentHtml = renderSkillProcessorContent();
@@ -1307,6 +1348,7 @@ export function generateStaticFallback(
         contentHtml = renderMissionControlContent();
         break;
     }
+
 
     const fullHtml = renderPage(room.id, contentHtml, captchaEnabled);
     const filePath = path.join(OUTPUT_DIR, room.filename);

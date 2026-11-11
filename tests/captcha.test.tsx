@@ -5,7 +5,12 @@ import TransmissionForm from "../src/rooms/CommunicationCenter/TransmissionForm"
 import { HCAPTCHA_CONFIG } from "../src/config/captchaConfig";
 import { ExperienceEngineProvider } from "../src/experience-engine/ExperienceEngineProvider";
 
-import { renderCommunicationCenterContent, renderPage } from "../scripts/generate-fallback";
+import {
+  renderCommunicationCenterContent,
+  renderPage,
+  resolveWeb3FormsAccessKey,
+  DEV_PLACEHOLDER_ACCESS_KEY,
+} from "../scripts/generate-fallback";
 
 interface MockCaptchaProps {
   sitekey: string;
@@ -292,6 +297,61 @@ describe("KAI HQ — Web3Forms hCaptcha Integration Suite", () => {
       }
     });
   });
+
+  describe("4. Web3Forms Access Key Build Validation", () => {
+    it("fails production generation when access key is missing or empty", () => {
+      expect(() => {
+        resolveWeb3FormsAccessKey({ isProduction: true, accessKey: "" });
+      }).toThrow(/Production build failure: VITE_WEB3FORMS_ACCESS_KEY is required/i);
+
+      expect(() => {
+        resolveWeb3FormsAccessKey({ isProduction: true, accessKey: "   " });
+      }).toThrow(/Production build failure: VITE_WEB3FORMS_ACCESS_KEY is required/i);
+    });
+
+    it("fails production generation when access key is a known placeholder", () => {
+      expect(() => {
+        resolveWeb3FormsAccessKey({ isProduction: true, accessKey: "YOUR_ACCESS_KEY_HERE" });
+      }).toThrow(/Never generate a production fallback with placeholder access keys/i);
+
+      expect(() => {
+        resolveWeb3FormsAccessKey({ isProduction: true, accessKey: DEV_PLACEHOLDER_ACCESS_KEY });
+      }).toThrow(/Never generate a production fallback with placeholder access keys/i);
+    });
+
+    it("succeeds in production generation when a valid access key is supplied", () => {
+      const resolved = resolveWeb3FormsAccessKey({
+        isProduction: true,
+        accessKey: "actual-prod-access-key-12345",
+      });
+      expect(resolved).toBe("actual-prod-access-key-12345");
+
+      const html = renderCommunicationCenterContent(false, "actual-prod-access-key-12345");
+      expect(html).toContain('value="actual-prod-access-key-12345"');
+      expect(html).not.toContain("YOUR_ACCESS_KEY_HERE");
+      expect(html).not.toContain(DEV_PLACEHOLDER_ACCESS_KEY);
+    });
+
+    it("uses safe dev placeholder in development mode when key is absent", () => {
+      const devResolved = resolveWeb3FormsAccessKey({ isProduction: false, accessKey: "" });
+      expect(devResolved).toBe(DEV_PLACEHOLDER_ACCESS_KEY);
+
+      const devHtml = renderCommunicationCenterContent(false, devResolved);
+      expect(devHtml).toContain(`value="${DEV_PLACEHOLDER_ACCESS_KEY}"`);
+      expect(devHtml).not.toContain("YOUR_ACCESS_KEY_HERE");
+    });
+
+    it("never produces 'YOUR_ACCESS_KEY_HERE' in generated output", () => {
+      // In development
+      const devHtml = renderCommunicationCenterContent(false);
+      expect(devHtml).not.toContain("YOUR_ACCESS_KEY_HERE");
+
+      // In production with key
+      const prodHtml = renderCommunicationCenterContent(false, "configured-prod-key");
+      expect(prodHtml).not.toContain("YOUR_ACCESS_KEY_HERE");
+    });
+  });
 });
+
 
 
