@@ -1,5 +1,7 @@
+import { useState, useRef, useEffect } from "react";
 import { knowledgeEngine } from "../../knowledge-engine";
 import { useExperienceEngine, resolveAssetUrl } from "../../experience-engine";
+import ProfilePhotoViewer from "./ProfilePhotoViewer";
 import {
   FolderGit2,
   Cpu,
@@ -13,6 +15,51 @@ import {
 export default function HeroSection() {
   const { changeRoom, openKAI, setAssistantFocus, reducedMotion, mode } = useExperienceEngine();
   const contact = knowledgeEngine.getContact();
+
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const photoTriggerRef = useRef<HTMLButtonElement>(null);
+
+  // 2-second hover / focus delayed tooltip for KAI AI button
+  const [showKaiTooltip, setShowKaiTooltip] = useState(false);
+  const tooltipTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleKaiButtonMouseEnter = () => {
+    if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
+    tooltipTimerRef.current = setTimeout(() => {
+      setShowKaiTooltip(true);
+    }, 2000);
+  };
+
+  const handleKaiButtonMouseLeave = () => {
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+      tooltipTimerRef.current = null;
+    }
+    setShowKaiTooltip(false);
+  };
+
+  const handleKaiButtonFocus = () => {
+    if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
+    tooltipTimerRef.current = setTimeout(() => {
+      setShowKaiTooltip(true);
+    }, 2000);
+  };
+
+  const handleKaiButtonBlur = () => {
+    if (tooltipTimerRef.current) {
+      clearTimeout(tooltipTimerRef.current);
+      tooltipTimerRef.current = null;
+    }
+    setShowKaiTooltip(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (tooltipTimerRef.current) {
+        clearTimeout(tooltipTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleTalkToKAI = () => {
     let contextPrompt = "Hello KAI, give me an overview of Kamalesh's engineering portfolio";
@@ -37,6 +84,33 @@ export default function HeroSection() {
         return "// KAI HQ OPERATING SYSTEM v1.0";
     }
   };
+
+  const renderKaiButton = (label: string) => (
+    <div
+      className="kai-tooltip-wrapper"
+      onMouseEnter={handleKaiButtonMouseEnter}
+      onMouseLeave={handleKaiButtonMouseLeave}
+    >
+      <button
+        type="button"
+        className="btn-hero-kai"
+        onClick={handleTalkToKAI}
+        onFocus={handleKaiButtonFocus}
+        onBlur={handleKaiButtonBlur}
+        id="hero-talk-to-kai-btn"
+        aria-label={`${label} - Launch KAI Assistant`}
+        aria-describedby={showKaiTooltip ? "kai-hero-tooltip" : undefined}
+      >
+        <Bot size={16} />
+        <span>{label}</span>
+      </button>
+      {showKaiTooltip && (
+        <div id="kai-hero-tooltip" className="kai-delayed-tooltip" role="tooltip">
+          Click to interact with KAI guide
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="hero-section" role="region" aria-label="Hero Overview">
@@ -121,15 +195,7 @@ export default function HeroSection() {
                   <span>Key Projects</span>
                 </button>
 
-                <button
-                  type="button"
-                  className="btn-hero-kai"
-                  onClick={handleTalkToKAI}
-                  id="hero-talk-to-kai-btn"
-                >
-                  <Bot size={16} />
-                  <span>Screening Q&A</span>
-                </button>
+                {renderKaiButton("Screening Q&A")}
               </>
             ) : mode === "developer" ? (
               <>
@@ -164,15 +230,7 @@ export default function HeroSection() {
                   <span>Protocol Research</span>
                 </button>
 
-                <button
-                  type="button"
-                  className="btn-hero-kai"
-                  onClick={handleTalkToKAI}
-                  id="hero-talk-to-kai-btn"
-                >
-                  <Bot size={16} />
-                  <span>Architecture Q&A</span>
-                </button>
+                {renderKaiButton("Architecture Q&A")}
               </>
             ) : (
               <>
@@ -207,28 +265,21 @@ export default function HeroSection() {
                   <span>View Resumes</span>
                 </button>
 
-                <button
-                  type="button"
-                  className="btn-hero-kai"
-                  onClick={handleTalkToKAI}
-                  id="hero-talk-to-kai-btn"
-                >
-                  <Bot size={16} />
-                  <span>Talk to KAI</span>
-                </button>
+                {renderKaiButton("Talk to KAI")}
               </>
             )}
           </div>
         </div>
 
-        {/* AI Core Interactive Visualizer */}
+        {/* AI Core Interactive Visualizer — Opens Full-Size Profile Photo Viewer */}
         <div className="hero-core-wrapper">
           <button
+            ref={photoTriggerRef}
             type="button"
             className={`ai-core-interactive ${reducedMotion ? "reduced-motion" : ""}`}
-            onClick={handleTalkToKAI}
-            aria-label="Launch KAI Assistant from Central Core"
-            title="Click to launch KAI Assistant"
+            onClick={() => setIsViewerOpen(true)}
+            aria-label="View full-size profile photograph of Kamalesh Suresh Kumar"
+            title="Click to view full-size profile photo"
           >
             <div className="core-glow-ambient"></div>
             <div className="core-ring ring-outer"></div>
@@ -245,10 +296,16 @@ export default function HeroSection() {
           </button>
           <div className="core-caption">
             <span>{contact.name.toUpperCase()}</span>
-            <small>Click core to interact with KAI</small>
           </div>
         </div>
       </div>
+
+      {/* Full-Size Profile Photo Lightbox */}
+      <ProfilePhotoViewer
+        isOpen={isViewerOpen}
+        onClose={() => setIsViewerOpen(false)}
+        triggerRef={photoTriggerRef}
+      />
     </div>
   );
 }

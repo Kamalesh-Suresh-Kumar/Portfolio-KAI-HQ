@@ -101,6 +101,7 @@ Not a menu — a **navigation system**, per the brief's design philosophy. Three
 1. **Spatial map affordance** — a persistent, minimal control (e.g., a corner-anchored headquarters map/index) listing all 8 rooms, usable by mouse, touch, or keyboard (Tab + Enter).
 2. **Command/search bar** — type-ahead access to any room or content entry, usable without ever engaging KAI conversationally. Serves keyboard-first and screen-reader users primarily.
 3. **Conversational routing** — asking KAI to take you somewhere (REQ-KAI-004), an alternative *path* to the same destinations, never the only path.
+4. **Header Brand Navigation** — Top-left brand identity ("KAI HQ" logo and "KAI HEADQUARTERS" title) acts as an interactive button that returns the visitor to the Lobby (`UX-ROOM-01`) from any room with visible keyboard focus and an accessible label (`aria-label="KAI HQ — Return to Lobby"`).
 
 **Design constraint UX-004:** All three methods must resolve to the same underlying navigation state (single source of truth) so that "where am I" is never ambiguous across input methods — this anticipates the Experience Engine's mediating role (Volume 1 §12) and will be a direct input to Volume 3's state management design.
 
@@ -114,7 +115,8 @@ Each room description below follows a fixed template: **Purpose → What the vis
 **Purpose:** Orientation and entry point (REQ-NAV-001, REQ-KAI-001).
 **Experience:** First room after Power On. Presents a short, scannable summary of the developer (role, focus areas) and the two soft path affordances (Recruiter / Developer framing) without gating.
 **Primary content:** One-line identity statement, current roles (CSE undergrad, two internships), links to all other rooms.
-**KAI's role:** Greets, offers orientation questions.
+**Profile Photo Inspection:** Clicking the hero profile photograph opens an accessible full-size lightbox viewer (`ProfilePhotoViewer`) with wheel/pinch zoom (1x–4x), pan dragging, double-click reset, keyboard trapping, and Escape/backdrop dismissal. This interaction is decoupled from the Assistant launcher. The KAI AI core button features a 2-second hover/focus delayed accessibility tooltip ("Interact with KAI AI Guide").
+**KAI's role:** Greets, offers orientation questions, and provides grounded assistance with dual cooldown abuse protections.
 **Fallback:** Static hero section with the same identity statement and a plain navigation list; fully readable with JS disabled (REQ-ACC-004).
 
 ### 7.2 Engineering Laboratory — `UX-ROOM-02`
@@ -148,11 +150,15 @@ Each room description below follows a fixed template: **Purpose → What the vis
 **Design constraint UX-005:** The Document Vault must be reachable in ≤2 actions from the Lobby via at least one of the three navigation methods (UX-004), independent of KAI. *(Directly protects the 60-second budget in US-01/Metric table §13 of Volume 1.)*
 
 ### 7.6 Communication Center — `UX-ROOM-06`
-**Purpose:** Contact (REQ-KNOW-001).
-**Experience:** Direct, low-friction contact methods (email, LinkedIn, GitHub) presented plainly — this room deliberately resists over-design, since its job is to get out of the way.
-**Primary content:** Contact channels, optionally a lightweight message affordance (mailto-based; no backend form processing, consistent with REQ-DEPLOY-002).
-**KAI's role:** Minimal — may confirm channels on request.
-**Fallback:** Static mailto/profile links.
+**Purpose:** Contact & Transmission (REQ-KNOW-001).
+**Experience:** Direct, low-friction contact channels and an integrated message transmission console powered by Web3Forms client-side API.
+**Primary content:**
+1. **Verified External Channels:** Direct links for Primary Email (`mailto:kamalesh.sde@gmail.com`), GitHub profile, KAI Nexus, Source Repository (`Portfolio-KAI-HQ`), Phone Number (`tel:+916369638817`), and WhatsApp (`https://wa.me/916369638817`).
+2. **Direct Transmission Console:** Accessible form featuring Name, Email, Subject dropdown (Internship, Job Opportunity, Project Collaboration, General Enquiry, Others), Custom Subject text field when "Others" is selected, and Message payload textarea with live character counter (10–5,000 chars). Submissions dispatch directly to `https://api.web3forms.com/submit` with dynamic subject formatting `[KAI HQ] {{Subject}} — {{Name}}`. Strictly no `mailto:` fallback in the form.
+3. **Delivery Disclaimer:** Clear notification that messages are submitted through Web3Forms and forwarded to Kamalesh at `kamalesh.sde@gmail.com`.
+4. **Non-blocking Notifications:** Reusable toast notifications (`NotificationToast`) providing auto-dismissing (5s) status and alert feedback.
+**KAI's role:** Can route visitors to Communication Center and summarize available channels.
+**Fallback:** Static fallback page (`communication-center.html`) with verified channel cards and native HTML `<form>` posting directly to Web3Forms without JavaScript.
 
 ### 7.7 Skill Processor — `UX-ROOM-07`
 **Purpose:** Skills (REQ-KNOW-001/002).

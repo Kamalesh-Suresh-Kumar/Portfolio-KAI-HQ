@@ -12,6 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadEnv } from "vite";
 import { knowledgeEngine } from "../src/knowledge-engine";
 import type { RoomId } from "../src/knowledge-engine/types";
 
@@ -19,6 +20,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const OUTPUT_DIR = path.resolve(__dirname, "..", "public", "fallback");
+const ROOT_DIR = path.resolve(__dirname, "..");
+
+// Safely load environment variables across both local (.env.local) and CI (process.env)
+const loadedEnv = {
+  ...loadEnv("production", ROOT_DIR, "VITE_"),
+  ...loadEnv("development", ROOT_DIR, "VITE_"),
+  ...process.env,
+};
+const WEB3FORMS_ACCESS_KEY = loadedEnv.VITE_WEB3FORMS_ACCESS_KEY || "";
 
 /**
  * Escapes HTML sensitive characters to prevent raw injection and ensure valid markup.
@@ -993,7 +1003,66 @@ function renderCommunicationCenterContent(): string {
           </p>
           <p><a href="${escapeHtml(contact.kaiNexus?.url || "https://kamalesh-suresh-kumar.github.io/KAI-Nexus/")}" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary" aria-label="Open KAI Nexus external site">Open KAI Nexus &rarr;</a></p>
         </div>
+
+        <div class="fallback-card">
+          <h4 class="card-title">Phone Number</h4>
+          <p style="font-size: 0.9rem; color: #94a3b8;">Direct voice communications for urgent engineering inquiries.</p>
+          <p style="font-size: 1.1rem; font-weight: 700; margin: 12px 0;">
+            <a href="tel:+916369638817">+91 63696 38817</a>
+          </p>
+          <p><a href="tel:+916369638817" class="btn-action btn-secondary" aria-label="Call Phone: +91 63696 38817">Call Phone &rarr;</a></p>
+        </div>
+
+        <div class="fallback-card">
+          <h4 class="card-title">WhatsApp</h4>
+          <p style="font-size: 0.9rem; color: #94a3b8;">Direct messaging and mobile chat channel.</p>
+          <p style="font-size: 1.1rem; font-weight: 700; margin: 12px 0;">
+            <a href="https://wa.me/916369638817" target="_blank" rel="noopener noreferrer">+91 63696 38817</a>
+          </p>
+          <p><a href="https://wa.me/916369638817" target="_blank" rel="noopener noreferrer" class="btn-action btn-secondary" aria-label="Open WhatsApp: +91 63696 38817">Open WhatsApp &rarr;</a></p>
+        </div>
       </div>
+    </section>
+
+    <section class="section-block">
+      <h3 class="section-title">Transmit Message (Web3Forms Native Submission)</h3>
+      ${
+        WEB3FORMS_ACCESS_KEY
+          ? `<form action="https://api.web3forms.com/submit" method="POST" class="fallback-card" style="gap: 16px;">
+        <input type="hidden" name="access_key" value="${escapeHtml(WEB3FORMS_ACCESS_KEY)}" />
+        <input type="hidden" name="from_name" value="KAI HQ Static Fallback" />
+
+        <div>
+          <label for="fallback-name" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Your Name / Organization <span style="color: #f87171;">*</span></label>
+          <input type="text" id="fallback-name" name="name" required style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; color: #f1f5f9; font-size: 0.9rem;" placeholder="e.g. Alex Mercer" />
+        </div>
+
+        <div>
+          <label for="fallback-email" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Return Email Address <span style="color: #f87171;">*</span></label>
+          <input type="email" id="fallback-email" name="email" required style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; color: #f1f5f9; font-size: 0.9rem;" placeholder="e.g. name@organization.com" />
+        </div>
+
+        <div>
+          <label for="fallback-subject" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Subject Header <span style="color: #f87171;">*</span></label>
+          <input type="text" id="fallback-subject" name="subject" required style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; color: #f1f5f9; font-size: 0.9rem;" placeholder="e.g. Full-Stack Engineering Opportunity" />
+        </div>
+
+        <div>
+          <label for="fallback-message" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Message Payload (Min 10 characters) <span style="color: #f87171;">*</span></label>
+          <textarea id="fallback-message" name="message" required minlength="10" rows="5" style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; color: #f1f5f9; font-size: 0.9rem;" placeholder="Enter your message, scope details, or questions..."></textarea>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 6px; padding: 12px 14px; font-size: 0.82rem; color: #94a3b8; line-height: 1.5;">
+          <strong style="color: #38bdf8; display: block; margin-bottom: 2px;">Secure Message Delivery</strong>
+          <span>Your message is submitted through Web3Forms and forwarded to Kamalesh at <strong>${escapeHtml(contact.email)}</strong>. Web3Forms processes your information to facilitate message delivery.</span>
+        </div>
+
+        <button type="submit" class="btn-action btn-primary" style="font-size: 0.9rem; font-weight: 700; cursor: pointer; border: none; padding: 12px 18px; border-radius: 6px; width: fit-content;">Transmit Message via Web3Forms &rarr;</button>
+      </form>`
+          : `<div style="padding: 14px 16px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 8px; color: #fde68a; font-size: 0.88rem; line-height: 1.5;">
+        <strong>Configuration Notice:</strong> Direct message transmission is temporarily unavailable in this static build because the Web3Forms gateway key is not configured.
+      </div>`
+      }
     </section>
 
     <section class="section-block">

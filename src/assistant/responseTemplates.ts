@@ -297,12 +297,77 @@ export function generateAssistantResponse(
       };
     }
 
+    case "creator": {
+      const contact = knowledgeEngine.getContact();
+      const content =
+        mode === "recruiter"
+          ? `${contact.name} is a ${contact.title} based in ${contact.location}.\n\n• Current Availability: ${contact.availability}\n• Bio Summary: ${contact.bio}\n\nKamalesh brings verified experience in full-stack engineering, distributed systems, and intelligent workflows. You can review 4 role-tailored resume specifications in the Document Vault or examine verified credentials in the Achievement Hall.`
+          : mode === "developer"
+          ? `${contact.name} is a ${contact.title} specializing in reactive system architectures, optical transmission security (Li-Fi data protocols briefed to law enforcement cyber wings), and decoupled state engines.\n\n• Core Stack: React 19, TypeScript, Node.js, Python, Tailwind CSS\n• Engineering Focus: Deterministic sub-10ms query engines, hardware-level optical validation, and resilient UI architectures.\n\nExplore architectural blueprints and code in the Engineering Laboratory.`
+          : `${contact.name} is a ${contact.title} located in ${contact.location}.\n\n"${contact.tagline}"\n\n${contact.bio}\n\nStatus: ${contact.availability}. You can inspect his engineering projects, technical skill matrix, career milestones, or verified credentials across the 8 facility rooms.`;
+
+      return {
+        id,
+        role: "kai",
+        content,
+        timestamp,
+        intent: "creator",
+        actions: [
+          {
+            label: mode === "recruiter" ? "Open Document Vault" : "Open Engineering Laboratory",
+            targetRoom: mode === "recruiter" ? "DocumentVault" : "EngineeringLaboratory",
+            description: "Inspect credentials and deliverables",
+          },
+          {
+            label: "Open Communication Center",
+            targetRoom: "CommunicationCenter",
+            description: "Direct contact coordinates",
+          },
+        ],
+        quickReplies: [
+          "Show projects",
+          "What are your skills?",
+          "Career timeline",
+          "Download resume",
+          "Contact channels",
+        ],
+      };
+    }
+
+    case "about_kai": {
+      return {
+        id,
+        role: "kai",
+        content: `I am KAI (Kamalesh Artificial Intelligence) — the virtual intelligence guide for KAI HQ.\n\nI operate entirely on deterministic client-side intent routing, grounded directly in the Knowledge Engine without external LLM dependencies or network latency. I can guide your inspection through Kamalesh's engineering specimens, capability matrix, career history, credentials, and contact channels.`,
+        timestamp,
+        intent: "about_kai",
+        actions: [
+          {
+            label: "Open Mission Control",
+            targetRoom: "MissionControl",
+            description: "Global facility index and telemetry",
+          },
+          {
+            label: "Explore Engineering Lab",
+            targetRoom: "EngineeringLaboratory",
+            description: "Inspect code architectures",
+          },
+        ],
+        quickReplies: [
+          "Who is Kamalesh?",
+          "Show projects",
+          "What are your skills?",
+          "How to contact?",
+        ],
+      };
+    }
+
     case "unknown":
     default: {
       return {
         id,
         role: "kai",
-        content: `I didn't recognize that command in my index. I can assist you with projects, technical skills, career timeline, achievements, resumes, contact channels, or facility navigation.`,
+        content: `I do not have enough specific information in my portfolio knowledge index to answer that inquiry with certainty.\n\nI can provide verified answers about Kamalesh's engineering projects, technical skills, career timeline, verified credentials, role-targeted resumes, or direct communication channels.`,
         timestamp,
         intent: "unknown",
         actions: [
@@ -311,13 +376,19 @@ export function generateAssistantResponse(
             targetRoom: "MissionControl",
             description: "Search the full deterministic index across all entities",
           },
+          {
+            label: "Open Communication Center",
+            targetRoom: "CommunicationCenter",
+            description: "Transmit an inquiry directly to Kamalesh",
+          },
         ],
         quickReplies: [
+          "Who is Kamalesh?",
           "Show projects",
           "What are your skills?",
           "Career timeline",
-          "View resumes",
-          "How to contact?",
+          "Download resume",
+          "Contact channels",
         ],
       };
     }

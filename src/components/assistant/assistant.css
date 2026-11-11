@@ -412,37 +412,46 @@
   outline-offset: 1px;
 }
 
-/* Quick Actions Section */
+/* Quick Actions Section (Feature 3 Layout Fix) */
 .kai-quick-actions-bar {
+  flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
   background: #0b1329;
   border-top: 1px solid #1e293b;
-  overflow-x: auto;
-  scrollbar-width: none;
+  max-height: 96px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+  z-index: 10;
 }
 
 .kai-quick-actions-bar::-webkit-scrollbar {
-  display: none;
+  width: 4px;
+}
+
+.kai-quick-actions-bar::-webkit-scrollbar-thumb {
+  background-color: #334155;
+  border-radius: 4px;
 }
 
 .kai-quick-chip {
-  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   background: #1e293b;
   color: #94a3b8;
   border: 1px solid #334155;
-  padding: 5px 10px;
+  padding: 4px 9px;
   border-radius: 9999px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 500;
   cursor: pointer;
-  white-space: nowrap;
   transition: all 0.15s ease;
+  line-height: 1.3;
 }
 
 .kai-quick-chip:hover {
@@ -456,11 +465,30 @@
   outline-offset: 1px;
 }
 
-/* Input Area */
+/* Input Area (Feature 3: Anchored at bottom) */
 .kai-panel-footer {
+  flex-shrink: 0;
   padding: 12px 14px;
   background: #0f172a;
   border-top: 1px solid #1e293b;
+  z-index: 20;
+}
+
+.kai-cooldown-notice {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.kai-trigger-btn.in-cooldown {
+  border-color: #f59e0b;
 }
 
 .kai-input-form {

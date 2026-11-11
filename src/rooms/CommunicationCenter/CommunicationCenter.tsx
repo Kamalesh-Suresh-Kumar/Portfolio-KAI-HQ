@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { knowledgeEngine } from "../../knowledge-engine";
 import ChannelCard, { type ChannelItem } from "./ChannelCard";
 import TransmissionForm from "./TransmissionForm";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaWhatsapp } from "react-icons/fa";
 import {
   Terminal,
   Copy,
@@ -13,6 +13,7 @@ import {
   Activity,
   Radio,
   Network,
+  Phone,
 } from "lucide-react";
 import "./communication-center.css";
 
@@ -69,6 +70,25 @@ export default function CommunicationCenter() {
         isExternal: true,
       });
     }
+
+    // Feature 7: Phone and WhatsApp Contact Cards immediately after Source Repository
+    list.push({
+      id: "phone",
+      name: "Phone Number",
+      sub: "+91 63696 38817",
+      url: "tel:+916369638817",
+      icon: <Phone size={18} />,
+      isExternal: false,
+    });
+
+    list.push({
+      id: "whatsapp",
+      name: "WhatsApp",
+      sub: "+91 63696 38817",
+      url: "https://wa.me/916369638817",
+      icon: <FaWhatsapp size={18} />,
+      isExternal: true,
+    });
 
     return list;
   }, [contact]);

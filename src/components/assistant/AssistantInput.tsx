@@ -1,19 +1,30 @@
 import { useState, useRef, useEffect, memo } from "react";
-import { Send, Mic, MicOff, AlertCircle, X, Info, ShieldAlert } from "lucide-react";
+import { Send, Mic, MicOff, AlertCircle, X, Info, ShieldAlert, Clock } from "lucide-react";
 import { speechAdapter, type VoiceInputState } from "../../assistant/speechAdapter";
 
 interface AssistantInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
   isOpen?: boolean;
+  cooldownRemaining?: number;
+  cooldownReason?: "abuse" | "rate_limit" | null;
 }
 
-function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
+function AssistantInput({
+  onSend,
+  disabled,
+  isOpen,
+  cooldownRemaining = 0,
+  cooldownReason = null,
+}: AssistantInputProps) {
   const [text, setText] = useState("");
   const [voiceState, setVoiceState] = useState<VoiceInputState>("idle");
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [showConsentPrompt, setShowConsentPrompt] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isCooldown = cooldownRemaining > 0;
+  const isInputDisabled = disabled || isCooldown;
 
   const isVoiceSupported = speechAdapter.isRecognitionSupported();
   const privacyInfo = speechAdapter.getRecognitionPrivacyInfo();
@@ -54,7 +65,7 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const trimmed = text.trim();
-    if (!trimmed || disabled) return;
+    if (!trimmed || isInputDisabled) return;
 
     if (voiceState === "listening") {
       speechAdapter.stopListening();
@@ -167,14 +178,25 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
         </div>
       )}
 
-      {isListening && (
+      {isCooldown && (
+        <div className="kai-cooldown-notice" role="alert" aria-live="polite">
+          <Clock size={13} style={{ flexShrink: 0 }} />
+          <span>
+            {cooldownReason === "abuse"
+              ? `Cooldown active (5 consecutive unindexed messages). Resuming in ${cooldownRemaining}s.`
+              : `Rate limit active (5 messages within 10s). Resuming in ${cooldownRemaining}s.`}
+          </span>
+        </div>
+      )}
+
+      {isListening && !isCooldown && (
         <div className="kai-voice-info" role="status" aria-live="polite">
           <Info size={13} style={{ flexShrink: 0 }} />
           <span>{privacyInfo.disclosure} [ESC] to cancel.</span>
         </div>
       )}
 
-      {voiceError && (
+      {voiceError && !isCooldown && (
         <div className="kai-voice-notice" role="alert" aria-live="assertive">
           <AlertCircle size={13} style={{ flexShrink: 0 }} />
           <span>{voiceError}</span>
@@ -196,14 +218,20 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
           className="kai-text-input"
           onKeyDown={handleInputKeyDown}
           placeholder={
-            isListening
+            isCooldown
+              ? `Cooldown active (${cooldownRemaining}s remaining)...`
+              : isListening
               ? "Listening... speak query now..."
               : "Ask KAI about projects, skills, history..."
           }
           value={text}
           onChange={(e) => setText(e.target.value)}
-          disabled={disabled}
-          aria-label="Ask KAI a question or type a command"
+          disabled={isInputDisabled}
+          aria-label={
+            isCooldown
+              ? `Input temporarily disabled due to cooldown (${cooldownRemaining}s remaining)`
+              : "Ask KAI a question or type a command"
+          }
         />
 
         {/* Microphone Button (Web Speech API) */}
@@ -211,16 +239,20 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
           type="button"
           className={`kai-mic-btn ${isListening ? "kai-mic-listening active" : ""}`}
           onClick={handleToggleVoice}
-          disabled={disabled || !isVoiceSupported}
+          disabled={isInputDisabled || !isVoiceSupported}
           title={
-            !isVoiceSupported
+            isCooldown
+              ? `Cooldown active (${cooldownRemaining}s remaining)`
+              : !isVoiceSupported
               ? "Voice input is not supported in this browser; typing is available"
               : isListening
               ? "Stop listening"
               : `Ask via voice (${privacyInfo.isLocalOnly ? "On-device processing" : "Browser Web Speech service"})`
           }
           aria-label={
-            !isVoiceSupported
+            isCooldown
+              ? "Voice input disabled during cooldown"
+              : !isVoiceSupported
               ? "Voice input not supported"
               : isListening
               ? "Stop voice input"
@@ -235,7 +267,7 @@ function AssistantInput({ onSend, disabled, isOpen }: AssistantInputProps) {
         <button
           type="submit"
           className="kai-send-btn"
-          disabled={!text.trim() || disabled}
+          disabled={!text.trim() || isInputDisabled}
           aria-label="Send message to KAI"
         >
           <Send size={15} />

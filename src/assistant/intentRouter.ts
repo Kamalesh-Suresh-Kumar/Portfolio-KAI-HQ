@@ -7,189 +7,286 @@ export interface IntentRouteResult {
   rawQuery: string;
 }
 
-export function routeIntent(rawQuery: string): IntentRouteResult {
-  const query = rawQuery.trim().toLowerCase();
+/**
+ * Normalizes query string: strips extraneous punctuation, expands common contractions,
+ * and fixes frequent phonetic spelling variations.
+ */
+function normalizeQuery(raw: string): string {
+  let q = raw.trim().toLowerCase();
 
-  // 1. Direct Greetings
+  // Remove common punctuation marks
+  q = q.replace(/[?!.,;:()[\]{}"'`~]/g, " ");
+
+  // Expand common contractions
+  q = q.replace(/\bwho's\b/g, "who is");
+  q = q.replace(/\bwhat's\b/g, "what is");
+  q = q.replace(/\bwhere's\b/g, "where is");
+  q = q.replace(/\bhow's\b/g, "how is");
+  q = q.replace(/\btell me\b/g, "tell");
+
+  // Fix common spelling mistakes & typos
+  q = q.replace(/\b(kamalsh|kamlesh|kamalash|kamles|kamelesh)\b/g, "kamalesh");
+  q = q.replace(/\b(projets|projcts|projekts|porjects|projectz)\b/g, "projects");
+  q = q.replace(/\b(skils|skilss|skll|skil)\b/g, "skills");
+  q = q.replace(/\b(experiance|experiense|timline|experence|experianse)\b/g, "experience");
+  q = q.replace(/\b(achivement|acheivement|achivements|certifcate|certifcates)\b/g, "achievements");
+  q = q.replace(/\b(resum|resumees|curriculam)\b/g, "resume");
+  q = q.replace(/\b(contect|cantact|messege|messeges|reachout)\b/g, "contact");
+  q = q.replace(/\b(navigashun|navgate|navigtion)\b/g, "navigation");
+
+  // Collapse multiple spaces
+  return q.replace(/\s+/g, " ").trim();
+}
+
+export function routeIntent(rawQuery: string): IntentRouteResult {
+  const normalized = normalizeQuery(rawQuery);
+
+  // 1. Greetings
   if (
-    query === "hi" ||
-    query === "hello" ||
-    query === "hey" ||
-    query === "greetings" ||
-    query.startsWith("hi ") ||
-    query.startsWith("hello ") ||
-    query.startsWith("hey ") ||
-    query === "start"
+    normalized === "hi" ||
+    normalized === "hello" ||
+    normalized === "hey" ||
+    normalized === "greetings" ||
+    normalized === "start" ||
+    normalized === "good morning" ||
+    normalized === "good afternoon" ||
+    normalized === "good evening" ||
+    normalized.startsWith("hi ") ||
+    normalized.startsWith("hello ") ||
+    normalized.startsWith("hey ") ||
+    normalized.startsWith("greetings ")
   ) {
     return { intent: "greeting", rawQuery };
   }
 
-  // 2. Specific Room Navigation Requests
-  if (query.includes("lobby") || query.includes("home") || query.includes("overview")) {
+  // 2. Creator / Kamalesh Questions
+  // e.g. "who is kamalesh", "tell me about kamalesh", "introduce kamalesh", "who created kai", "who made this portfolio", "tell me about your creator"
+  if (
+    normalized.includes("kamalesh") ||
+    normalized.includes("creator") ||
+    normalized.includes("who created") ||
+    normalized.includes("who made") ||
+    normalized.includes("who built") ||
+    normalized.includes("the developer") ||
+    normalized.includes("the engineer") ||
+    normalized.includes("the person behind") ||
+    normalized.includes("the author") ||
+    normalized.includes("introduce yourself and your creator") ||
+    normalized.includes("who are you built by")
+  ) {
+    return { intent: "creator", matchedRoom: "Lobby", rawQuery };
+  }
+
+  // 3. About KAI / KAI HQ System Questions
+  // e.g. "who is kai", "what is kai", "what is kai hq", "tell me about kai", "what does kai stand for", "what is this place", "explain kai"
+  if (
+    normalized === "who is kai" ||
+    normalized === "what is kai" ||
+    normalized === "what is kai hq" ||
+    normalized === "tell about kai" ||
+    normalized === "tell kai" ||
+    normalized === "about kai" ||
+    normalized.includes("what does kai do") ||
+    normalized.includes("what is kai hq") ||
+    normalized.includes("who is kai") ||
+    normalized.includes("what is kai") ||
+    normalized.includes("about kai") ||
+    normalized.includes("kai stand for") ||
+    normalized.includes("what is this place") ||
+    normalized.includes("explain kai") ||
+    normalized.includes("purpose of kai")
+  ) {
+    return { intent: "about_kai", matchedRoom: "Lobby", rawQuery };
+  }
+
+  // 4. Specific Room Navigation Requests
+  if (
+    normalized.includes("lobby") ||
+    normalized.includes("home") ||
+    normalized.includes("entrance")
+  ) {
     return { intent: "room_navigation", matchedRoom: "Lobby", rawQuery };
   }
   if (
-    query.includes("engineering lab") ||
-    query.includes("engineering laboratory") ||
-    query.includes("lab") ||
-    query.includes("codebase")
+    normalized.includes("engineering lab") ||
+    normalized.includes("engineering laboratory") ||
+    normalized.includes("codebase") ||
+    normalized.includes("project specimens")
   ) {
     return { intent: "room_navigation", matchedRoom: "EngineeringLaboratory", rawQuery };
   }
   if (
-    query.includes("memory archive") ||
-    query.includes("archive") ||
-    query.includes("career history")
+    normalized.includes("memory archive") ||
+    normalized.includes("career history")
   ) {
     return { intent: "room_navigation", matchedRoom: "MemoryArchive", rawQuery };
   }
   if (
-    query.includes("achievement hall") ||
-    query.includes("hall of fame") ||
-    query.includes("awards hall")
+    normalized.includes("achievement hall") ||
+    normalized.includes("hall of fame") ||
+    normalized.includes("awards hall") ||
+    normalized.includes("credentials room")
   ) {
     return { intent: "room_navigation", matchedRoom: "AchievementHall", rawQuery };
   }
   if (
-    query.includes("document vault") ||
-    query.includes("vault") ||
-    query.includes("download resume")
+    normalized.includes("document vault") ||
+    normalized.includes("vault")
   ) {
     return { intent: "room_navigation", matchedRoom: "DocumentVault", rawQuery };
   }
   if (
-    query.includes("communication center") ||
-    query.includes("comm center") ||
-    query.includes("outlets")
+    normalized.includes("communication center") ||
+    normalized.includes("comm center")
   ) {
     return { intent: "room_navigation", matchedRoom: "CommunicationCenter", rawQuery };
   }
   if (
-    query.includes("skill processor") ||
-    query.includes("processor") ||
-    query.includes("capability matrix")
+    normalized.includes("skill processor") ||
+    normalized.includes("capability matrix")
   ) {
     return { intent: "room_navigation", matchedRoom: "SkillProcessor", rawQuery };
   }
   if (
-    query.includes("mission control") ||
-    query.includes("command center") ||
-    query.includes("operations")
+    normalized.includes("mission control") ||
+    normalized.includes("command center") ||
+    normalized.includes("operations room")
   ) {
     return { intent: "room_navigation", matchedRoom: "MissionControl", rawQuery };
   }
 
-  // 3. Projects Intent
+  // 5. Projects Intent
   if (
-    query.includes("project") ||
-    query.includes("projects") ||
-    query.includes("built") ||
-    query.includes("portfolio") ||
-    query.includes("applications") ||
-    query.includes("apps") ||
-    query.includes("software") ||
-    query.includes("github") ||
-    query.includes("code") ||
-    query.includes("work sample")
+    normalized.includes("project") ||
+    normalized.includes("projects") ||
+    normalized.includes("built") ||
+    normalized.includes("portfolio") ||
+    normalized.includes("applications") ||
+    normalized.includes("apps") ||
+    normalized.includes("software") ||
+    normalized.includes("github") ||
+    normalized.includes("code") ||
+    normalized.includes("work sample") ||
+    normalized.includes("specimen")
   ) {
     return { intent: "projects", matchedRoom: "EngineeringLaboratory", rawQuery };
   }
 
-  // 4. Skills Intent
+  // 6. Skills Intent
   if (
-    query.includes("skill") ||
-    query.includes("skills") ||
-    query.includes("tech stack") ||
-    query.includes("stack") ||
-    query.includes("technolog") ||
-    query.includes("language") ||
-    query.includes("framework") ||
-    query.includes("proficienc") ||
-    query.includes("competenc") ||
-    query.includes("tools") ||
-    query.includes("python") ||
-    query.includes("react") ||
-    query.includes("typescript")
+    normalized.includes("skill") ||
+    normalized.includes("skills") ||
+    normalized.includes("tech stack") ||
+    normalized.includes("stack") ||
+    normalized.includes("technology") ||
+    normalized.includes("technologies") ||
+    normalized.includes("language") ||
+    normalized.includes("languages") ||
+    normalized.includes("framework") ||
+    normalized.includes("frameworks") ||
+    normalized.includes("proficiency") ||
+    normalized.includes("competency") ||
+    normalized.includes("tools") ||
+    normalized.includes("python") ||
+    normalized.includes("react") ||
+    normalized.includes("typescript") ||
+    normalized.includes("node") ||
+    normalized.includes("c++") ||
+    normalized.includes("optical") ||
+    normalized.includes("security")
   ) {
     return { intent: "skills", matchedRoom: "SkillProcessor", rawQuery };
   }
 
-  // 5. Timeline / Experience Intent
+  // 7. Timeline / Experience Intent
   if (
-    query.includes("experience") ||
-    query.includes("timeline") ||
-    query.includes("education") ||
-    query.includes("degree") ||
-    query.includes("university") ||
-    query.includes("college") ||
-    query.includes("career") ||
-    query.includes("history") ||
-    query.includes("background") ||
-    query.includes("work") ||
-    query.includes("jobs") ||
-    query.includes("milestone")
+    normalized.includes("experience") ||
+    normalized.includes("timeline") ||
+    normalized.includes("education") ||
+    normalized.includes("degree") ||
+    normalized.includes("university") ||
+    normalized.includes("college") ||
+    normalized.includes("career") ||
+    normalized.includes("history") ||
+    normalized.includes("background") ||
+    normalized.includes("work") ||
+    normalized.includes("job") ||
+    normalized.includes("jobs") ||
+    normalized.includes("milestone") ||
+    normalized.includes("milestones") ||
+    normalized.includes("study")
   ) {
     return { intent: "timeline", matchedRoom: "MemoryArchive", rawQuery };
   }
 
-  // 6. Achievements / Certifications Intent
+  // 8. Achievements / Certifications Intent
   if (
-    query.includes("achievement") ||
-    query.includes("achievements") ||
-    query.includes("certif") ||
-    query.includes("award") ||
-    query.includes("honor") ||
-    query.includes("credential") ||
-    query.includes("license") ||
-    query.includes("recognition")
+    normalized.includes("achievement") ||
+    normalized.includes("achievements") ||
+    normalized.includes("certif") ||
+    normalized.includes("certificate") ||
+    normalized.includes("certification") ||
+    normalized.includes("certifications") ||
+    normalized.includes("award") ||
+    normalized.includes("awards") ||
+    normalized.includes("honor") ||
+    normalized.includes("honors") ||
+    normalized.includes("credential") ||
+    normalized.includes("credentials") ||
+    normalized.includes("police") ||
+    normalized.includes("briefing") ||
+    normalized.includes("recognition")
   ) {
     return { intent: "achievements", matchedRoom: "AchievementHall", rawQuery };
   }
 
-  // 7. Resume / Documents Intent
+  // 9. Resumes / Documents Intent
   if (
-    query.includes("resume") ||
-    query.includes("cv") ||
-    query.includes("curriculum vitae") ||
-    query.includes("document") ||
-    query.includes("documents") ||
-    query.includes("pdf") ||
-    query.includes("download")
+    normalized.includes("resume") ||
+    normalized.includes("cv") ||
+    normalized.includes("curriculum vitae") ||
+    normalized.includes("document") ||
+    normalized.includes("documents") ||
+    normalized.includes("pdf") ||
+    normalized.includes("download") ||
+    normalized.includes("curated variants")
   ) {
     return { intent: "resumes", matchedRoom: "DocumentVault", rawQuery };
   }
 
-  // 8. Contact / Communication Intent
+  // 10. Contact / Communication Intent
   if (
-    query.includes("contact") ||
-    query.includes("email") ||
-    query.includes("reach") ||
-    query.includes("hire") ||
-    query.includes("message") ||
-    query.includes("connect") ||
-    query.includes("linkedin") ||
-    query.includes("nexus") ||
-    query.includes("social") ||
-    query.includes("call") ||
-    query.includes("touch")
+    normalized.includes("contact") ||
+    normalized.includes("email") ||
+    normalized.includes("reach") ||
+    normalized.includes("hire") ||
+    normalized.includes("message") ||
+    normalized.includes("connect") ||
+    normalized.includes("linkedin") ||
+    normalized.includes("nexus") ||
+    normalized.includes("phone") ||
+    normalized.includes("whatsapp") ||
+    normalized.includes("call") ||
+    normalized.includes("touch")
   ) {
     return { intent: "contact", matchedRoom: "CommunicationCenter", rawQuery };
   }
 
-  // 9. Help / Capabilities Intent
+  // 11. Help / Capabilities Intent
   if (
-    query.includes("help") ||
-    query.includes("who are you") ||
-    query.includes("what can you do") ||
-    query.includes("options") ||
-    query.includes("guide") ||
-    query.includes("command") ||
-    query.includes("commands") ||
-    query.includes("features")
+    normalized.includes("help") ||
+    normalized.includes("who are you") ||
+    normalized.includes("what can you do") ||
+    normalized.includes("options") ||
+    normalized.includes("guide") ||
+    normalized.includes("command") ||
+    normalized.includes("commands") ||
+    normalized.includes("features") ||
+    normalized.includes("how to use")
   ) {
     return { intent: "help", rawQuery };
   }
 
-  // 10. Fallback Unknown
+  // 12. Fallback Unknown
   return { intent: "unknown", rawQuery };
 }

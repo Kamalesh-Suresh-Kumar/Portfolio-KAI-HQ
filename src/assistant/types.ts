@@ -2,6 +2,8 @@ import type { Room } from "../experience-engine/ExperienceEngineContext";
 
 export type IntentType =
   | "greeting"
+  | "creator"
+  | "about_kai"
   | "projects"
   | "skills"
   | "timeline"

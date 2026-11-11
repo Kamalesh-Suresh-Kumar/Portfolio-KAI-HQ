@@ -113,6 +113,26 @@ body {
   gap: 12px;
 }
 
+button.header-branding {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  border-radius: 8px;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+button.header-branding:hover {
+  opacity: 0.9;
+}
+
+button.header-branding:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
 .header-logo-symbol {
   width: 36px;
   height: 36px;

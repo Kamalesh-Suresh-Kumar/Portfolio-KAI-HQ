@@ -1382,3 +1382,189 @@
     padding: 18px 14px;
   }
 }
+
+/* ==========================================================================
+   FEATURE 1: FULL-SIZE PROFILE PHOTO VIEWER LIGHTBOX
+   ========================================================================== */
+
+.profile-viewer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 7, 18, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: viewerFadeIn 0.2s ease-out;
+}
+
+@keyframes viewerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.profile-viewer-dialog {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.profile-viewer-toolbar {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 9999px;
+  padding: 6px 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.profile-viewer-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-viewer-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.profile-viewer-btn:hover:not(:disabled) {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.profile-viewer-btn:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+.profile-viewer-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.profile-viewer-scale-text {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #38bdf8;
+  min-width: 44px;
+  text-align: center;
+}
+
+.profile-viewer-close-btn {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-left: 6px;
+}
+
+.profile-viewer-close-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #ffffff;
+}
+
+.profile-viewer-close-btn:focus-visible {
+  outline: 2px solid #ef4444;
+  outline-offset: 2px;
+}
+
+.profile-viewer-stage {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.profile-viewer-img {
+  max-width: 90vw;
+  max-height: 84vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  transition: transform 0.1s ease-out;
+  transform-origin: center center;
+}
+
+.profile-viewer-img.reduced-motion {
+  transition: none !important;
+}
+
+/* ==========================================================================
+   FEATURE 9: KAI AI BUTTON TOOLTIP
+   ========================================================================== */
+
+.kai-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.kai-delayed-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0f172a;
+  border: 1px solid #38bdf8;
+  color: #e2e8f0;
+  font-size: 0.76rem;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  animation: tooltipFadeIn 0.18s ease-out;
+}
+
+.kai-delayed-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #38bdf8 transparent transparent transparent;
+}
+
+@keyframes tooltipFadeIn {
+  from { opacity: 0; transform: translate(-50%, 4px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}

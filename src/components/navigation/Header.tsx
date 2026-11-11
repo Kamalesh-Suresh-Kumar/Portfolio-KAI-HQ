@@ -16,7 +16,7 @@ export default function Header({
   onToggleMobileNav,
   toggleButtonRef,
 }: HeaderProps) {
-  const { currentRoom, mode, setMode } = useExperienceEngine();
+  const { currentRoom, mode, setMode, changeRoom } = useExperienceEngine();
   const displayName = ROOM_DISPLAY_NAMES[currentRoom] || currentRoom;
 
   const modeOptions: { id: VisitorMode; label: string; icon: React.ReactNode; tooltip: string }[] = [
@@ -56,7 +56,12 @@ export default function Header({
             {isMobileNavOpen ? <FaTimes aria-hidden="true" /> : <FaBars aria-hidden="true" />}
           </button>
         )}
-        <div className="header-branding">
+        <button
+          type="button"
+          className="header-branding"
+          onClick={() => changeRoom("Lobby")}
+          aria-label="KAI HQ — Return to Lobby"
+        >
           <img
             src={resolveAssetUrl("/assets/kai-hq-symbol.svg")}
             alt="KAI HQ Symbol"
@@ -66,7 +71,7 @@ export default function Header({
             <h1>KAI HQ</h1>
             <p>Kamalesh Artificial Intelligence Headquarters</p>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Visitor Mode Perspective Switcher */}

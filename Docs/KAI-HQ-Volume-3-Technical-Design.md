@@ -334,6 +334,54 @@ IntentClassifier (pattern/keyword matching + lightweight scoring)
 - **Voice Output (`SpeechSynthesis`):** Independent toggle in KAI Assistant header (`voiceEnabled`). Utterances are pre-cleaned (`cleanTextForSpeech`) to strip markdown, raw URLs, and code blocks. Overlapping speech is canceled with `stopSpeaking()`, voices are dynamically cached via `onvoiceschanged`, and audio playback is halted immediately on room navigation and browser popstate.
 - **Typed Query Privacy Guarantee:** Typed queries are processed 100% client-side by KAI HQ's in-memory Knowledge Engine and deterministic pattern router. No typed query data is ever sent to external AI APIs or cloud servers.
 
+### 7.4 Communication Transmission & Protective Rate Limiting Architecture
+
+#### 1. Web3Forms Transmission Gateway (`TransmissionForm.tsx`)
+- **Transport:** Native `fetch()` executing `POST` requests to `https://api.web3forms.com/submit`.
+- **Credential Sourcing:** Configured through Vite client environment variable `import.meta.env.VITE_WEB3FORMS_ACCESS_KEY` without hardcoding or server proxies.
+- **Payload Schema:**
+  ```ts
+  {
+    access_key: string,
+    name: string,
+    email: string,
+    subject: string, // Formatted as "[KAI HQ] {{Subject}} — {{Name}}"
+    message: string,
+    from_name: "KAI HQ",
+    replyto: string
+  }
+  ```
+- **Validation Pipeline:** Pre-flight validation enforces non-empty fields, RFC-compliant email formatting, subject category selection (with required inline custom specification if "Others" selected), and message length constraints (10 to 5,000 characters).
+- **Graceful Error Recovery:** On submission failure or network interruption, entered form state is preserved so the visitor does not lose their input. On confirmed success, the form is reset and displays a confirmation banner with a prompt to compose another dispatch.
+- **Notification Feedback:** Top-right `NotificationToast` component displays status (`role="status"`, `aria-live="polite"`) or alert (`role="alert"`, `aria-live="assertive"`) messages with a 5,000 ms auto-dismiss timer and keyboard-accessible close button.
+- **Zero Mailto Fallback:** Strictly no `mailto:` redirection is used in the transmission console. Fallback mode uses a native HTML form submitting directly to the Web3Forms endpoint.
+
+#### 2. KAI Assistant Dual Cooldown Protection (`Assistant.tsx` & `AssistantInput.tsx`)
+- **Protection A (Consecutive Unindexed Queries / Abuse):**
+  - Triggers after 5 consecutive queries resolving to the `"unknown"` intent.
+  - Activates a 30-second cooldown timer (`cooldownReason: "abuse"`).
+  - Any valid recognized interaction instantly resets the consecutive unindexed counter.
+- **Protection B (High-Frequency Flooding / Rate Limiting):**
+  - Sliding timestamp window tracks queries submitted in the preceding 10,000 ms.
+  - If 5 or more queries occur within this 10-second window, a 15-second cooldown timer is initiated (`cooldownReason: "rate_limit"`).
+- **Cooldown User Interface & Accessibility:**
+  - Floating trigger button displays countdown badge (`COOLDOWN Xs`) with orange pulse indicator.
+  - Message input and send button are disabled with `aria-label` announcing remaining cooldown time.
+  - Accessible alert notice informs the visitor of the active cooldown and the exact duration remaining.
+
+#### 3. Full-Size Profile Photo Viewer (`ProfilePhotoViewer.tsx`)
+- **Portal Rendering:** Injected into `document.body` via React `createPortal` to prevent clipping or stacking-context collisions.
+- **Interactive Controls:**
+  - Scale range bounded between 1.0x (default) and 4.0x in 0.5x increments.
+  - Mouse wheel delta and touch pinch-to-zoom support.
+  - Drag panning enabled when `scale > 1.0`.
+  - Double-click or reset button returns image to 1.0x and centers position at (0, 0).
+- **Accessibility & Focus Management:**
+  - Semantic `<div role="dialog" aria-modal="true" aria-label="Full-Size Profile Photograph Viewer">`.
+  - Focus trapped within modal while open; initial focus lands on the close button.
+  - Escape key and backdrop clicks dismiss modal.
+  - Focus returns to the originating hero profile image trigger upon dismissal.
+
 ---
 
 ## 8. Automation Pipeline (CI/CD)

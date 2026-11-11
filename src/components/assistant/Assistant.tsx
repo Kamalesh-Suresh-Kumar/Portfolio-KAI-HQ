@@ -42,6 +42,33 @@ export default function Assistant() {
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [activeSpeakingId, setActiveSpeakingId] = useState<string | null>(null);
 
+  // Protection A: Consecutive flagged/unrelated messages (5 threshold -> 30s)
+  const [consecutiveFlaggedCount, setConsecutiveFlaggedCount] = useState<number>(0);
+
+  // Protection B: Rapid message rate limiting (5 within 10s -> 15s)
+  const messageTimestampsRef = useRef<number[]>([]);
+
+  // Cooldown countdown state
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+  const [cooldownReason, setCooldownReason] = useState<"abuse" | "rate_limit" | null>(null);
+
+  // Interval timer for active cooldown
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+
+    const interval = setInterval(() => {
+      setCooldownRemaining((prev) => {
+        if (prev <= 1) {
+          setCooldownReason(null);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [cooldownRemaining]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerBtnRef = useRef<HTMLButtonElement>(null);
@@ -182,20 +209,50 @@ export default function Assistant() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isKAIOpen, closeKAI, handleStopSpeech]);
 
-  // Message Handler
+  // Message Handler with Cooldown Protection
   const handleSendMessage = useCallback(
     (text: string) => {
+      if (cooldownRemaining > 0) return;
+
       handleStopSpeech();
+
+      const now = Date.now();
+
+      // Protection B: Rapid-message rate limiting (5 messages within 10 seconds -> 15s cooldown)
+      const recent = [...messageTimestampsRef.current, now].filter((t) => now - t <= 10000);
+      messageTimestampsRef.current = recent;
+
+      if (recent.length >= 5) {
+        setCooldownRemaining(15);
+        setCooldownReason("rate_limit");
+        messageTimestampsRef.current = [];
+        return;
+      }
 
       const userMsg: IAssistantMessage = {
         id: `msg-${Date.now()}-user`,
         role: "user",
         content: text,
-        timestamp: Date.now(),
+        timestamp: now,
       };
 
       const route = routeIntent(text);
       const kaiMsg = generateAssistantResponse(route, mode);
+
+      // Protection A: Consecutive flagged/unrelated messages (5 threshold -> 30s cooldown)
+      if (route.intent === "unknown") {
+        const nextFlagged = consecutiveFlaggedCount + 1;
+        if (nextFlagged >= 5) {
+          setCooldownRemaining(30);
+          setCooldownReason("abuse");
+          setConsecutiveFlaggedCount(0);
+        } else {
+          setConsecutiveFlaggedCount(nextFlagged);
+        }
+      } else {
+        // Valid, supported interaction resets consecutive flagged counter
+        setConsecutiveFlaggedCount(0);
+      }
 
       setMessages((prev) => [...prev, userMsg, kaiMsg]);
 
@@ -204,7 +261,14 @@ export default function Assistant() {
         handleSpeakMessage(kaiMsg.content, kaiMsg.id);
       }
     },
-    [mode, voiceEnabled, handleSpeakMessage, handleStopSpeech]
+    [
+      cooldownRemaining,
+      consecutiveFlaggedCount,
+      mode,
+      voiceEnabled,
+      handleSpeakMessage,
+      handleStopSpeech,
+    ]
   );
 
   const handleResetConversation = useCallback(() => {
@@ -240,18 +304,37 @@ export default function Assistant() {
         <button
           ref={triggerBtnRef}
           type="button"
-          className={`kai-trigger-btn ${isKAIOpen ? "active" : ""}`}
+          className={`kai-trigger-btn ${isKAIOpen ? "active" : ""} ${cooldownRemaining > 0 ? "in-cooldown" : ""}`}
           onClick={handleToggleKAI}
           aria-expanded={isKAIOpen}
           aria-controls="kai-dialog-panel"
-          aria-label={isKAIOpen ? "Close KAI Assistant" : "Open KAI Assistant guide"}
+          aria-label={
+            cooldownRemaining > 0
+              ? `KAI Assistant in cooldown (${cooldownRemaining}s remaining)`
+              : isKAIOpen
+              ? "Close KAI Assistant"
+              : "Open KAI Assistant guide"
+          }
+          title={
+            cooldownRemaining > 0
+              ? `Cooldown active: ${cooldownRemaining}s remaining`
+              : isKAIOpen
+              ? "Close KAI Assistant"
+              : "Open KAI Assistant guide"
+          }
         >
           <div className="kai-trigger-icon-wrap">
-            {!reducedMotion && !isKAIOpen && <span className="kai-pulse-ring" />}
+            {!reducedMotion && !isKAIOpen && cooldownRemaining === 0 && <span className="kai-pulse-ring" />}
             <Sparkles size={16} />
           </div>
-          <span className="kai-trigger-label">KAI GUIDE</span>
-          <span className="kai-status-dot" title="Operational" />
+          <span className="kai-trigger-label">
+            {cooldownRemaining > 0 ? `COOLDOWN ${cooldownRemaining}s` : "KAI GUIDE"}
+          </span>
+          <span
+            className="kai-status-dot"
+            style={{ backgroundColor: cooldownRemaining > 0 ? "#f59e0b" : "#34d399" }}
+            title={cooldownRemaining > 0 ? `In cooldown (${cooldownRemaining}s)` : "Operational"}
+          />
         </button>
       </div>
 
@@ -375,10 +458,12 @@ export default function Assistant() {
             customReplies={currentQuickReplies}
           />
 
-          {/* Message Input Footer with Speech Recognition */}
+          {/* Message Input Footer with Speech Recognition & Cooldown Protection */}
           <AssistantInput
             onSend={handleSendMessage}
             isOpen={isKAIOpen}
+            cooldownRemaining={cooldownRemaining}
+            cooldownReason={cooldownReason}
           />
         </aside>
       )}
