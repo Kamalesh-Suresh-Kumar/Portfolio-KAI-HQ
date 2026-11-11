@@ -447,6 +447,13 @@ export default function TransmissionForm({
                 onKeyDown={handleDropdownKeyDown}
                 aria-haspopup="listbox"
                 aria-expanded={isDropdownOpen}
+                aria-controls={isDropdownOpen ? "comm-subject-listbox" : undefined}
+                aria-activedescendant={
+                  isDropdownOpen && highlightedIndex >= 0
+                    ? `comm-subject-option-${highlightedIndex}`
+                    : undefined
+                }
+                aria-required="true"
                 aria-label={formData.subject ? `Selected Category: ${formData.subject}` : "Select category"}
                 aria-invalid={!!errors.subject}
                 aria-describedby={errors.subject ? "comm-subject-error" : undefined}
