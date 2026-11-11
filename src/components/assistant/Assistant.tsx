@@ -51,6 +51,7 @@ export default function Assistant() {
   // Cooldown countdown state
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
   const [cooldownReason, setCooldownReason] = useState<"abuse" | "rate_limit" | null>(null);
+  const [isTriggerHovered, setIsTriggerHovered] = useState<boolean>(false);
 
   // Interval timer for active cooldown
   useEffect(() => {
@@ -306,6 +307,10 @@ export default function Assistant() {
           type="button"
           className={`kai-trigger-btn ${isKAIOpen ? "active" : ""} ${cooldownRemaining > 0 ? "in-cooldown" : ""}`}
           onClick={handleToggleKAI}
+          onMouseEnter={() => setIsTriggerHovered(true)}
+          onMouseLeave={() => setIsTriggerHovered(false)}
+          onFocus={() => setIsTriggerHovered(true)}
+          onBlur={() => setIsTriggerHovered(false)}
           aria-expanded={isKAIOpen}
           aria-controls="kai-dialog-panel"
           aria-label={
@@ -336,6 +341,12 @@ export default function Assistant() {
             title={cooldownRemaining > 0 ? `In cooldown (${cooldownRemaining}s)` : "Operational"}
           />
         </button>
+
+        {cooldownRemaining > 0 && isTriggerHovered && (
+          <div className="kai-trigger-cooldown-tooltip" role="tooltip">
+            Cooldown active: {cooldownRemaining}s remaining
+          </div>
+        )}
       </div>
 
       {/* Expandable Conversation Panel */}

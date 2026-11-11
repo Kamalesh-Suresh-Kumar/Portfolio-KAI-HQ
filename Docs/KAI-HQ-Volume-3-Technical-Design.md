@@ -382,6 +382,18 @@ IntentClassifier (pattern/keyword matching + lightweight scoring)
   - Escape key and backdrop clicks dismiss modal.
   - Focus returns to the originating hero profile image trigger upon dismissal.
 
+#### 4. Assistant Three-Tier Panel Layout & Quick Action Chips (`QuickActions.tsx`)
+- **Three-Tier Architecture:** Resolves long-conversation overflow by isolating three distinct vertical flex areas:
+  1. *Conversation History:* Independent scrolling container (`flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain`) allowing full access to previous messages without clipping.
+  2. *Quick Actions Suggestions:* Fixed directly above the input footer (`flex-shrink: 0; display: flex; flex-wrap: wrap; max-height: 96px; overflow-y: auto`). Suggestion chips wrap naturally within the available width and never overlap the composer.
+  3. *Message Composer:* Fixed at bottom (`flex-shrink: 0; z-index: 20`) containing the text input, Web Speech microphone toggle, send action, and dynamic cooldown alerts.
+- **Responsive Guarantee:** On mobile viewports (≤ 768px), quick action chips preserve natural wrapping (`max-height: 85px; overflow-y: auto`) with touch-friendly touch targets.
+
+#### 5. Header Brand Return Navigation (`Header.tsx`)
+- **Interaction Model:** Semantic `<button type="button" className="header-branding">` wrapping the KAI HQ symbol and title.
+- **Experience Routing:** Dispatches `changeRoom("Lobby")` through the Experience Engine mediator, maintaining browser History API state and synchronizing room state with zero page reloads.
+- **Accessibility:** Visible focus ring on keyboard tab navigation (`:focus-visible`) and descriptive accessible label (`aria-label="KAI HQ — Return to Lobby"`).
+
 ---
 
 ## 8. Automation Pipeline (CI/CD)

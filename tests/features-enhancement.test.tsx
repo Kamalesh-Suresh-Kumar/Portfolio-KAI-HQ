@@ -97,9 +97,19 @@ describe("KAI HQ Feature Enhancement Batch Test Suite", () => {
         "who is kamalesh",
         "who is the creator",
         "who created kai",
+        "who created kai hq",
         "who built this portfolio",
         "tell me about the developer",
         "who made kai hq",
+        "who made this portfolio",
+        "tell me about kamalesh",
+        "introduce kamalesh",
+        "tell me about your creator",
+        "can you introduce the developer",
+        "tell me about the person behind this website",
+        "who designed this portfolio",
+        "who programmed kai hq",
+        "who is kamalsh",
       ];
 
       for (const q of queries) {
@@ -112,16 +122,29 @@ describe("KAI HQ Feature Enhancement Batch Test Suite", () => {
       const queries = [
         "what is kai",
         "what is kai hq",
+        "who is kai",
         "tell me about kai",
+        "what does kai do",
         "what does kai stand for",
         "what is this place",
         "explain kai",
+        "who are you",
+        "introduce yourself",
       ];
 
       for (const q of queries) {
         const route = routeIntent(q);
         expect(route.intent).toBe("about_kai");
       }
+    });
+
+    it("handles common spelling mistakes and typos across portfolio domains", () => {
+      expect(routeIntent("tell me abot the prjcts").intent).toBe("projects");
+      expect(routeIntent("what skilss do u have").intent).toBe("skills");
+      expect(routeIntent("experiance and career milestones").intent).toBe("timeline");
+      expect(routeIntent("show achivements and certifcates").intent).toBe("achievements");
+      expect(routeIntent("download curriculam cv resum").intent).toBe("resumes");
+      expect(routeIntent("reachout contect email").intent).toBe("contact");
     });
 
     it("generates grounded responses for creator across visitor personas", () => {

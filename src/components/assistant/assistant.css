@@ -95,6 +95,35 @@
   box-shadow: 0 0 8px #34d399;
 }
 
+.kai-trigger-cooldown-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: #0f172a;
+  border: 1px solid #f59e0b;
+  color: #fbbf24;
+  font-size: 0.75rem;
+  font-family: monospace;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  animation: kaiTooltipFadeIn 0.15s ease-out;
+  z-index: 460;
+}
+
+@keyframes kaiTooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Assistant Drawer / Panel */
 .kai-panel {
   position: fixed;
@@ -840,9 +869,13 @@
     padding: 6px 10px;
     gap: 5px;
     flex-shrink: 0;
-    overflow-x: auto;
+    display: flex;
+    flex-wrap: wrap;
+    max-height: 85px;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: #334155 transparent;
   }
 
   .kai-quick-chip {

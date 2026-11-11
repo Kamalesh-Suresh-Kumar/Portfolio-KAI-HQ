@@ -26,13 +26,14 @@ function normalizeQuery(raw: string): string {
 
   // Fix common spelling mistakes & typos
   q = q.replace(/\b(kamalsh|kamlesh|kamalash|kamles|kamelesh)\b/g, "kamalesh");
-  q = q.replace(/\b(projets|projcts|projekts|porjects|projectz)\b/g, "projects");
-  q = q.replace(/\b(skils|skilss|skll|skil)\b/g, "skills");
-  q = q.replace(/\b(experiance|experiense|timline|experence|experianse)\b/g, "experience");
-  q = q.replace(/\b(achivement|acheivement|achivements|certifcate|certifcates)\b/g, "achievements");
-  q = q.replace(/\b(resum|resumees|curriculam)\b/g, "resume");
-  q = q.replace(/\b(contect|cantact|messege|messeges|reachout)\b/g, "contact");
+  q = q.replace(/\b(projets|projcts|prjcts|prjct|projct|projekts|porjects|projectz)\b/g, "projects");
+  q = q.replace(/\b(skils|skilss|skll|skil|skl)\b/g, "skills");
+  q = q.replace(/\b(experiance|experiense|timline|experence|experianse|exprnc|exprnce)\b/g, "experience");
+  q = q.replace(/\b(achivement|acheivement|achivements|acheivements|achievment|achievments|certifcate|certifcates|certificat|certificats)\b/g, "achievements");
+  q = q.replace(/\b(resum|resumee|resumees|curriculam|curriculum)\b/g, "resume");
+  q = q.replace(/\b(contect|cantact|messege|messeges|mesage|mesages|reachout)\b/g, "contact");
   q = q.replace(/\b(navigashun|navgate|navigtion)\b/g, "navigation");
+  q = q.replace(/\b(abot|abt)\b/g, "about");
 
   // Collapse multiple spaces
   return q.replace(/\s+/g, " ").trim();
@@ -67,6 +68,10 @@ export function routeIntent(rawQuery: string): IntentRouteResult {
     normalized.includes("who created") ||
     normalized.includes("who made") ||
     normalized.includes("who built") ||
+    normalized.includes("who designed") ||
+    normalized.includes("who programmed") ||
+    normalized.includes("who owns") ||
+    normalized.includes("who is behind") ||
     normalized.includes("the developer") ||
     normalized.includes("the engineer") ||
     normalized.includes("the person behind") ||
@@ -78,7 +83,7 @@ export function routeIntent(rawQuery: string): IntentRouteResult {
   }
 
   // 3. About KAI / KAI HQ System Questions
-  // e.g. "who is kai", "what is kai", "what is kai hq", "tell me about kai", "what does kai stand for", "what is this place", "explain kai"
+  // e.g. "who is kai", "what is kai", "what is kai hq", "tell me about kai", "what does kai stand for", "what is this place", "explain kai", "who are you"
   if (
     normalized === "who is kai" ||
     normalized === "what is kai" ||
@@ -86,6 +91,9 @@ export function routeIntent(rawQuery: string): IntentRouteResult {
     normalized === "tell about kai" ||
     normalized === "tell kai" ||
     normalized === "about kai" ||
+    normalized === "who are you" ||
+    normalized.startsWith("who are you") ||
+    normalized.includes("introduce yourself") ||
     normalized.includes("what does kai do") ||
     normalized.includes("what is kai hq") ||
     normalized.includes("who is kai") ||

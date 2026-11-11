@@ -21,7 +21,7 @@ export default function HeroSection() {
 
   // 2-second hover / focus delayed tooltip for KAI AI button
   const [showKaiTooltip, setShowKaiTooltip] = useState(false);
-  const tooltipTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const tooltipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleKaiButtonMouseEnter = () => {
     if (tooltipTimerRef.current) clearTimeout(tooltipTimerRef.current);
