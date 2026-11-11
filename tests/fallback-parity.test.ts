@@ -370,6 +370,28 @@ describe("Static Fallback Knowledge Engine Parity Suite (Phase 6.3.2)", () => {
       expect(html).toContain('<th scope="row">Current Availability</th>');
       expect(html).toContain('<th scope="row">Operational Mode</th>');
     });
+
+    it("verifies hCaptcha widget, script, and noscript notice in communication-center.html", () => {
+      const commHtml = readFallbackFile("communication-center.html");
+      expect(commHtml).toContain('<div class="h-captcha" data-captcha="true" data-theme="dark"></div>');
+      expect(commHtml).toContain('<script src="https://web3forms.com/client/script.js" async defer></script>');
+      expect(commHtml).toContain("Automated spam protection (hCaptcha) requires JavaScript");
+
+      // Verify no other fallback pages contain the Web3Forms script
+      const otherPages = [
+        "index.html",
+        "engineering-laboratory.html",
+        "memory-archive.html",
+        "achievement-hall.html",
+        "document-vault.html",
+        "skill-processor.html",
+        "mission-control.html",
+      ];
+      for (const page of otherPages) {
+        const pageHtml = readFallbackFile(page);
+        expect(pageHtml).not.toContain("web3forms.com/client/script.js");
+      }
+    });
   });
 
   describe("9. Skill Processor Matrix & Formatted Proficiencies", () => {

@@ -442,6 +442,7 @@ a:focus-visible {
 }
 
   </style>
+  <script src="https://web3forms.com/client/script.js" async defer></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -535,9 +536,44 @@ a:focus-visible {
 
     <section class="section-block">
       <h3 class="section-title">Transmit Message (Web3Forms Native Submission)</h3>
-      <div style="padding: 14px 16px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 8px; color: #fde68a; font-size: 0.88rem; line-height: 1.5;">
-        <strong>Configuration Notice:</strong> Direct message transmission is temporarily unavailable in this static build because the Web3Forms gateway key is not configured.
-      </div>
+      <form action="https://api.web3forms.com/submit" method="POST" class="fallback-card" style="gap: 16px;">
+        <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
+        <input type="hidden" name="from_name" value="KAI HQ Static Fallback" />
+
+        <div>
+          <label for="fallback-name" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Your Name / Organization <span style="color: #f87171;">*</span></label>
+          <input type="text" id="fallback-name" name="name" required style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; color: #f1f5f9; font-size: 0.9rem;" placeholder="e.g. Alex Mercer" />
+        </div>
+
+        <div>
+          <label for="fallback-email" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Return Email Address <span style="color: #f87171;">*</span></label>
+          <input type="email" id="fallback-email" name="email" required style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; color: #f1f5f9; font-size: 0.9rem;" placeholder="e.g. name@organization.com" />
+        </div>
+
+        <div>
+          <label for="fallback-subject" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Subject Header <span style="color: #f87171;">*</span></label>
+          <input type="text" id="fallback-subject" name="subject" required style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; color: #f1f5f9; font-size: 0.9rem;" placeholder="e.g. Full-Stack Engineering Opportunity" />
+        </div>
+
+        <div>
+          <label for="fallback-message" style="display: block; font-size: 0.82rem; font-family: monospace; text-transform: uppercase; margin-bottom: 6px; color: #cbd5e1;">Message Payload (Min 10 characters) <span style="color: #f87171;">*</span></label>
+          <textarea id="fallback-message" name="message" required minlength="10" rows="5" style="width: 100%; box-sizing: border-box; background: #090e1a; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; color: #f1f5f9; font-size: 0.9rem;" placeholder="Enter your message, scope details, or questions..."></textarea>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 6px; padding: 12px 14px; font-size: 0.82rem; color: #94a3b8; line-height: 1.5;">
+          <strong style="color: #38bdf8; display: block; margin-bottom: 2px;">Secure Message Delivery</strong>
+          <span>Your message is submitted through Web3Forms and forwarded to Kamalesh at <strong>kamalesh.sde@gmail.com</strong>. Web3Forms processes your information to facilitate message delivery.</span>
+        </div>
+
+        <div class="h-captcha" data-captcha="true" data-theme="dark"></div>
+        <noscript>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 10px 12px; font-size: 0.8rem; color: #fde68a; line-height: 1.4;">
+            <strong>Security Verification Notice:</strong> Automated spam protection (hCaptcha) requires JavaScript. If browsing with JavaScript disabled, please enable JavaScript to submit this form or dispatch your message directly via email to <a href="mailto:kamalesh.sde@gmail.com" style="color: #38bdf8;">kamalesh.sde@gmail.com</a>.
+          </div>
+        </noscript>
+
+        <button type="submit" class="btn-action btn-primary" style="font-size: 0.9rem; font-weight: 700; cursor: pointer; border: none; padding: 12px 18px; border-radius: 6px; width: fit-content;">Transmit Message via Web3Forms &rarr;</button>
+      </form>
     </section>
 
     <section class="section-block">

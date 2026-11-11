@@ -348,11 +348,18 @@ IntentClassifier (pattern/keyword matching + lightweight scoring)
     subject: string, // Formatted as "[KAI HQ] {{Subject}} — {{Name}}"
     message: string,
     from_name: "KAI HQ",
-    replyto: string
+    replyto: string,
+    "h-captcha-response"?: string // Populated with verified token when hCaptcha is active
   }
   ```
-- **Validation Pipeline:** Pre-flight validation enforces non-empty fields, RFC-compliant email formatting, subject category selection (with required inline custom specification if "Others" selected), and message length constraints (10 to 5,000 characters).
+- **Validation Pipeline:** Pre-flight validation enforces non-empty fields, RFC-compliant email formatting, subject category selection (with required inline custom specification if "Others" selected), message length constraints (10 to 5,000 characters), and active captcha token verification when enabled.
 - **Graceful Error Recovery:** On submission failure or network interruption, entered form state is preserved so the visitor does not lose their input. On confirmed success, the form is reset and displays a confirmation banner with a prompt to compose another dispatch.
+- **Web3Forms hCaptcha Spam Protection Architecture:**
+  - **Component & Version:** `@hcaptcha/react-hcaptcha` (v2.2.0).
+  - **Site Key:** Official Web3Forms public sitekey `50b2fe65-b00b-4b9e-ad62-3ba471098be2` (`reCaptchaCompat={false}`, `theme="dark"`).
+  - **Single Source of Truth Configuration (`src/config/captchaConfig.ts`):** `HCAPTCHA_CONFIG.siteKey` and staged activation toggle `HCAPTCHA_CONFIG.enabled` (defaulted to `false` during staging to strictly prevent blocking visitors while the Web3Forms dashboard CAPTCHA setting is `None`).
+  - **Token Lifecycle:** When active, the submit button is disabled until verified. On submission, the single-use token is transmitted under `"h-captcha-response"`. Upon completion or failure, the widget is reset (`captchaRef.current?.resetCaptcha()`) and the token cleared to prevent stale reuse.
+  - **Static Fallback Implementation:** Pre-rendered fallback in `scripts/generate-fallback.ts` injects `<div class="h-captcha" data-captcha="true" data-theme="dark"></div>`, `<script src="https://web3forms.com/client/script.js" async defer></script>` in the document head of `communication-center.html`, and a `<noscript>` notice stating that automated CAPTCHA verification requires JavaScript.
 - **Notification Feedback:** Top-right `NotificationToast` component displays status (`role="status"`, `aria-live="polite"`) or alert (`role="alert"`, `aria-live="assertive"`) messages with a 5,000 ms auto-dismiss timer and keyboard-accessible close button.
 - **Zero Mailto Fallback:** Strictly no `mailto:` redirection is used in the transmission console. Fallback mode uses a native HTML form submitting directly to the Web3Forms endpoint.
 

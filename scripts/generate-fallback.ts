@@ -598,7 +598,7 @@ function renderPage(currentRoomId: RoomId, contentHtml: string): string {
   <style>
 ${FALLBACK_CSS}
   </style>
-</head>
+${currentRoomId === "CommunicationCenter" ? '  <script src="https://web3forms.com/client/script.js" async defer></script>\n' : ""}</head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -1026,10 +1026,8 @@ function renderCommunicationCenterContent(): string {
 
     <section class="section-block">
       <h3 class="section-title">Transmit Message (Web3Forms Native Submission)</h3>
-      ${
-        WEB3FORMS_ACCESS_KEY
-          ? `<form action="https://api.web3forms.com/submit" method="POST" class="fallback-card" style="gap: 16px;">
-        <input type="hidden" name="access_key" value="${escapeHtml(WEB3FORMS_ACCESS_KEY)}" />
+      <form action="https://api.web3forms.com/submit" method="POST" class="fallback-card" style="gap: 16px;">
+        <input type="hidden" name="access_key" value="${escapeHtml(WEB3FORMS_ACCESS_KEY || "YOUR_ACCESS_KEY_HERE")}" />
         <input type="hidden" name="from_name" value="KAI HQ Static Fallback" />
 
         <div>
@@ -1057,12 +1055,15 @@ function renderCommunicationCenterContent(): string {
           <span>Your message is submitted through Web3Forms and forwarded to Kamalesh at <strong>${escapeHtml(contact.email)}</strong>. Web3Forms processes your information to facilitate message delivery.</span>
         </div>
 
+        <div class="h-captcha" data-captcha="true" data-theme="dark"></div>
+        <noscript>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 10px 12px; font-size: 0.8rem; color: #fde68a; line-height: 1.4;">
+            <strong>Security Verification Notice:</strong> Automated spam protection (hCaptcha) requires JavaScript. If browsing with JavaScript disabled, please enable JavaScript to submit this form or dispatch your message directly via email to <a href="mailto:${escapeHtml(contact.email)}" style="color: #38bdf8;">${escapeHtml(contact.email)}</a>.
+          </div>
+        </noscript>
+
         <button type="submit" class="btn-action btn-primary" style="font-size: 0.9rem; font-weight: 700; cursor: pointer; border: none; padding: 12px 18px; border-radius: 6px; width: fit-content;">Transmit Message via Web3Forms &rarr;</button>
-      </form>`
-          : `<div style="padding: 14px 16px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 8px; color: #fde68a; font-size: 0.88rem; line-height: 1.5;">
-        <strong>Configuration Notice:</strong> Direct message transmission is temporarily unavailable in this static build because the Web3Forms gateway key is not configured.
-      </div>`
-      }
+      </form>
     </section>
 
     <section class="section-block">

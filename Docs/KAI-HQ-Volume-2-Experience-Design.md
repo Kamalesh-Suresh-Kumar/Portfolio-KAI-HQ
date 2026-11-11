@@ -157,8 +157,9 @@ Each room description below follows a fixed template: **Purpose → What the vis
 2. **Direct Transmission Console:** Accessible form featuring Name, Email, Subject dropdown (Internship, Job Opportunity, Project Collaboration, General Enquiry, Others), Custom Subject text field when "Others" is selected, and Message payload textarea with live character counter (10–5,000 chars). Submissions dispatch directly to `https://api.web3forms.com/submit` with dynamic subject formatting `[KAI HQ] {{Subject}} — {{Name}}`. Strictly no `mailto:` fallback in the form.
 3. **Delivery Disclaimer:** Clear notification that messages are submitted through Web3Forms and forwarded to Kamalesh at `kamalesh.sde@gmail.com`.
 4. **Non-blocking Notifications:** Reusable toast notifications (`NotificationToast`) providing auto-dismissing (5s) status and alert feedback.
+5. **Web3Forms hCaptcha Spam Protection:** Official Web3Forms hCaptcha verification (`@hcaptcha/react-hcaptcha`, public sitekey `50b2fe65-b00b-4b9e-ad62-3ba471098be2`). Controlled via staged activation flag (`HCAPTCHA_CONFIG.enabled = false` default during staging) to prevent visitor lockouts while the Web3Forms dashboard setting is `None`. When active, transmission is blocked until verified, tokens are attached as `h-captcha-response`, and widgets are automatically reset upon completion or failure.
 **KAI's role:** Can route visitors to Communication Center and summarize available channels.
-**Fallback:** Static fallback page (`communication-center.html`) with verified channel cards and native HTML `<form>` posting directly to Web3Forms without JavaScript.
+**Fallback:** Static fallback page (`communication-center.html`) with verified channel cards, native HTML `<form>`, `<div class="h-captcha" data-captcha="true"></div>`, `<script src="https://web3forms.com/client/script.js" async defer></script>`, and `<noscript>` explaining that CAPTCHA requires JavaScript.
 
 ### 7.7 Skill Processor — `UX-ROOM-07`
 **Purpose:** Skills (REQ-KNOW-001/002).

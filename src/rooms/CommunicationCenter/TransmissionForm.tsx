@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, CheckCircle2, AlertCircle, ShieldCheck, Mail, Loader2, ChevronDown, Check } from "lucide-react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import NotificationToast, { type NotificationItem } from "../../components/common/NotificationToast";
+import { HCAPTCHA_CONFIG } from "../../config/captchaConfig";
 
 interface TransmissionFormProps {
   recipientEmail?: string;
+  captchaEnabled?: boolean;
+  siteKey?: string;
 }
 
 interface FormState {
@@ -20,6 +24,7 @@ interface FormErrors {
   subject?: string;
   customSubject?: string;
   message?: string;
+  captcha?: string;
 }
 
 const SUBJECT_OPTIONS = [
@@ -35,6 +40,8 @@ const MIN_MESSAGE_LENGTH = 10;
 
 export default function TransmissionForm({
   recipientEmail = "kamalesh.sde@gmail.com",
+  captchaEnabled = HCAPTCHA_CONFIG.enabled,
+  siteKey = HCAPTCHA_CONFIG.siteKey,
 }: TransmissionFormProps) {
   const [formData, setFormData] = useState<FormState>({
     name: "",
@@ -43,6 +50,9 @@ export default function TransmissionForm({
     customSubject: "",
     message: "",
   });
+
+  const [captchaToken, setCaptchaToken] = useState<string>("");
+  const captchaRef = useRef<HCaptcha>(null);
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -128,6 +138,34 @@ export default function TransmissionForm({
     }
   };
 
+  const handleCaptchaVerify = (token: string) => {
+    setCaptchaToken(token);
+    if (errors.captcha) {
+      setErrors((prev) => ({ ...prev, captcha: undefined }));
+    }
+  };
+
+  const handleCaptchaExpire = () => {
+    setCaptchaToken("");
+  };
+
+  const handleCaptchaError = () => {
+    setCaptchaToken("");
+    setErrors((prev) => ({
+      ...prev,
+      captcha: "Verification challenge encountered an error. Please retry.",
+    }));
+  };
+
+  const resetCaptchaWidget = () => {
+    setCaptchaToken("");
+    try {
+      captchaRef.current?.resetCaptcha();
+    } catch {
+      // Widget not mounted or already disposed
+    }
+  };
+
   const validate = (): boolean => {
     const errs: FormErrors = {};
 
@@ -156,6 +194,10 @@ export default function TransmissionForm({
       errs.message = `Message must be at least ${MIN_MESSAGE_LENGTH} characters (currently ${trimmedMsg.length})`;
     } else if (trimmedMsg.length > MAX_MESSAGE_LENGTH) {
       errs.message = `Message exceeds maximum limit of ${MAX_MESSAGE_LENGTH} characters`;
+    }
+
+    if (captchaEnabled && !captchaToken) {
+      errs.captcha = "Please complete the security verification challenge.";
     }
 
     setErrors(errs);
@@ -196,7 +238,7 @@ export default function TransmissionForm({
         ? `[KAI HQ] Others — ${formData.customSubject.trim()} — ${visitorName}`
         : `[KAI HQ] ${formData.subject} — ${visitorName}`;
 
-    const payload = {
+    const payload: Record<string, string> = {
       access_key: accessKey,
       name: visitorName,
       email: formData.email.trim(),
@@ -205,6 +247,10 @@ export default function TransmissionForm({
       from_name: "KAI HQ",
       replyto: formData.email.trim(),
     };
+
+    if (captchaEnabled && captchaToken) {
+      payload["h-captcha-response"] = captchaToken;
+    }
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
@@ -267,12 +313,18 @@ export default function TransmissionForm({
       // Values preserved
     } finally {
       setIsSubmitting(false);
+      if (captchaEnabled) {
+        resetCaptchaWidget();
+      }
     }
   };
 
   const handleComposeAnother = () => {
     setSubmissionStatus("idle");
     setStatusMessage("");
+    if (captchaEnabled) {
+      resetCaptchaWidget();
+    }
   };
 
   const messageLength = formData.message.length;
@@ -624,11 +676,34 @@ export default function TransmissionForm({
             </div>
           </div>
 
+          {/* hCaptcha Spam Protection (Active when captchaEnabled is true) */}
+          {captchaEnabled && (
+            <div className="comm-captcha-container">
+              <div className="comm-captcha-wrapper">
+                <HCaptcha
+                  ref={captchaRef}
+                  sitekey={siteKey}
+                  reCaptchaCompat={false}
+                  theme="dark"
+                  onVerify={handleCaptchaVerify}
+                  onExpire={handleCaptchaExpire}
+                  onError={handleCaptchaError}
+                />
+              </div>
+              {errors.captcha && (
+                <span id="comm-captcha-error" className="form-error-msg" role="alert">
+                  <AlertCircle size={12} />
+                  <span>{errors.captcha}</span>
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
             className="form-submit-btn"
-            disabled={isSubmitting}
+            disabled={isSubmitting || (captchaEnabled && !captchaToken)}
             aria-label={isSubmitting ? "Sending message..." : "Transmit Message via Web3Forms"}
           >
             {isSubmitting ? (
