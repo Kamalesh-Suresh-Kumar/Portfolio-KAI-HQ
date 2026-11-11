@@ -26,6 +26,7 @@
     "typecheck": "tsc -b && tsc -p tsconfig.test.json --noEmit"
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^2.2.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/pdfkit": "^0.17.7",
     "clsx": "^2.1.1",

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Send, CheckCircle2, AlertCircle, ShieldCheck, Mail, Loader2 } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Send, CheckCircle2, AlertCircle, ShieldCheck, Mail, Loader2, ChevronDown, Check } from "lucide-react";
 import NotificationToast, { type NotificationItem } from "../../components/common/NotificationToast";
 
 interface TransmissionFormProps {
@@ -49,6 +49,84 @@ export default function TransmissionForm({
   const [submissionStatus, setSubmissionStatus] = useState<"idle" | "success" | "error" | "missing_key">("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [notification, setNotification] = useState<NotificationItem | null>(null);
+
+  // Custom accessible dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+        setHighlightedIndex(-1);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
+
+  const handleSelectSubject = (option: string) => {
+    setFormData((prev) => ({ ...prev, subject: option }));
+    if (errors.subject) setErrors((prev) => ({ ...prev, subject: undefined }));
+    setIsDropdownOpen(false);
+    setHighlightedIndex(-1);
+  };
+
+  const handleDropdownKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!isDropdownOpen) {
+        setIsDropdownOpen(true);
+        const currentIdx = SUBJECT_OPTIONS.indexOf(formData.subject);
+        setHighlightedIndex(currentIdx >= 0 ? currentIdx : 0);
+      } else {
+        setHighlightedIndex((prev) => (prev < SUBJECT_OPTIONS.length - 1 ? prev + 1 : 0));
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!isDropdownOpen) {
+        setIsDropdownOpen(true);
+        const currentIdx = SUBJECT_OPTIONS.indexOf(formData.subject);
+        setHighlightedIndex(currentIdx >= 0 ? currentIdx : SUBJECT_OPTIONS.length - 1);
+      } else {
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : SUBJECT_OPTIONS.length - 1));
+      }
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (isDropdownOpen) {
+        if (highlightedIndex >= 0 && highlightedIndex < SUBJECT_OPTIONS.length) {
+          handleSelectSubject(SUBJECT_OPTIONS[highlightedIndex]);
+        } else {
+          setIsDropdownOpen(false);
+        }
+      } else {
+        setIsDropdownOpen(true);
+        const currentIdx = SUBJECT_OPTIONS.indexOf(formData.subject);
+        setHighlightedIndex(currentIdx >= 0 ? currentIdx : 0);
+      }
+    } else if (e.key === "Escape") {
+      if (isDropdownOpen) {
+        e.preventDefault();
+        setIsDropdownOpen(false);
+        setHighlightedIndex(-1);
+      }
+    } else if (e.key === "Tab") {
+      if (isDropdownOpen) {
+        setIsDropdownOpen(false);
+        setHighlightedIndex(-1);
+      }
+    } else if (/^[a-zA-Z]$/.test(e.key)) {
+      const char = e.key.toLowerCase();
+      const matchIdx = SUBJECT_OPTIONS.findIndex((opt) => opt.toLowerCase().startsWith(char));
+      if (matchIdx !== -1) {
+        e.preventDefault();
+        if (!isDropdownOpen) setIsDropdownOpen(true);
+        setHighlightedIndex(matchIdx);
+      }
+    }
+  };
 
   const validate = (): boolean => {
     const errs: FormErrors = {};
@@ -296,6 +374,8 @@ export default function TransmissionForm({
             <input
               id="comm-name"
               type="text"
+              autoComplete="name"
+              spellCheck="false"
               className={`form-input ${errors.name ? "input-error" : ""}`}
               placeholder="e.g. Alex Mercer"
               value={formData.name}
@@ -324,6 +404,8 @@ export default function TransmissionForm({
             <input
               id="comm-email"
               type="email"
+              autoComplete="email"
+              spellCheck="false"
               className={`form-input ${errors.email ? "input-error" : ""}`}
               placeholder="e.g. name@organization.com"
               value={formData.email}
@@ -343,33 +425,100 @@ export default function TransmissionForm({
             )}
           </div>
 
-          {/* Subject Dropdown */}
+          {/* Subject Dropdown — Dark Navy & Cyan Theme */}
           <div className="form-field-group">
-            <label htmlFor="comm-subject" className="form-label">
+            <label id="comm-subject-label" htmlFor="comm-subject" className="form-label">
               <span>Subject Category</span>
               <span className="form-required-mark">*</span>
             </label>
-            <select
-              id="comm-subject"
-              className={`form-select ${errors.subject ? "input-error" : ""}`}
-              value={formData.subject}
-              onChange={(e) => {
-                setFormData({ ...formData, subject: e.target.value });
-                if (errors.subject) setErrors({ ...errors, subject: undefined });
-              }}
-              aria-required="true"
-              aria-invalid={!!errors.subject}
-              aria-describedby={errors.subject ? "comm-subject-error" : undefined}
-            >
-              <option value="" disabled>
-                Select a subject
-              </option>
-              {SUBJECT_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
+
+            <div className="custom-select-container" ref={dropdownRef}>
+              <button
+                type="button"
+                id="comm-subject-trigger"
+                className={`custom-select-trigger ${errors.subject ? "input-error" : ""}`}
+                onClick={() => {
+                  setIsDropdownOpen((prev) => !prev);
+                  if (!isDropdownOpen) {
+                    const currentIdx = SUBJECT_OPTIONS.indexOf(formData.subject);
+                    setHighlightedIndex(currentIdx >= 0 ? currentIdx : 0);
+                  }
+                }}
+                onKeyDown={handleDropdownKeyDown}
+                aria-haspopup="listbox"
+                aria-expanded={isDropdownOpen}
+                aria-label={formData.subject ? `Selected Category: ${formData.subject}` : "Select category"}
+                aria-invalid={!!errors.subject}
+                aria-describedby={errors.subject ? "comm-subject-error" : undefined}
+              >
+                <span className={`trigger-label ${!formData.subject ? "placeholder-text" : "selected-text"}`}>
+                  {formData.subject || "Select a subject"}
+                </span>
+                <ChevronDown size={16} className={`custom-select-arrow ${isDropdownOpen ? "open" : ""}`} />
+              </button>
+
+              {isDropdownOpen && (
+                <ul
+                  id="comm-subject-listbox"
+                  role="listbox"
+                  aria-labelledby="comm-subject-label"
+                  className="custom-select-menu"
+                >
+                  <li
+                    role="option"
+                    aria-selected={formData.subject === ""}
+                    aria-disabled="true"
+                    className="custom-select-option option-placeholder"
+                  >
+                    Select a subject
+                  </li>
+                  {SUBJECT_OPTIONS.map((opt, idx) => {
+                    const isSelected = formData.subject === opt;
+                    const isHighlighted = highlightedIndex === idx;
+                    return (
+                      <li
+                        key={opt}
+                        id={`comm-subject-option-${idx}`}
+                        role="option"
+                        aria-selected={isSelected}
+                        className={`custom-select-option ${isSelected ? "option-selected" : ""} ${isHighlighted ? "option-highlighted" : ""}`}
+                        onClick={() => handleSelectSubject(opt)}
+                        onMouseEnter={() => setHighlightedIndex(idx)}
+                      >
+                        <span>{opt}</span>
+                        {isSelected && <Check size={14} className="option-check-icon" />}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+
+              {/* Synchronized native select for full form compatibility and testing */}
+              <select
+                id="comm-subject"
+                name="subject"
+                className="sr-only-select"
+                value={formData.subject}
+                onChange={(e) => {
+                  setFormData({ ...formData, subject: e.target.value });
+                  if (errors.subject) setErrors({ ...errors, subject: undefined });
+                }}
+                aria-required="true"
+                aria-invalid={!!errors.subject}
+                aria-describedby={errors.subject ? "comm-subject-error" : undefined}
+                tabIndex={-1}
+              >
+                <option value="" disabled>
+                  Select a subject
                 </option>
-              ))}
-            </select>
+                {SUBJECT_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {errors.subject && (
               <span id="comm-subject-error" className="form-error-msg">
                 <AlertCircle size={12} />
@@ -388,6 +537,7 @@ export default function TransmissionForm({
               <input
                 id="comm-custom-subject"
                 type="text"
+                autoComplete="off"
                 className={`form-input ${errors.customSubject ? "input-error" : ""}`}
                 placeholder="e.g. Advisory Consultation Request"
                 value={formData.customSubject}

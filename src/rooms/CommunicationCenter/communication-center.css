@@ -388,41 +388,278 @@
   color: #f87171;
 }
 
+/* Form Controls — Dark Scheme Enforcement */
+.transmission-form,
 .form-input,
 .form-select,
 .form-textarea {
-  background: #090e1a;
+  color-scheme: dark;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  background-color: #090e1a !important;
+  background: #090e1a !important;
   border: 1px solid #1e293b;
   border-radius: 6px;
   padding: 10px 12px;
   font-size: 0.88rem;
-  color: #f1f5f9;
+  font-family: inherit;
+  color: #f1f5f9 !important;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
   box-sizing: border-box;
+  caret-color: #38bdf8;
+  user-select: text;
+  -webkit-user-select: text;
 }
 
-.form-select {
-  cursor: pointer;
+/* Chrome / Safari / Edge Autofill Dark Background Override */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus,
+.form-input:-webkit-autofill:active,
+.form-select:-webkit-autofill,
+.form-select:-webkit-autofill:hover,
+.form-select:-webkit-autofill:focus,
+.form-textarea:-webkit-autofill,
+.form-textarea:-webkit-autofill:hover,
+.form-textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f1f5f9 !important;
+  -webkit-box-shadow: 0 0 0 1000px #090e1a inset !important;
+  box-shadow: 0 0 0 1000px #090e1a inset !important;
+  border-color: #1e293b !important;
+  caret-color: #38bdf8 !important;
+  font-size: 0.88rem !important;
+  transition: background-color 5000000s ease-in-out 0s;
+  color-scheme: dark !important;
 }
 
-.form-select option {
-  background: #0b1329;
-  color: #f1f5f9;
-}
-
+/* Focused Input State */
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+  outline: none;
+}
+
+.form-input:-webkit-autofill:focus,
+.form-textarea:-webkit-autofill:focus,
+.form-select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #090e1a inset, 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+  box-shadow: 0 0 0 1000px #090e1a inset, 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+  border-color: #38bdf8 !important;
+}
+
+/* Standard :autofill pseudo-class (Firefox & modern Chromium) */
+.form-input:autofill,
+.form-input:autofill:hover,
+.form-input:autofill:focus,
+.form-select:autofill,
+.form-textarea:autofill {
+  -webkit-text-fill-color: #f1f5f9 !important;
+  box-shadow: 0 0 0 1000px #090e1a inset !important;
+  border-color: #1e293b !important;
+  caret-color: #38bdf8 !important;
+  color-scheme: dark !important;
+}
+
+.form-input:autofill:focus,
+.form-textarea:autofill:focus {
+  box-shadow: 0 0 0 1000px #090e1a inset, 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+  border-color: #38bdf8 !important;
+}
+
+/* Muted Placeholder Styling across browsers */
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.form-input::-webkit-input-placeholder,
+.form-textarea::-webkit-input-placeholder {
+  color: #64748b;
+}
+
+.form-input::-moz-placeholder,
+.form-textarea::-moz-placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.form-input:-ms-input-placeholder,
+.form-textarea:-ms-input-placeholder {
+  color: #64748b;
+}
+
+/* Text Selection within Inputs */
+.form-input::selection,
+.form-select::selection,
+.form-textarea::selection {
+  background-color: rgba(56, 189, 248, 0.35);
+  color: #ffffff;
+}
+
+/* Custom Dropdown Trigger & Popover Styles */
+.custom-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  background-color: #090e1a !important;
+  background: #090e1a !important;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #f1f5f9 !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.custom-select-trigger:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.custom-select-trigger:focus,
+.custom-select-trigger:focus-visible {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2) !important;
+  outline: none;
+}
+
+.custom-select-trigger.input-error {
+  border-color: #f87171 !important;
+}
+
+.trigger-label.placeholder-text {
+  color: #64748b;
+}
+
+.trigger-label.selected-text {
+  color: #f1f5f9;
+}
+
+.custom-select-arrow {
+  color: #38bdf8;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.custom-select-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Custom Dropdown Menu List */
+.custom-select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #0c1527;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(56, 189, 248, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+/* Custom Options */
+.custom-select-option {
+  padding: 9px 12px;
+  font-size: 0.86rem;
+  border-radius: 5px;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+
+.custom-select-option.option-placeholder {
+  color: #64748b;
+  cursor: default;
+  font-style: italic;
+  font-size: 0.78rem;
+  padding: 4px 12px 6px 12px;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+  margin-bottom: 2px;
+}
+
+.custom-select-option:not(.option-placeholder):hover,
+.custom-select-option.option-highlighted:not(.option-placeholder) {
+  background-color: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+}
+
+.custom-select-option.option-selected {
+  background-color: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.option-check-icon {
+  color: #38bdf8;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Screen-reader-only native select utility */
+.sr-only-select {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Native select fallback styling if rendered standalone */
+.form-select option {
+  background-color: #0c1527;
+  color: #f1f5f9;
+}
+
+.form-select option:disabled {
+  color: #64748b;
+  background-color: #080d1a;
+}
+
+.form-select option:checked {
+  background-color: #0369a1;
+  color: #38bdf8;
 }
 
 .form-input.input-error,
 .form-select.input-error,
 .form-textarea.input-error {
-  border-color: #f87171;
+  border-color: #f87171 !important;
 }
 
 .form-field-meta-row {

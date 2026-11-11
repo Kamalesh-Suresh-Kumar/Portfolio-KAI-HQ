@@ -209,6 +209,47 @@ describe("KAI HQ Feature Enhancement Batch Test Suite", () => {
       expect(screen.getByLabelText(/Specify Custom Subject/i)).toBeInTheDocument();
     });
 
+    it("supports custom dropdown click and keyboard navigation with dark theme options", () => {
+      renderWithEngine(<TransmissionForm recipientEmail="kamalesh.sde@gmail.com" />);
+
+      const triggerBtn = screen.getByRole("button", { name: /Select category/i });
+      expect(triggerBtn).toHaveAttribute("aria-expanded", "false");
+
+      // Open dropdown via click
+      fireEvent.click(triggerBtn);
+      expect(triggerBtn).toHaveAttribute("aria-expanded", "true");
+
+      const listbox = screen.getByRole("listbox");
+      expect(listbox).toBeInTheDocument();
+
+      // Click "Project Collaboration" option in custom menu
+      const projectOption = screen.getAllByText("Project Collaboration").find(
+        (el) => el.closest(".custom-select-option")
+      );
+      expect(projectOption).toBeDefined();
+      fireEvent.click(projectOption!);
+
+      // Menu closes and selection updates
+      expect(screen.queryByRole("listbox")).toBeNull();
+      expect(screen.getAllByText("Project Collaboration").length).toBeGreaterThanOrEqual(1);
+
+      // Open dropdown via ArrowDown key and close via Escape
+      fireEvent.keyDown(triggerBtn, { key: "ArrowDown" });
+      expect(screen.getByRole("listbox")).toBeInTheDocument();
+      fireEvent.keyDown(triggerBtn, { key: "Escape" });
+      expect(screen.queryByRole("listbox")).toBeNull();
+    });
+
+    it("includes proper autocomplete attributes on name and email inputs", () => {
+      renderWithEngine(<TransmissionForm recipientEmail="kamalesh.sde@gmail.com" />);
+
+      const nameInput = screen.getByLabelText(/Your Name \/ Organization/i);
+      const emailInput = screen.getByLabelText(/Return Email Address/i);
+
+      expect(nameInput).toHaveAttribute("autoComplete", "name");
+      expect(emailInput).toHaveAttribute("autoComplete", "email");
+    });
+
     it("enforces exact Feature 6 disclaimer text with no mailto fallback", () => {
       const { container } = renderWithEngine(<TransmissionForm recipientEmail="kamalesh.sde@gmail.com" />);
 
