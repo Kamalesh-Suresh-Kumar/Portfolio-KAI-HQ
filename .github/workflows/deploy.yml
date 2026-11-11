@@ -51,6 +51,8 @@ jobs:
         run: npm run test:all
 
       - name: Production application build
+        env:
+          VITE_WEB3FORMS_ACCESS_KEY: ${{ secrets.VITE_WEB3FORMS_ACCESS_KEY }}
         run: npm run build
 
       - name: Automated bundle budget verification gate
