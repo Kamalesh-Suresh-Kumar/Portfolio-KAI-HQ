@@ -14,6 +14,8 @@ import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
 import { knowledgeEngine } from "../src/knowledge-engine";
 import type { RoomId } from "../src/knowledge-engine/types";
+import { HCAPTCHA_CONFIG } from "../src/config/captchaConfig";
+import { renderPage, renderCommunicationCenterContent } from "../scripts/generate-fallback";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -371,11 +373,24 @@ describe("Static Fallback Knowledge Engine Parity Suite (Phase 6.3.2)", () => {
       expect(html).toContain('<th scope="row">Operational Mode</th>');
     });
 
-    it("verifies hCaptcha widget, script, and noscript notice in communication-center.html", () => {
+    it("verifies static fallback reflects HCAPTCHA_CONFIG state (enabled: false)", () => {
+      expect(HCAPTCHA_CONFIG.enabled).toBe(false);
       const commHtml = readFallbackFile("communication-center.html");
-      expect(commHtml).toContain('<div class="h-captcha" data-captcha="true" data-theme="dark"></div>');
-      expect(commHtml).toContain('<script src="https://web3forms.com/client/script.js" async defer></script>');
-      expect(commHtml).toContain("Automated spam protection (hCaptcha) requires JavaScript");
+
+      // When HCAPTCHA_CONFIG.enabled is false:
+      // Excludes widget container, client script, and noscript alert
+      expect(commHtml).not.toContain('<div class="h-captcha"');
+      expect(commHtml).not.toContain("web3forms.com/client/script.js");
+      expect(commHtml).not.toContain("Automated spam protection (hCaptcha) requires JavaScript");
+
+      // Preserves normal native Web3Forms form submission
+      expect(commHtml).toContain('<form action="https://api.web3forms.com/submit" method="POST"');
+      expect(commHtml).toContain('name="access_key"');
+      expect(commHtml).toContain('name="name"');
+      expect(commHtml).toContain('name="email"');
+      expect(commHtml).toContain('name="subject"');
+      expect(commHtml).toContain('name="message"');
+      expect(commHtml).toContain("Transmit Message via Web3Forms");
 
       // Verify no other fallback pages contain the Web3Forms script
       const otherPages = [
@@ -390,6 +405,32 @@ describe("Static Fallback Knowledge Engine Parity Suite (Phase 6.3.2)", () => {
       for (const page of otherPages) {
         const pageHtml = readFallbackFile(page);
         expect(pageHtml).not.toContain("web3forms.com/client/script.js");
+      }
+    });
+
+    it("verifies generator includes widget, script, and noscript notice when captchaEnabled: true", () => {
+      // Simulate enabled state via generator without modifying production files
+      const enabledContent = renderCommunicationCenterContent(true);
+      const enabledFullHtml = renderPage("CommunicationCenter", enabledContent, true);
+
+      expect(enabledFullHtml).toContain('<div class="h-captcha" data-captcha="true" data-theme="dark"></div>');
+      expect(enabledFullHtml).toContain('<script src="https://web3forms.com/client/script.js" async defer></script>');
+      expect(enabledFullHtml).toContain("Automated spam protection (hCaptcha) requires JavaScript");
+
+      // Verify other rooms NEVER receive script or captcha markup even when captchaEnabled is true
+      const otherRoomIds: RoomId[] = [
+        "Lobby",
+        "EngineeringLaboratory",
+        "MemoryArchive",
+        "AchievementHall",
+        "DocumentVault",
+        "SkillProcessor",
+        "MissionControl",
+      ];
+      for (const rId of otherRoomIds) {
+        const pageHtml = renderPage(rId, "<div>Sample Room Content</div>", true);
+        expect(pageHtml).not.toContain("web3forms.com/client/script.js");
+        expect(pageHtml).not.toContain("h-captcha");
       }
     });
   });

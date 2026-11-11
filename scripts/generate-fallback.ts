@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { loadEnv } from "vite";
 import { knowledgeEngine } from "../src/knowledge-engine";
 import type { RoomId } from "../src/knowledge-engine/types";
+import { HCAPTCHA_CONFIG } from "../src/config/captchaConfig";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -575,7 +576,11 @@ function formatProficiency(level: string): string {
  * Builds the common page wrapper including skip link, static mode notice,
  * branding header, 8-room navigation tabs, main content, and footer.
  */
-function renderPage(currentRoomId: RoomId, contentHtml: string): string {
+export function renderPage(
+  currentRoomId: RoomId,
+  contentHtml: string,
+  captchaEnabled: boolean = HCAPTCHA_CONFIG.enabled
+): string {
   const currentRoom = ROOM_DEFINITIONS.find((r) => r.id === currentRoomId)!;
   const pageTitle = `${currentRoom.name} — KAI HQ Static Fallback`;
   const metaDescription = `Static no-JavaScript view of ${currentRoom.name} (${currentRoom.code}) in Kamalesh Artificial Intelligence Headquarters.`;
@@ -586,6 +591,10 @@ function renderPage(currentRoomId: RoomId, contentHtml: string): string {
     const ariaCurrent = isActive ? ' aria-current="page"' : "";
     return `        <a href="./${r.filename}" class="nav-link${activeClass}"${ariaCurrent}>${escapeHtml(r.name)}</a>`;
   }).join("\n");
+
+  const headScript = currentRoomId === "CommunicationCenter" && captchaEnabled
+    ? '  <script src="https://web3forms.com/client/script.js" async defer></script>\n'
+    : "";
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -598,7 +607,7 @@ function renderPage(currentRoomId: RoomId, contentHtml: string): string {
   <style>
 ${FALLBACK_CSS}
   </style>
-${currentRoomId === "CommunicationCenter" ? '  <script src="https://web3forms.com/client/script.js" async defer></script>\n' : ""}</head>
+${headScript}</head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -839,13 +848,8 @@ function renderMemoryArchiveContent(): string {
           </ul>`
         : "";
 
-      const techTags = item.technologies && item.technologies.length > 0
-        ? `<div class="tag-list" style="margin-top: 10px;">
-            ${item.technologies.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}
-          </div>`
-        : "";
-
       return `      <article id="timeline-${escapeHtml(item.id)}" class="fallback-card">
+
         <div class="card-header-row">
           <div>
             <h3 class="card-title">${escapeHtml(item.title)}</h3>
@@ -856,10 +860,10 @@ function renderMemoryArchiveContent(): string {
         <p style="font-size: 0.85rem; color: #94a3b8; margin: 0;">Location: ${escapeHtml(item.location)} &bull; Category: ${escapeHtml(item.category)}</p>
         <p style="line-height: 1.5; font-size: 0.92rem; margin-top: 6px;">${escapeHtml(item.description)}</p>
         ${achievementsList}
-        ${techTags}
       </article>`;
     })
     .join("\n\n");
+
 
   return `    <section>
       <div class="card-grid">
@@ -969,10 +973,21 @@ ${cardsHtml}
     </section>`;
 }
 
-function renderCommunicationCenterContent(): string {
+export function renderCommunicationCenterContent(
+  captchaEnabled: boolean = HCAPTCHA_CONFIG.enabled
+): string {
   const contact = knowledgeEngine.getContact();
   const githubCleanUrl = contact.github.startsWith("http") ? contact.github : `https://github.com/${contact.github}`;
   const githubDisplayText = contact.github.replace(/^https?:\/\//, "");
+
+  const captchaMarkup = captchaEnabled
+    ? `\n        <div class="h-captcha" data-captcha="true" data-theme="dark"></div>
+        <noscript>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 10px 12px; font-size: 0.8rem; color: #fde68a; line-height: 1.4;">
+            <strong>Security Verification Notice:</strong> Automated spam protection (hCaptcha) requires JavaScript. If browsing with JavaScript disabled, please enable JavaScript to submit this form or dispatch your message directly via email to <a href="mailto:${escapeHtml(contact.email)}" style="color: #38bdf8;">${escapeHtml(contact.email)}</a>.
+          </div>
+        </noscript>\n`
+    : "";
 
   return `    <section class="section-block" style="margin-top: 0;">
       <h3 class="section-title">Direct Communication Channels</h3>
@@ -1053,15 +1068,7 @@ function renderCommunicationCenterContent(): string {
         <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 6px; padding: 12px 14px; font-size: 0.82rem; color: #94a3b8; line-height: 1.5;">
           <strong style="color: #38bdf8; display: block; margin-bottom: 2px;">Secure Message Delivery</strong>
           <span>Your message is submitted through Web3Forms and forwarded to Kamalesh at <strong>${escapeHtml(contact.email)}</strong>. Web3Forms processes your information to facilitate message delivery.</span>
-        </div>
-
-        <div class="h-captcha" data-captcha="true" data-theme="dark"></div>
-        <noscript>
-          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 10px 12px; font-size: 0.8rem; color: #fde68a; line-height: 1.4;">
-            <strong>Security Verification Notice:</strong> Automated spam protection (hCaptcha) requires JavaScript. If browsing with JavaScript disabled, please enable JavaScript to submit this form or dispatch your message directly via email to <a href="mailto:${escapeHtml(contact.email)}" style="color: #38bdf8;">${escapeHtml(contact.email)}</a>.
-          </div>
-        </noscript>
-
+        </div>${captchaMarkup}
         <button type="submit" class="btn-action btn-primary" style="font-size: 0.9rem; font-weight: 700; cursor: pointer; border: none; padding: 12px 18px; border-radius: 6px; width: fit-content;">Transmit Message via Web3Forms &rarr;</button>
       </form>
     </section>
@@ -1245,9 +1252,17 @@ function renderMissionControlContent(): string {
 // MAIN GENERATOR ROUTINE
 // ============================================================================
 
-export function generateStaticFallback(): { generatedFiles: string[]; totalBytes: number } {
+export interface FallbackGeneratorOptions {
+  captchaEnabled?: boolean;
+}
+
+export function generateStaticFallback(
+  options: FallbackGeneratorOptions = {}
+): { generatedFiles: string[]; totalBytes: number } {
+  const captchaEnabled = options.captchaEnabled ?? HCAPTCHA_CONFIG.enabled;
   console.log("=== KAI HQ Phase 6.2: Generating Static No-JS Fallback ===");
   console.log(`Output Directory: ${OUTPUT_DIR}`);
+  console.log(`CAPTCHA Enabled:  ${captchaEnabled} (Source: src/config/captchaConfig.ts)`);
 
   if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -1283,7 +1298,7 @@ export function generateStaticFallback(): { generatedFiles: string[]; totalBytes
         contentHtml = renderDocumentVaultContent();
         break;
       case "CommunicationCenter":
-        contentHtml = renderCommunicationCenterContent();
+        contentHtml = renderCommunicationCenterContent(captchaEnabled);
         break;
       case "SkillProcessor":
         contentHtml = renderSkillProcessorContent();
@@ -1293,7 +1308,7 @@ export function generateStaticFallback(): { generatedFiles: string[]; totalBytes
         break;
     }
 
-    const fullHtml = renderPage(room.id, contentHtml);
+    const fullHtml = renderPage(room.id, contentHtml, captchaEnabled);
     const filePath = path.join(OUTPUT_DIR, room.filename);
     fs.writeFileSync(filePath, fullHtml, "utf-8");
 

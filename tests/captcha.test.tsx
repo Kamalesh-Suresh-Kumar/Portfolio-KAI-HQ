@@ -5,6 +5,8 @@ import TransmissionForm from "../src/rooms/CommunicationCenter/TransmissionForm"
 import { HCAPTCHA_CONFIG } from "../src/config/captchaConfig";
 import { ExperienceEngineProvider } from "../src/experience-engine/ExperienceEngineProvider";
 
+import { renderCommunicationCenterContent, renderPage } from "../scripts/generate-fallback";
+
 interface MockCaptchaProps {
   sitekey: string;
   theme?: string;
@@ -248,4 +250,48 @@ describe("KAI HQ — Web3Forms hCaptcha Integration Suite", () => {
       expect(screen.getByRole("button", { name: /Transmit Message via Web3Forms/i })).toBeDisabled();
     });
   });
+
+  describe("3. Static Fallback Consistency & Shared Configuration", () => {
+    it("respects HCAPTCHA_CONFIG.enabled default (false) and omits widget, script, and noscript warning", () => {
+      expect(HCAPTCHA_CONFIG.enabled).toBe(false);
+      const fallbackContent = renderCommunicationCenterContent();
+      expect(fallbackContent).not.toContain("h-captcha");
+      expect(fallbackContent).not.toContain("data-captcha");
+      expect(fallbackContent).not.toContain("Security Verification Notice");
+
+      const fullPage = renderPage("CommunicationCenter", fallbackContent);
+      expect(fullPage).not.toContain("https://web3forms.com/client/script.js");
+      expect(fullPage).toContain("action=\"https://api.web3forms.com/submit\"");
+    });
+
+    it("includes widget, script, and noscript explanation when captcha is explicitly enabled", () => {
+      const fallbackContent = renderCommunicationCenterContent(true);
+      expect(fallbackContent).toContain('<div class="h-captcha" data-captcha="true" data-theme="dark"></div>');
+      expect(fallbackContent).toContain("Security Verification Notice:");
+
+      const fullPage = renderPage("CommunicationCenter", fallbackContent, true);
+      expect(fullPage).toContain('<script src="https://web3forms.com/client/script.js" async defer></script>');
+      expect(fullPage).toContain("action=\"https://api.web3forms.com/submit\"");
+    });
+
+    it("never injects CAPTCHA client script into non-CommunicationCenter rooms even if captcha is enabled", () => {
+      const nonCommRooms = [
+        "Lobby",
+        "EngineeringLaboratory",
+        "MemoryArchive",
+        "AchievementHall",
+        "DocumentVault",
+        "SkillProcessor",
+        "MissionControl",
+      ] as const;
+
+      for (const roomId of nonCommRooms) {
+        const fullPage = renderPage(roomId, "<p>Room Content</p>", true);
+        expect(fullPage).not.toContain("web3forms.com/client/script.js");
+        expect(fullPage).not.toContain("h-captcha");
+      }
+    });
+  });
 });
+
+
