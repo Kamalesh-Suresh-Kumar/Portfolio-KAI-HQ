@@ -66,13 +66,20 @@ describe("KAI HQ — Web3Forms hCaptcha Integration Suite", () => {
   });
 
   describe("1. Configuration & Staged Activation Defaults", () => {
-    it("exports public sitekey and staged disabled flag in HCAPTCHA_CONFIG", () => {
+    it("exports public sitekey and active enabled flag in HCAPTCHA_CONFIG", () => {
       expect(HCAPTCHA_CONFIG.siteKey).toBe("50b2fe65-b00b-4b9e-ad62-3ba471098be2");
-      expect(HCAPTCHA_CONFIG.enabled).toBe(false); // Must be false until dashboard activation
+      expect(HCAPTCHA_CONFIG.enabled).toBe(true);
     });
 
-    it("does not render hCaptcha widget by default when captchaEnabled is false", () => {
+    it("renders hCaptcha widget by default when captchaEnabled prop is omitted", () => {
       renderWithEngine(<TransmissionForm recipientEmail="kamalesh.sde@gmail.com" />);
+      expect(screen.getByTestId("mock-hcaptcha-widget")).toBeInTheDocument();
+    });
+
+    it("does not render hCaptcha widget when captchaEnabled is explicitly false", () => {
+      renderWithEngine(
+        <TransmissionForm recipientEmail="kamalesh.sde@gmail.com" captchaEnabled={false} />
+      );
       expect(screen.queryByTestId("mock-hcaptcha-widget")).toBeNull();
     });
 
@@ -257,14 +264,25 @@ describe("KAI HQ — Web3Forms hCaptcha Integration Suite", () => {
   });
 
   describe("3. Static Fallback Consistency & Shared Configuration", () => {
-    it("respects HCAPTCHA_CONFIG.enabled default (false) and omits widget, script, and noscript warning", () => {
-      expect(HCAPTCHA_CONFIG.enabled).toBe(false);
+    it("respects HCAPTCHA_CONFIG.enabled default (true) and includes widget, script, and noscript warning", () => {
+      expect(HCAPTCHA_CONFIG.enabled).toBe(true);
       const fallbackContent = renderCommunicationCenterContent();
+      expect(fallbackContent).toContain("h-captcha");
+      expect(fallbackContent).toContain("data-captcha");
+      expect(fallbackContent).toContain("Security Verification Notice");
+
+      const fullPage = renderPage("CommunicationCenter", fallbackContent);
+      expect(fullPage).toContain("https://web3forms.com/client/script.js");
+      expect(fullPage).toContain("action=\"https://api.web3forms.com/submit\"");
+    });
+
+    it("omits widget, script, and noscript explanation when captcha is explicitly disabled (captchaEnabled = false)", () => {
+      const fallbackContent = renderCommunicationCenterContent(false);
       expect(fallbackContent).not.toContain("h-captcha");
       expect(fallbackContent).not.toContain("data-captcha");
       expect(fallbackContent).not.toContain("Security Verification Notice");
 
-      const fullPage = renderPage("CommunicationCenter", fallbackContent);
+      const fullPage = renderPage("CommunicationCenter", fallbackContent, false);
       expect(fullPage).not.toContain("https://web3forms.com/client/script.js");
       expect(fullPage).toContain("action=\"https://api.web3forms.com/submit\"");
     });
@@ -312,6 +330,10 @@ describe("KAI HQ — Web3Forms hCaptcha Integration Suite", () => {
     it("fails production generation when access key is a known placeholder", () => {
       expect(() => {
         resolveWeb3FormsAccessKey({ isProduction: true, accessKey: "YOUR_ACCESS_KEY_HERE" });
+      }).toThrow(/Never generate a production fallback with placeholder access keys/i);
+
+      expect(() => {
+        resolveWeb3FormsAccessKey({ isProduction: true, accessKey: "your_web3forms_access_key" });
       }).toThrow(/Never generate a production fallback with placeholder access keys/i);
 
       expect(() => {

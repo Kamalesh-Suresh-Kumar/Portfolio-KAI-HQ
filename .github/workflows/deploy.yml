@@ -53,7 +53,7 @@ jobs:
       - name: Production application build
         env:
           VITE_WEB3FORMS_ACCESS_KEY: ${{ secrets.VITE_WEB3FORMS_ACCESS_KEY }}
-        run: npm run build
+        run: npm run generate:fallback -- --production && tsc -b && vite build
 
       - name: Automated bundle budget verification gate
         run: npm run check:bundle

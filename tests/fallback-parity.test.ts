@@ -373,17 +373,17 @@ describe("Static Fallback Knowledge Engine Parity Suite (Phase 6.3.2)", () => {
       expect(html).toContain('<th scope="row">Operational Mode</th>');
     });
 
-    it("verifies static fallback reflects HCAPTCHA_CONFIG state (enabled: false)", () => {
-      expect(HCAPTCHA_CONFIG.enabled).toBe(false);
+    it("verifies static fallback reflects HCAPTCHA_CONFIG state (enabled: true)", () => {
+      expect(HCAPTCHA_CONFIG.enabled).toBe(true);
       const commHtml = readFallbackFile("communication-center.html");
 
-      // When HCAPTCHA_CONFIG.enabled is false:
-      // Excludes widget container, client script, and noscript alert
-      expect(commHtml).not.toContain('<div class="h-captcha"');
-      expect(commHtml).not.toContain("web3forms.com/client/script.js");
-      expect(commHtml).not.toContain("Automated spam protection (hCaptcha) requires JavaScript");
+      // When HCAPTCHA_CONFIG.enabled is true:
+      // Includes widget container, client script, and noscript alert in communication-center.html
+      expect(commHtml).toContain('<div class="h-captcha"');
+      expect(commHtml).toContain("web3forms.com/client/script.js");
+      expect(commHtml).toContain("Automated spam protection (hCaptcha) requires JavaScript");
 
-      // Preserves normal native Web3Forms form submission
+      // Preserves normal native Web3Forms form submission fields
       expect(commHtml).toContain('<form action="https://api.web3forms.com/submit" method="POST"');
       expect(commHtml).toContain('name="access_key"');
       expect(commHtml).toContain('name="name"');
@@ -406,6 +406,15 @@ describe("Static Fallback Knowledge Engine Parity Suite (Phase 6.3.2)", () => {
         const pageHtml = readFallbackFile(page);
         expect(pageHtml).not.toContain("web3forms.com/client/script.js");
       }
+    });
+
+    it("verifies generator omits widget and script when captchaEnabled is explicitly false", () => {
+      const disabledHtml = renderCommunicationCenterContent(false);
+      expect(disabledHtml).not.toContain('<div class="h-captcha"');
+      expect(disabledHtml).not.toContain("Automated spam protection (hCaptcha) requires JavaScript");
+
+      const disabledPage = renderPage("CommunicationCenter", disabledHtml, false);
+      expect(disabledPage).not.toContain("web3forms.com/client/script.js");
     });
 
     it("verifies generator includes widget, script, and noscript notice when captchaEnabled: true", () => {

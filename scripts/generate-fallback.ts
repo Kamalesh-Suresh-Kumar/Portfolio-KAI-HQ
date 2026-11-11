@@ -24,7 +24,6 @@ const OUTPUT_DIR = path.resolve(__dirname, "..", "public", "fallback");
 const ROOT_DIR = path.resolve(__dirname, "..");
 
 const isProduction =
-  process.env.NODE_ENV === "production" ||
   process.env.GITHUB_ACTIONS === "true" ||
   process.argv.includes("--production");
 
@@ -36,6 +35,12 @@ const loadedEnv = {
 };
 
 export const DEV_PLACEHOLDER_ACCESS_KEY = "DEV_ACCESS_KEY_UNSET";
+export const KNOWN_PLACEHOLDER_KEYS = [
+  "YOUR_ACCESS_KEY_HERE",
+  "your_web3forms_access_key",
+  "YOUR_WEB3FORMS_ACCESS_KEY",
+  DEV_PLACEHOLDER_ACCESS_KEY,
+];
 
 export function resolveWeb3FormsAccessKey(options: {
   isProduction?: boolean;
@@ -45,7 +50,11 @@ export function resolveWeb3FormsAccessKey(options: {
   const key = (options.accessKey ?? loadedEnv.VITE_WEB3FORMS_ACCESS_KEY ?? "").trim();
 
   if (prod) {
-    if (!key || key === "YOUR_ACCESS_KEY_HERE" || key === DEV_PLACEHOLDER_ACCESS_KEY) {
+    const isPlaceholder = KNOWN_PLACEHOLDER_KEYS.some(
+      (placeholder) => key.toLowerCase() === placeholder.toLowerCase()
+    );
+
+    if (!key || isPlaceholder) {
       throw new Error(
         "Production build failure: VITE_WEB3FORMS_ACCESS_KEY is required for production static fallback generation. " +
         "Ensure the VITE_WEB3FORMS_ACCESS_KEY secret or environment variable is configured and non-empty. " +

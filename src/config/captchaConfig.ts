@@ -10,5 +10,5 @@ export const HCAPTCHA_CONFIG = {
    * Defaulted to false while Web3Forms dashboard CAPTCHA setting is 'None'.
    * Set to true once CAPTCHA is activated in the Web3Forms dashboard.
    */
-  enabled: false,
+  enabled: true,
 } as const;

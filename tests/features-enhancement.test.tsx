@@ -273,7 +273,9 @@ describe("KAI HQ Feature Enhancement Batch Test Suite", () => {
       });
       globalThis.fetch = fetchMock;
 
-      renderWithEngine(<TransmissionForm recipientEmail="kamalesh.sde@gmail.com" />);
+      renderWithEngine(
+        <TransmissionForm recipientEmail="kamalesh.sde@gmail.com" captchaEnabled={false} />
+      );
 
       fireEvent.change(screen.getByLabelText(/Your Name \/ Organization/i), { target: { value: "Ada Lovelace" } });
       fireEvent.change(screen.getByLabelText(/Return Email Address/i), { target: { value: "ada@example.com" } });
@@ -316,7 +318,9 @@ describe("KAI HQ Feature Enhancement Batch Test Suite", () => {
       });
       globalThis.fetch = fetchMock;
 
-      renderWithEngine(<TransmissionForm recipientEmail="kamalesh.sde@gmail.com" />);
+      renderWithEngine(
+        <TransmissionForm recipientEmail="kamalesh.sde@gmail.com" captchaEnabled={false} />
+      );
 
       fireEvent.change(screen.getByLabelText(/Your Name \/ Organization/i), { target: { value: "Grace Hopper" } });
       fireEvent.change(screen.getByLabelText(/Return Email Address/i), { target: { value: "grace@example.com" } });
