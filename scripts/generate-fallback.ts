@@ -47,9 +47,15 @@ export function resolveWeb3FormsAccessKey(options: {
   accessKey?: string;
 } = {}): string {
   const prod = options.isProduction ?? isProduction;
-  const key = (options.accessKey ?? loadedEnv.VITE_WEB3FORMS_ACCESS_KEY ?? "").trim();
 
   if (prod) {
+    const key = (
+      options.accessKey ??
+      process.env.VITE_WEB3FORMS_ACCESS_KEY ??
+      loadedEnv.VITE_WEB3FORMS_ACCESS_KEY ??
+      ""
+    ).trim();
+
     const isPlaceholder = KNOWN_PLACEHOLDER_KEYS.some(
       (placeholder) => key.toLowerCase() === placeholder.toLowerCase()
     );
@@ -64,8 +70,14 @@ export function resolveWeb3FormsAccessKey(options: {
     return key;
   }
 
-  // Development mode: Return the configured key if present, otherwise safe dev placeholder
-  return key || DEV_PLACEHOLDER_ACCESS_KEY;
+  // Development mode: Return DEV_ACCESS_KEY_UNSET by default so real environment keys
+  // from .env.local or process.env are never embedded into static development fallback HTML.
+  // The optional explicit options.accessKey override is preserved for tests or callers that supply one.
+  if (options.accessKey !== undefined && options.accessKey.trim() !== "") {
+    return options.accessKey.trim();
+  }
+
+  return DEV_PLACEHOLDER_ACCESS_KEY;
 }
 
 /**
