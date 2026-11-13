@@ -1,0 +1,26 @@
+
+# KAI HQ — Docker CI Environment
+# Node.js 24 + Debian Bookworm + Playwright Chromium
+
+FROM node:24-bookworm
+
+WORKDIR /app
+
+# Enable deterministic CI behavior
+ENV CI=true
+
+# Install dependencies using the committed cross-platform lockfile
+COPY package.json package-lock.json ./
+
+RUN npm ci --include=optional
+
+# Install Chromium and its required Linux system dependencies
+RUN npx playwright install --with-deps chromium
+
+# Copy the project source
+COPY . .
+
+# Default working directory
+WORKDIR /app
+
+CMD ["npm", "run", "test:all"]

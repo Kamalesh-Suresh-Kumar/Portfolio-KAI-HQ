@@ -49,12 +49,12 @@ export function resolveWeb3FormsAccessKey(options: {
   const prod = options.isProduction ?? isProduction;
 
   if (prod) {
-    const key = (
-      options.accessKey ??
-      process.env.VITE_WEB3FORMS_ACCESS_KEY ??
-      loadedEnv.VITE_WEB3FORMS_ACCESS_KEY ??
-      ""
-    ).trim();
+    const configuredKey =
+      options.accessKey !== undefined
+        ? options.accessKey
+        : process.env.VITE_WEB3FORMS_ACCESS_KEY ?? loadedEnv.VITE_WEB3FORMS_ACCESS_KEY ?? "";
+
+    const key = configuredKey.trim();
 
     const isPlaceholder = KNOWN_PLACEHOLDER_KEYS.some(
       (placeholder) => key.toLowerCase() === placeholder.toLowerCase()

@@ -322,7 +322,10 @@ describe("KAI HQ — Web3Forms hCaptcha Integration Suite", () => {
       try {
         delete process.env.VITE_WEB3FORMS_ACCESS_KEY;
         expect(() => {
-          resolveWeb3FormsAccessKey({ isProduction: true });
+          resolveWeb3FormsAccessKey({
+            isProduction: true,
+            accessKey: "",
+          });
         }).toThrow(/Production build failure: VITE_WEB3FORMS_ACCESS_KEY is required/i);
 
         expect(() => {
@@ -365,7 +368,9 @@ describe("KAI HQ — Web3Forms hCaptcha Integration Suite", () => {
       const originalEnvKey = process.env.VITE_WEB3FORMS_ACCESS_KEY;
       try {
         process.env.VITE_WEB3FORMS_ACCESS_KEY = "env-prod-access-key-99999";
-        const resolvedFromEnv = resolveWeb3FormsAccessKey({ isProduction: true });
+        const resolvedFromEnv = resolveWeb3FormsAccessKey({
+          isProduction: true,
+        });
         expect(resolvedFromEnv).toBe("env-prod-access-key-99999");
       } finally {
         if (originalEnvKey !== undefined) {
@@ -388,8 +393,10 @@ describe("KAI HQ — Web3Forms hCaptcha Integration Suite", () => {
         const devResolved = resolveWeb3FormsAccessKey({ isProduction: false });
         expect(devResolved).toBe(DEV_PLACEHOLDER_ACCESS_KEY);
 
-        // Also test default without arguments (CLI npm run generate:fallback default)
-        const defaultResolved = resolveWeb3FormsAccessKey();
+        // Explicitly verify development behavior, including when running in CI.
+        const defaultResolved = resolveWeb3FormsAccessKey({
+          isProduction: false,
+        });
         expect(defaultResolved).toBe(DEV_PLACEHOLDER_ACCESS_KEY);
       } finally {
         if (originalEnvKey !== undefined) {

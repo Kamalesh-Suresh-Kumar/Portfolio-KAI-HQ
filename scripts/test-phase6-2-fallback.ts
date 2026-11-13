@@ -44,7 +44,9 @@ console.log("=== KAI HQ Phase 6.2: Static No-JS Fallback Test Suite ===\n");
 // 1. Generator Execution & File Inventory
 console.log("1. Generator Execution & File Inventory");
 {
-  const { generatedFiles, totalBytes } = generateStaticFallback();
+  const { generatedFiles, totalBytes } = generateStaticFallback({
+    isProduction: false,
+  });
   assert(generatedFiles.length >= 9, `Generator produced ${generatedFiles.length} files (expected >= 9)`);
   assert(totalBytes > 50000, `Total generated fallback size is ${(totalBytes / 1024).toFixed(1)} KB (> 50 KB)`);
 
@@ -265,7 +267,9 @@ console.log("\n7. Deterministic Idempotence Check");
   }
 
   // Run generator again
-  generateStaticFallback();
+  generateStaticFallback({
+    isProduction: false,
+  });
 
   let identicalCount = 0;
   for (const file of files) {
