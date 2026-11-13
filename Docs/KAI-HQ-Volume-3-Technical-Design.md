@@ -501,7 +501,7 @@ A lightweight runtime FPS sampler (rolling average over ~2s windows) informs a `
   1. *Bundle Budget Discipline:* GSAP (+65KB gzipped) and Three.js (+400KB gzipped) would severely breach the strict ≤180KB initial JavaScript critical-path budget (NFR-PERF-001).
   2. *Compositor Thread Execution:* Native CSS `transform` and `opacity` properties execute directly on the browser compositor thread with zero runtime garbage-collection pauses.
   3. *Accessibility Parity:* CSS transitions are cleanly and synchronously overridden via `@media (prefers-reduced-motion: reduce)` and the Experience Engine's `reducedMotion` state, ensuring zero-latency compliance with REQ-ACC-002 and Volume 2 §10.
-  4. *Power On Sequence (`BootSequence.tsx`):* Implemented with a deterministic 1.8-second duration (< 3.0s limit per UX-001). Skippable in a single interaction (Escape, Space, Enter, or Click), and immediately bypassed under reduced motion (0ms) or direct facility room deep-linking.
+  4. *Power On Sequence (`BootSequence.tsx`):* Implemented with a deterministic **7.0-second** duration (`BOOT_SEQUENCE_DURATION_MS = 7000`, extended from the earlier 1.8s draft so first-time visitors can read the diagnostic boot steps). Skippable in a single interaction (Escape, Space, Enter, Skip button, or backdrop click), shown once per session, and immediately bypassed under reduced motion (0ms) or direct facility room deep-linking.
 
 ### 11.3 Performance Budget
 

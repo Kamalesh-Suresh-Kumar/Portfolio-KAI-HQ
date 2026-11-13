@@ -48,7 +48,7 @@ The visitor is not "loading a website" — narratively, they are requesting remo
 3. **KAI Online** — KAI greets the visitor (REQ-KAI-001) and offers two paths: browse independently (REQ-NAV-003) or state an intent to KAI (REQ-KAI-004).
 4. **Free Exploration** — the visitor moves through rooms at will for the remainder of the session.
 
-**Design constraint UX-001:** The Power On sequence must be skippable within 1 interaction (tap/click/Esc) and must never exceed 3 seconds even if not skipped, to protect US-01's 60-second budget. *(Traces to REQ-NAV-001, NFR-PERF-001.)*
+**Design constraint UX-001:** The Power On sequence must be skippable within 1 interaction (tap/click/Esc) and originally specified a 3-second maximum ceiling even if not skipped, to protect US-01's 60-second budget. *(Traces to REQ-NAV-001, NFR-PERF-001.)* **Post-Phase 4 Update:** The unskipped first-visit Power On sequence was intentionally extended from 1.8s to **7.0s** (`BOOT_SEQUENCE_DURATION_MS = 7000`) so visitors can read all four diagnostic steps, while preserving instant 1-interaction skip, session-only display, deep-link bypass, and 0ms reduced-motion bypass.
 
 ---
 

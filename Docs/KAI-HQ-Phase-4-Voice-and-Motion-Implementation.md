@@ -27,7 +27,7 @@
 
 Phase 4 introduces two high-impact sensory and narrative enhancements to KAI HQ:
 1. **The Voice Layer:** Client-side speech recognition (`SpeechRecognition`) and text-to-speech synthesis (`SpeechSynthesis`), engineered as strictly progressive, non-blocking enhancements with an explicit privacy-consent boundary.
-2. **The Motion & Power On Experience:** A deterministic cybernetic boot sequence (`BootSequence.tsx`) satisfying UX-001 (< 3.0s duration, 1-interaction skip), supported by native compositor-thread CSS transitions and an instantaneous 0ms bypass under reduced-motion preferences.
+2. **The Motion & Power On Experience:** A deterministic cybernetic boot sequence (`BootSequence.tsx`) tuned to a readable **7.0-second** duration (expanded from the earlier 1.8s prototype; skippable in 1 interaction), supported by native compositor-thread CSS transitions and an instantaneous 0ms bypass under reduced-motion preferences.
 
 All functionality is achieved with **0 KB external motion/audio dependencies** (GSAP and Three.js formally excluded via ADR-04), preserving the production bundle at **122.16 KB gzipped JavaScript** (32.1% under the ≤ 180 KB budget) and **15.31 KB gzipped CSS**.
 
@@ -40,7 +40,7 @@ All functionality is achieved with **0 KB external motion/audio dependencies** (
 - **Informed Consent Protocol:** Explicit visitor consent dialog prior to engaging any cloud-assisted browser recognition engine.
 - **Instance-Bound Lifecycle Hardening:** Guaranteed prevention of stale transcript emission or delayed callback leakage using instance-bound session tokens (`ActiveSpeechSession`).
 - **Text-to-Speech (TTS):** Dynamic voice resolution, asynchronous `onvoiceschanged` cache loading, natural English voice prioritization, sanitization of markdown and code symbols (`cleanTextForSpeech`), and audio bleed prevention on navigation.
-- **Power On Sequence:** Deterministic 1.8-second initialization terminal displaying progress and facility diagnostics, skippable via Escape, Space/Enter (non-input), or Skip button.
+- **Power On Sequence:** Deterministic 7.0-second initialization terminal displaying readable progress and facility diagnostics, skippable via Escape, Space/Enter (non-input), click-on-backdrop, or Skip button.
 - **Deep-Link Bypass:** Direct room or entity URLs immediately bypass boot animation to guarantee instant access.
 - **Reduced Motion Parity:** Immediate 0ms resolution for visitors with `prefers-reduced-motion` enabled.
 
@@ -60,7 +60,7 @@ All functionality is achieved with **0 KB external motion/audio dependencies** (
 │                                                                        │
 │  ┌─────────────────────────┐         ┌──────────────────────────────┐  │
 │  │   BootSequence.tsx      │         │   ExperienceEngineProvider   │  │
-│  │   (UX-001, 1.8s, Skip)  │         │   (Central State Mediator)   │  │
+│  │   (REQ-NAV-001,7.0s,Skip)│         │   (Central State Mediator)   │  │
 │  └────────────┬────────────┘         └──────────────┬───────────────┘  │
 │               │                                     │                  │
 │               ▼                                     ▼                  │
@@ -206,14 +206,14 @@ interface ActiveSpeechSession {
 
 ## 9. Power On Sequence Architecture
 
-The Power On sequence (`src/components/system-feedback/BootSequence.tsx`) fulfills `REQ-NAV-001` and `UX-001`:
+The Power On sequence (`src/components/system-feedback/BootSequence.tsx`, configured via `src/components/system-feedback/bootConfig.ts`) fulfills `REQ-NAV-001` and `UX-001` (with the unskipped sequence intentionally extended from the earlier 1.8s / `< 3.0s` draft to 7.0s so first-time visitors can read the diagnostic steps, while retaining immediate 1-interaction skip):
 
-- **Planned Duration:** Exactly 1.8 seconds (well below the strict 3.0s threshold).
+- **Planned Duration:** 7.0 seconds (`BOOT_SEQUENCE_DURATION_MS = 7000`), plus brief 150ms completion hold and 250ms exit fade.
 - **Diagnostics Progression:**
-  - `0.0s - 0.4s` [20%] Gateway handshake & latency diagnostics.
-  - `0.4s - 0.8s` [50%] Knowledge Engine mount (4 projects, 20 skills, 4 resumes).
-  - `0.8s - 1.2s` [80%] Spatial route table & 8 facilities mounted.
-  - `1.2s - 1.8s` [100%] Neural interface lock & readiness.
+  - `0.0s - 1.4s` [20%] `NET_INIT` — Gateway handshake & latency diagnostics.
+  - `1.4s - 3.5s` [50%] `DATA_SYNC` — Knowledge Engine mount (4 projects, 20 skills, 4 resumes, 5 credentials).
+  - `3.5s - 5.6s` [80%] `FACILITY_MOUNT` — Spatial route table & 8 facilities mounted.
+  - `5.6s - 7.0s` [100%] `KAI_READY` — Neural interface lock & readiness.
 - **One-Interaction Skip:**
   - `Escape`: Unconditionally dismisses sequence.
   - `Skip Button`: Keyboard accessible (`tabIndex={0}`, focus ring, touch target $\ge 40\text{px}$).
@@ -269,7 +269,7 @@ dist/assets/index-DR8pBAa_.js   436.29 kB │ gzip: 122.16 kB
 |---|:---:|:---:|:---:|:---:|
 | **Initial JS Bundle (gzip)** | ≤ 180.00 KB | **122.16 KB** | **-57.84 KB (32.1%)** | **PASSED** |
 | **CSS Bundle (gzip)** | ≤ 25.00 KB | **15.31 KB** | **-9.69 KB (38.8%)** | **PASSED** |
-| **Boot Sequence Duration** | ≤ 3.00 s | **1.80 s** | **-1.20 s (40.0%)** | **PASSED** |
+| **Boot Sequence Duration** | 5.00 s – 9.00 s (skippable in 1 interaction) | **7.00 s** | **Readable pacing (supersedes 1.8s)** | **PASSED** |
 | **Reduced-Motion Boot** | 0.00 s | **0.00 s** | **0.00 s (Instant)** | **PASSED** |
 
 ### Critical Path vs. Total JS
@@ -307,7 +307,7 @@ Because KAI HQ is architected as an instantaneous simulation facility, all 8 roo
 | `src/assistant/speechAdapter.ts` | Voice Engine | Web Speech API wrapper, privacy modes, consent tracking, instance session lifecycle, text cleaning. |
 | `src/components/assistant/AssistantInput.tsx` | Assistant UI | Mic button, explicit consent dialog, privacy badge, global Escape handler, unmount abort. |
 | `src/components/assistant/assistant.css` | Styling | High-contrast consent prompt styling, mic pulse rings, reduced-motion overrides. |
-| `src/components/system-feedback/BootSequence.tsx` | System Feedback | 1.8s power on terminal, progress bar, 1-key skip, input typing protection, focus restoration. |
+| `src/components/system-feedback/BootSequence.tsx` | System Feedback | 7.0s power on terminal, progress bar, 1-key skip, input typing protection, timer cleanup, focus restoration. |
 | `src/components/system-feedback/boot-sequence.css` | Styling | Cybernetic initialization layout (`z-index: 2500`), mobile responsiveness, reduced-motion hide. |
 | `src/app/HeadquartersShell.tsx` | Application Shell | `sessionStorage` boot persistence, deep-link boot bypass logic, reduced-motion bypass. |
 | `src/experience-engine/ExperienceEngineProvider.tsx` | State Mediator | Cancels speech synthesis on `changeRoom()` and `popstate` navigation. |
@@ -355,7 +355,7 @@ The compatibility status in this specification reflects structural code design, 
 
 | Environment / Browser | Engine | Speech Recognition (STT) Status | Speech Synthesis (TTS) Status | Motion & Power On Status | Physical QA Status |
 |---|---|---|---|---|:---:|
-| **Headless Node.js (CI / Test Runner)** | V8 | **Verified by automated tests:** Feature detection returns strict boolean `false`; degrades safely without unhandled exceptions. | **Verified by automated tests:** Feature detection returns strict boolean `false`; execution degrades cleanly. | **Verified by automated tests:** 1.8s duration budget, input typing protection, and deep-link bypass asserted. | **PASS (Automated Unit Tests)** |
+| **Headless Node.js (CI / Test Runner)** | V8 | **Verified by automated tests:** Feature detection returns strict boolean `false`; degrades safely without unhandled exceptions. | **Verified by automated tests:** Feature detection returns strict boolean `false`; execution degrades cleanly. | **Verified by automated tests:** 7.0s duration target (5–9s range), input typing protection, and deep-link bypass asserted. | **PASS (Automated Unit Tests)** |
 | **Google Chrome (Desktop / Android)** | Chromium | **Browser-dependent:** Web Speech API supported. Requires explicit visitor consent unless native on-device model is exposed and installed. | **Browser-dependent:** Supported via native synthesis engine; selects English voices when available. | **Architectural design:** Compositor-thread CSS keyframes; instantaneous bypass under reduced motion. | **NOT PERFORMED (No physical browser/mic QA)** |
 | **Microsoft Edge** | Chromium | **Browser-dependent:** Web Speech API supported; routes to Microsoft speech services with explicit consent requirement. | **Browser-dependent:** Supported via Windows/Edge synthesis voices. | **Architectural design:** Compositor-thread CSS keyframes; instantaneous bypass under reduced motion. | **NOT PERFORMED (No physical browser/mic QA)** |
 | **Mozilla Firefox** | Gecko | **Browser-dependent:** SpeechRecognition unsupported by default; gracefully falls back to text typing. | **Browser-dependent:** Supported via operating system speech synthesis voices. | **Architectural design:** Compositor-thread CSS keyframes; instantaneous bypass under reduced motion. | **NOT PERFORMED (No physical browser/mic QA)** |
@@ -383,7 +383,7 @@ The compatibility status in this specification reflects structural code design, 
 
 | Requirement ID | UX / Spec ID | Implementation Component | Verification Check | Status |
 |---|---|---|---|:---:|
-| `REQ-NAV-001` | `UX-001` | `src/components/system-feedback/BootSequence.tsx` | Test: Duration = 1800ms (< 3000ms), 1-key skip | **PASS** |
+| `REQ-NAV-001` | `UX-001` (updated) | `src/components/system-feedback/BootSequence.tsx` | Test: Duration = 7000ms (5–9s readable pacing), 1-interaction skip | **PASS** |
 | `REQ-KAI-003` | Volume 2 §4 | `src/assistant/speechAdapter.ts`, `AssistantInput.tsx` | Test: Explicit consent prompt, STT/TTS | **PASS** |
 | `REQ-ACC-002` | `UX-007` | `globals.css`, `boot-sequence.css`, `BootSequence.tsx` | Test: 0ms bypass under reduced motion | **PASS** |
 | `NFR-PERF-001` | Volume 3 §11 | `vite.config.ts`, ADR-04 | Build: 122.16 KB JS gzip (≤ 180 KB budget) | **PASS** |

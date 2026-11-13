@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Terminal, Shield, FastForward } from "lucide-react";
+import {
+  BOOT_SEQUENCE_DURATION_MS,
+  BOOT_COMPLETION_HOLD_MS,
+  BOOT_EXIT_TRANSITION_MS,
+} from "./bootConfig";
 import "./boot-sequence.css";
 
 interface BootSequenceProps {
@@ -51,13 +56,41 @@ export default function BootSequence({ onComplete, reducedMotion = false }: Boot
   const [isExiting, setIsExiting] = useState(false);
   const skipBtnRef = useRef<HTMLButtonElement>(null);
   const hasFinishedRef = useRef(false);
+  const isMountedRef = useRef(true);
+  const completionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Track mount lifecycle and clean up any pending timeouts on unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      hasFinishedRef.current = false;
+      if (completionTimerRef.current !== null) {
+        clearTimeout(completionTimerRef.current);
+        completionTimerRef.current = null;
+      }
+      if (exitTimerRef.current !== null) {
+        clearTimeout(exitTimerRef.current);
+        exitTimerRef.current = null;
+      }
+    };
+  }, []);
 
   // Complete and unmount with subtle transition
   const finishSequence = useCallback(() => {
-    if (hasFinishedRef.current) return;
+    if (hasFinishedRef.current || !isMountedRef.current) return;
     hasFinishedRef.current = true;
+
+    if (completionTimerRef.current !== null) {
+      clearTimeout(completionTimerRef.current);
+      completionTimerRef.current = null;
+    }
+
     setIsExiting(true);
-    setTimeout(() => {
+    exitTimerRef.current = setTimeout(() => {
+      exitTimerRef.current = null;
+      if (!isMountedRef.current) return;
       onComplete();
       // Restore focus to the main landmark for seamless keyboard navigation
       if (typeof document !== "undefined") {
@@ -66,10 +99,10 @@ export default function BootSequence({ onComplete, reducedMotion = false }: Boot
           mainContent.focus();
         }
       }
-    }, reducedMotion ? 0 : 250);
+    }, reducedMotion ? 0 : BOOT_EXIT_TRANSITION_MS);
   }, [onComplete, reducedMotion]);
 
-  // Reduced motion bypasses sequence immediately per UX-001 / REQ-ACC-002
+  // Reduced motion bypasses sequence immediately per REQ-ACC-002
   useEffect(() => {
     if (reducedMotion) {
       finishSequence();
@@ -78,8 +111,10 @@ export default function BootSequence({ onComplete, reducedMotion = false }: Boot
 
   // Focus skip button on mount for accessibility
   useEffect(() => {
-    skipBtnRef.current?.focus();
-  }, []);
+    if (!reducedMotion) {
+      skipBtnRef.current?.focus();
+    }
+  }, [reducedMotion]);
 
   // Keyboard skip listener: Escape predictability, Space/Enter only when appropriate
   useEffect(() => {
@@ -112,30 +147,44 @@ export default function BootSequence({ onComplete, reducedMotion = false }: Boot
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [finishSequence]);
 
-  // Deterministic timed sequence: 0 to 100% in exactly 1.8 seconds (< 3.0s constraint)
+  // Deterministic timed sequence: 0 to 100% in BOOT_SEQUENCE_DURATION_MS (7.0 seconds)
   useEffect(() => {
     if (reducedMotion) return;
 
     const startTime = performance.now();
-    const duration = 1800; // 1.8 seconds
+    const duration = BOOT_SEQUENCE_DURATION_MS;
 
-    let frameId: number;
+    let frameId: number | null = null;
 
     const tick = (now: number) => {
-      const elapsed = now - startTime;
+      if (!isMountedRef.current || hasFinishedRef.current) return;
+
+      const elapsed = Math.max(0, now - startTime);
       const pct = Math.min(100, Math.round((elapsed / duration) * 100));
       setProgress(pct);
 
       if (pct < 100) {
         frameId = requestAnimationFrame(tick);
       } else {
-        setTimeout(finishSequence, 150);
+        frameId = null;
+        completionTimerRef.current = setTimeout(() => {
+          completionTimerRef.current = null;
+          finishSequence();
+        }, BOOT_COMPLETION_HOLD_MS);
       }
     };
 
     frameId = requestAnimationFrame(tick);
 
-    return () => cancelAnimationFrame(frameId);
+    return () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId);
+      }
+      if (completionTimerRef.current !== null) {
+        clearTimeout(completionTimerRef.current);
+        completionTimerRef.current = null;
+      }
+    };
   }, [reducedMotion, finishSequence]);
 
   if (reducedMotion) return null;

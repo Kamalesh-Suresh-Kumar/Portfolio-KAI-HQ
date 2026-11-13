@@ -7,6 +7,7 @@
 import { speechAdapter } from "../src/assistant/speechAdapter";
 import { knowledgeEngine } from "../src/knowledge-engine";
 import { buildPath, parsePath } from "../src/experience-engine/routeHelper";
+import { BOOT_SEQUENCE_DURATION_MS } from "../src/components/system-feedback/bootConfig";
 import type { Room } from "../src/experience-engine/ExperienceEngineContext";
 
 function assert(condition: boolean, message: string) {
@@ -191,12 +192,13 @@ console.log("\n3. Speech Recognition State Machine, Privacy & Error Handling Tes
 // 4. Power On / Boot Sequence Constraints & Keyboard Logic
 console.log("\n4. Power On / Boot Sequence Constraints, Keyboard Logic & Deep Link Tests");
 {
-  const targetDurationMs = 1800;
-  const maxAllowedDurationMs = 3000;
+  const minReadableDurationMs = 5000;
+  const maxAllowedDurationMs = 9000;
 
   assert(
-    targetDurationMs < maxAllowedDurationMs,
-    `BootSequence planned duration (${targetDurationMs}ms) strictly obeys UX-001 constraint (< ${maxAllowedDurationMs}ms)`
+    BOOT_SEQUENCE_DURATION_MS >= minReadableDurationMs &&
+      BOOT_SEQUENCE_DURATION_MS <= maxAllowedDurationMs,
+    `BootSequence planned duration (${BOOT_SEQUENCE_DURATION_MS}ms) lies within readable 5-9s range (${minReadableDurationMs}-${maxAllowedDurationMs}ms)`
   );
 
   // Verify that in reduced motion mode, duration is instantaneous (0ms)

@@ -1,6 +1,6 @@
 /* ==========================================================================
    KAI HQ — Power On / Boot Sequence Stylesheet (REQ-NAV-001 & UX-001)
-   Lightweight, performant, skippable in 1 interaction, strictly <= 3.0s.
+   Lightweight, performant, skippable in 1 interaction (~7.0s full sequence).
    ========================================================================== */
 
 .kai-boot-backdrop {
