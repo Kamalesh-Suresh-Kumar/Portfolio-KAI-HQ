@@ -125,11 +125,6 @@ export default function HeroSection() {
           </div>
 
           <div className="hero-title-lockup">
-            <img
-              src={resolveAssetUrl("/assets/kai-hq-logo.svg")}
-              alt="KAI HQ Primary Logo"
-              className="hero-logo-img"
-            />
             <div className="hero-title-text-wrap">
               <h1 className="hero-title">
                 KAI HQ
